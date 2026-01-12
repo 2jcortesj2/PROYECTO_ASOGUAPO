@@ -15,12 +15,18 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ---
 
-## [0.1.0] - Por definir
+## [0.1.0] - 2026-01-12
 
-### Planeado
-- Pantalla de lista de contadores
-- Pantalla de registro de lectura con cámara
-- Pantalla de confirmación
-- Pantalla de historial con exportación CSV
-- Almacenamiento local SQLite
-- Captura de GPS automático
+### Agregado
+- **Prototipo UI Flutter completo:** Implementación de las 4 pantallas principales.
+- **Sistema de Temas:** Configuración de Material 3 con alto contraste para exteriores.
+- **Modelos de Datos:** Definición de clases `Contador` y `Lectura` con serialización.
+- **Navegación:** Flujo completo entre lista, registro, confirmación e historial.
+- **Widgets Personalizados:** `BotonPrincipal`, `ContadorCard`, `LecturaInput` y `GpsIndicator`.
+- **Documentación:** Manual de usuario y manual técnico iniciales.
+- **Estructura Git:** Configuración de ramas `main`/`dev` y flujo de trabajo.
+
+### Planeado para Fase 3
+- Implementación de persistencia local con SQFLite.
+- Integración de cámara nativa y captura de coordenadas GPS reales.
+- Lógica de exportación de archivos CSV reales.
