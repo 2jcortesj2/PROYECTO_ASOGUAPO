@@ -36,13 +36,16 @@ Al abrir la app verás la lista de todos los contadores de tu zona.
 
 **Pasos:**
 
-1. **Apunta la cámara** al contador hasta que se vea claramente
-2. **Toca el botón circular blanco** para tomar la foto
+1. **Toca el botón circular** para abrir la cámara
+2. **Apunta al contador** y toma la foto
 3. **Ingresa la lectura** en el campo numérico grande
-4. **Verifica** que el GPS esté activo (ícono verde)
+4. **Verifica** que el GPS esté activo (ícono verde con coordenadas)
 5. **Toca "GUARDAR LECTURA"**
 
-> ⚠️ **Importante:** No guardes si el GPS muestra error (ícono rojo)
+> ⚠️ **Importante:** 
+> - Si el GPS muestra error, toca el ícono de reintentar
+> - La foto se guarda automáticamente en tu dispositivo
+> - Puedes volver a tomar la foto tocando el botón de refresh
 
 ---
 

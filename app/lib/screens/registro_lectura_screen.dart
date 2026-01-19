@@ -4,13 +4,15 @@ import '../config/theme.dart';
 import '../config/constants.dart';
 import '../models/contador.dart';
 import '../models/lectura.dart';
+import '../services/camera_service.dart';
+import '../services/gps_service.dart';
 import '../widgets/boton_principal.dart';
 import '../widgets/lectura_input.dart';
 import '../widgets/gps_indicator.dart';
 import 'confirmacion_screen.dart';
 
 /// Pantalla de registro de lectura
-/// Incluye cámara, input de lectura y GPS
+/// Incluye cámara real, input de lectura y GPS real
 class RegistroLecturaScreen extends StatefulWidget {
   final Contador contador;
 
@@ -22,30 +24,45 @@ class RegistroLecturaScreen extends StatefulWidget {
 
 class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
   final TextEditingController _lecturaController = TextEditingController();
+  final CameraService _cameraService = CameraService();
+  final GpsService _gpsService = GpsService();
 
   String? _fotoPath;
   bool _gpsActivo = false;
   bool _obteniendoGps = true;
   double? _latitud;
   double? _longitud;
+  String? _gpsError;
   bool _guardando = false;
   String? _errorLectura;
+  bool _capturandoFoto = false;
 
   @override
   void initState() {
     super.initState();
-    _simularGps();
+    _obtenerGps();
   }
 
-  // Simula la obtención de GPS para el prototipo
-  Future<void> _simularGps() async {
-    await Future.delayed(const Duration(seconds: 2));
+  /// Obtiene la ubicación GPS real
+  Future<void> _obtenerGps() async {
+    setState(() {
+      _obteniendoGps = true;
+      _gpsError = null;
+    });
+
+    final result = await _gpsService.getCurrentLocation();
+
     if (mounted) {
       setState(() {
-        _gpsActivo = true;
         _obteniendoGps = false;
-        _latitud = 4.5923;
-        _longitud = -74.0836;
+        if (result.success) {
+          _gpsActivo = true;
+          _latitud = result.latitude;
+          _longitud = result.longitude;
+        } else {
+          _gpsActivo = false;
+          _gpsError = result.errorMessage;
+        }
       });
     }
   }
@@ -59,7 +76,8 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
   bool get _puedeGuardar {
     return _fotoPath != null &&
         _lecturaController.text.isNotEmpty &&
-        !_guardando;
+        !_guardando &&
+        !_capturandoFoto;
   }
 
   @override
@@ -117,13 +135,25 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
                       GpsIndicator(
                         activo: _gpsActivo,
                         obteniendo: _obteniendoGps,
-                        coordenadas: _gpsActivo ? 'GPS Activo' : null,
-                        onRetry: _gpsActivo ? null : _simularGps,
+                        coordenadas: _gpsActivo
+                            ? '${_latitud?.toStringAsFixed(4)}, ${_longitud?.toStringAsFixed(4)}'
+                            : null,
+                        onRetry: _gpsActivo ? null : _obtenerGps,
                       ),
                       const SizedBox(width: 16),
                       FechaIndicator(fecha: DateTime.now()),
                     ],
                   ),
+
+                  // Mostrar error de GPS si existe
+                  if (_gpsError != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _gpsError!,
+                      style: TextStyle(color: AppColors.error, fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
 
                   const SizedBox(height: 20),
 
@@ -161,19 +191,26 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
           else
             Container(
               color: Colors.grey[900],
-              child: const Center(
+              child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.camera_alt_outlined,
+                      _capturandoFoto
+                          ? Icons.hourglass_top
+                          : Icons.camera_alt_outlined,
                       size: 64,
                       color: Colors.white54,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Text(
-                      'Vista de cámara',
-                      style: TextStyle(color: Colors.white54, fontSize: 16),
+                      _capturandoFoto
+                          ? 'Abriendo cámara...'
+                          : 'Toca el botón para tomar foto',
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 16,
+                      ),
                     ),
                   ],
                 ),
@@ -181,7 +218,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
             ),
 
           // Marco guía
-          if (_fotoPath == null)
+          if (_fotoPath == null && !_capturandoFoto)
             Container(
               width: 200,
               height: 150,
@@ -230,12 +267,12 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
           Positioned(
             bottom: 20,
             child: GestureDetector(
-              onTap: _tomarFoto,
+              onTap: _capturandoFoto ? null : _tomarFoto,
               child: Container(
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: _capturandoFoto ? Colors.grey : Colors.white,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors.white.withValues(alpha: 0.3),
@@ -248,11 +285,19 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
                     ),
                   ],
                 ),
-                child: Icon(
-                  _fotoPath != null ? Icons.refresh : Icons.camera_alt,
-                  size: 32,
-                  color: AppColors.textPrimary,
-                ),
+                child: _capturandoFoto
+                    ? const Center(
+                        child: SizedBox(
+                          width: 32,
+                          height: 32,
+                          child: CircularProgressIndicator(strokeWidth: 3),
+                        ),
+                      )
+                    : Icon(
+                        _fotoPath != null ? Icons.refresh : Icons.camera_alt,
+                        size: 32,
+                        color: AppColors.textPrimary,
+                      ),
               ),
             ),
           ),
@@ -261,21 +306,39 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
     );
   }
 
-  void _tomarFoto() {
-    // Simulación para prototipo - en producción usar image_picker
-    setState(() {
-      // Simula que se tomó una foto
-      _fotoPath = '/path/to/simulated/photo.jpg';
-    });
+  /// Captura una foto real usando el servicio de cámara
+  Future<void> _tomarFoto() async {
+    setState(() => _capturandoFoto = true);
 
-    // Feedback visual
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('📷 Foto capturada'),
-        duration: Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    final path = await _cameraService.capturePhoto();
+
+    if (mounted) {
+      setState(() {
+        _capturandoFoto = false;
+        if (path != null) {
+          _fotoPath = path;
+        }
+      });
+
+      if (path != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('📷 Foto capturada exitosamente'),
+            duration: Duration(seconds: 1),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('❌ No se pudo capturar la foto'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _guardarLectura() async {
@@ -299,8 +362,8 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
 
     setState(() => _guardando = true);
 
-    // Simular guardado
-    await Future.delayed(const Duration(milliseconds: 800));
+    // Pequeña pausa para feedback visual
+    await Future.delayed(const Duration(milliseconds: 300));
 
     // Crear registro de lectura
     final registro = Lectura(

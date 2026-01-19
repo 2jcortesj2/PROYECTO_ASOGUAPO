@@ -15,6 +15,22 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ---
 
+## [0.2.0] - 2026-01-19
+
+### Agregado
+- **Captura de foto real:** Integración con `image_picker` para usar la cámara del dispositivo.
+- **GPS real:** Integración con `geolocator` para obtener coordenadas de ubicación.
+- **Servicios:** Nueva capa de servicios (`camera_service.dart`, `gps_service.dart`).
+- **Permisos Android:** Configuración de permisos de cámara, ubicación y almacenamiento.
+- **Manejo de errores:** Feedback visual para errores de GPS y cámara.
+
+### Cambios
+- `registro_lectura_screen.dart`: Ahora usa servicios reales en lugar de simulaciones.
+- `AndroidManifest.xml`: Permisos agregados para cámara y GPS.
+- `pubspec.yaml`: Nuevas dependencias (`image_picker`, `geolocator`, `permission_handler`, `path_provider`).
+
+---
+
 ## [0.1.0] - 2026-01-19
 
 ### Agregado
