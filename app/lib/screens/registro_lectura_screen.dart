@@ -88,7 +88,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, -2),
                   ),
@@ -187,7 +187,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
               height: 150,
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(8),
@@ -238,12 +238,12 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
                   color: Colors.white,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha: 0.3),
                     width: 4,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 10,
                     ),
                   ],

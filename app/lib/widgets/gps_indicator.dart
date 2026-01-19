@@ -70,9 +70,9 @@ class GpsIndicator extends StatelessWidget {
   }
 
   Color _getBackgroundColor() {
-    if (obteniendo) return AppColors.primary.withOpacity(0.1);
-    if (activo) return AppColors.success.withOpacity(0.1);
-    return AppColors.error.withOpacity(0.1);
+    if (obteniendo) return AppColors.primary.withValues(alpha: 0.1);
+    if (activo) return AppColors.success.withValues(alpha: 0.1);
+    return AppColors.error.withValues(alpha: 0.1);
   }
 
   Color _getIconColor() {
@@ -107,7 +107,7 @@ class FechaIndicator extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.textSecondary.withOpacity(0.1),
+        color: AppColors.textSecondary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

@@ -108,7 +108,6 @@ class AppTheme {
         secondary: AppColors.secondary,
         error: AppColors.error,
         surface: AppColors.surface,
-        background: AppColors.background,
       ),
 
       // Scaffold
