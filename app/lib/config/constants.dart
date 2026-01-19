@@ -1,5 +1,4 @@
 /// Constantes globales de la aplicación AguaLector
-
 class AppConstants {
   // Nombre de la app
   static const String appName = 'AguaLector';
