@@ -15,7 +15,7 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ---
 
-## [0.1.0] - 2026-01-12
+## [0.1.0] - 2026-01-19
 
 ### Agregado
 - **Prototipo UI Flutter completo:** Implementación de las 4 pantallas principales.
@@ -23,8 +23,14 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Modelos de Datos:** Definición de clases `Contador` y `Lectura` con serialización.
 - **Navegación:** Flujo completo entre lista, registro, confirmación e historial.
 - **Widgets Personalizados:** `BotonPrincipal`, `ContadorCard`, `LecturaInput` y `GpsIndicator`.
-- **Documentación:** Manual de usuario y manual técnico iniciales.
-- **Estructura Git:** Configuración de ramas `main`/`dev` y flujo de trabajo.
+- **Documentación:** Manual de usuario, manual técnico y **guía de testing**.
+- **Estructura Git:** Configuración de ramas `main`/`dev` y flujo de trabajo simplificado.
+
+### Corregido
+- **Pruebas:** Corregida referencia a `AguaLectorApp` en `widget_test.dart` y añadidos escenarios reales.
+- **Mantenimiento:** Migrados métodos obsoletos (`withOpacity` -> `withValues`) para compatibilidad con Flutter 3.27+.
+- **Tema:** Eliminados parámetros de color obsoletos en `ColorScheme`.
+- **Documentación:** Corregidos comentarios dangling en archivo de constantes.
 
 ### Planeado para Fase 3
 - Implementación de persistencia local con SQFLite.

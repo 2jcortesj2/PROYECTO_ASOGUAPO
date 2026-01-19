@@ -24,6 +24,7 @@ Al abrir la app verás la lista de todos los contadores de tu zona.
 **Indicadores de estado:**
 - ⚪ Gris = Pendiente de lectura
 - ✅ Verde = Lectura completada
+- 🟠 Naranja = Error en el contador / lectura previa irregular
 
 **Para buscar:** Usa la barra de búsqueda en la parte superior.
 

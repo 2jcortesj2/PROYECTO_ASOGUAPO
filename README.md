@@ -41,10 +41,21 @@ PROYECTO_ASOGUAPO/
 │   └── pubspec.yaml
 ├── docs/                   # Documentación
 │   ├── manual_usuario.md
-│   └── manual_tecnico.md
+│   ├── manual_tecnico.md
+│   └── TESTING.md          # Guía de pruebas
 ├── .gitignore
 ├── CHANGELOG.md
 └── README.md
+```
+
+## 🧪 Pruebas
+
+El proyecto incluye una guía de testing detallada en [docs/TESTING.md](docs/TESTING.md) que cubre análisis estático y casos de prueba manuales.
+
+Para ejecutar pruebas automáticas:
+```bash
+cd app
+flutter test
 ```
 
 ## 🚀 Instalación

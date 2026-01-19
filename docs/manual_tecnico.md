@@ -46,9 +46,18 @@ app/
 │   └── utils/
 │       └── formatters.dart
 ├── android/
+├── test/
+│   └── widget_test.dart       # Pruebas de UI
+├── docs/
+│   ├── manual_usuario.md
+│   ├── manual_tecnico.md
+│   └── TESTING.md             # Guía de testing
 ├── pubspec.yaml
 └── pubspec.lock
 ```
+
+> [!NOTE]
+> En esta versión (v0.1.0 Prototipo UI), los servicios de Cámara, GPS y Base de Datos están **simulados** mediante lógica interna para demostrar el flujo de usuario sin requerir hardware real o persistencia.
 
 ---
 
