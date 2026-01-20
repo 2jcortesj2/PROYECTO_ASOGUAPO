@@ -387,15 +387,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
         }
       });
 
-      if (path != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('📷 Foto capturada exitosamente'),
-            duration: Duration(seconds: 1),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      } else {
+      if (path == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('❌ No se pudo capturar la foto'),
