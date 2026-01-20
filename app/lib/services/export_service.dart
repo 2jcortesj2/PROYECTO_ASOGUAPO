@@ -18,27 +18,41 @@ class ExportService {
 
       List<List<dynamic>> csvData = [
         [
-          'ID_CONTADOR',
-          'NOMBRE_USUARIO',
+          'CODIGO_CONCATENADO',
+          'NOMBRE_COMPLETO',
           'VEREDA',
-          'LECTURA',
-          'FECHA',
-          'HORA',
+          'LECTURA_ANTERIOR',
+          'LECTURA_ACTUAL',
+          'CONSUMO',
+          'FECHA_LECTURA',
+          'HORA_LECTURA',
           'LATITUD',
           'LONGITUD',
+          'RUTA_FOTO',
         ],
       ];
 
+      // Obtener contadores para tener la lectura anterior
+      final contadores = await _databaseService.getContadores();
+      final contadoresMap = {for (var c in contadores) c.id: c};
+
       for (var lectura in lecturas) {
+        final contador = contadoresMap[lectura.contadorId];
+        final lecturaAnterior = contador?.ultimaLectura ?? 0;
+        final consumo = lectura.lectura - lecturaAnterior;
+
         csvData.add([
           lectura.contadorId,
           lectura.nombreUsuario,
           lectura.vereda,
-          lectura.lectura,
+          lecturaAnterior.toStringAsFixed(0),
+          lectura.lectura.toStringAsFixed(0),
+          consumo.toStringAsFixed(0),
           DateFormat('yyyy-MM-dd').format(lectura.fecha),
           DateFormat('HH:mm:ss').format(lectura.fecha),
-          lectura.latitud ?? '',
-          lectura.longitud ?? '',
+          lectura.latitud?.toStringAsFixed(6) ?? '',
+          lectura.longitud?.toStringAsFixed(6) ?? '',
+          lectura.fotoPath,
         ]);
       }
 
