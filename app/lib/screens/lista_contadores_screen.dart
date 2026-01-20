@@ -428,6 +428,12 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
                           'Hora exacta',
                           '${lectura.fecha.hour.toString().padLeft(2, '0')}:${lectura.fecha.minute.toString().padLeft(2, '0')}',
                         ),
+                        const SizedBox(height: 12),
+                        _buildDetalleRow(
+                          Icons.location_on,
+                          'Ubicación',
+                          lectura.ubicacionFormateada,
+                        ),
                       ],
                     ),
                   ),
