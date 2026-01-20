@@ -150,7 +150,7 @@ class DatabaseService {
     });
   }
 
-  Future<Lectura?> getLecturaPorContadorHoy(String contadorId) async {
+  Future<Lectura?> getLecturaActiva(String contadorId) async {
     final db = await database;
     // Obtener lecturas del contador ordenadas por fecha reciente
     final List<Map<String, dynamic>> maps = await db.query(
@@ -165,18 +165,74 @@ class DatabaseService {
 
     final lectura = Lectura.fromMap(maps.first);
     final now = DateTime.now();
+    final diferencia = now.difference(lectura.fecha).inDays;
 
-    // Verificar estrictamente si la lectura es de HOY
-    final isSameDay =
-        lectura.fecha.year == now.year &&
-        lectura.fecha.month == now.month &&
-        lectura.fecha.day == now.day;
-
-    if (isSameDay) {
+    // Solo es editable/borrable si tiene menos de 15 días
+    if (diferencia < 15) {
       return lectura;
     }
 
     return null;
+  }
+
+  /// Limpia fotos antiguas (>15 días) y prepara contadores para nueva lectura
+  Future<void> limpiarYActualizarRegistros() async {
+    final db = await database;
+    final now = DateTime.now();
+    final builtInLimit = now
+        .subtract(const Duration(days: 15))
+        .toIso8601String();
+
+    // 1. Obtener lecturas que ya pasaron su periodo de gracia (15 días)
+    // y que aún tienen foto o el contador sigue marcado como 'registrado'
+    final List<Map<String, dynamic>> oldLecturas = await db.rawQuery(
+      '''
+      SELECT l.* FROM lecturas l
+      JOIN contadores c ON l.contador_id = c.id
+      WHERE l.fecha < ? AND (l.foto_path != '' OR c.estado = 'registrado')
+    ''',
+      [builtInLimit],
+    );
+
+    if (oldLecturas.isEmpty) return;
+
+    for (var row in oldLecturas) {
+      final lectura = Lectura.fromMap(row);
+
+      // A. Borrar archivo físico de foto
+      if (lectura.fotoPath.isNotEmpty) {
+        final file = File(lectura.fotoPath);
+        if (await file.exists()) {
+          try {
+            await file.delete();
+          } catch (e) {
+            print('Error al borrar foto antigua: $e');
+          }
+        }
+      }
+
+      // B. Actualizar registro de lectura (quitar path de foto)
+      await db.update(
+        'lecturas',
+        {'foto_path': ''},
+        where: 'id = ?',
+        whereArgs: [lectura.id],
+      );
+
+      // C. Actualizar contador:
+      // - Nueva 'ultima_lectura' es el valor de esta lectura vieja
+      // - 'estado' vuelve a 'pendiente' para el nuevo mes
+      await db.update(
+        'contadores',
+        {
+          'ultima_lectura': lectura.lectura,
+          'fecha_ultima_lectura': lectura.fecha.toIso8601String(),
+          'estado': EstadoContador.pendiente.name,
+        },
+        where: 'id = ?',
+        whereArgs: [lectura.contadorId],
+      );
+    }
   }
 
   Future<void> updateLectura(Lectura lectura) async {

@@ -46,6 +46,10 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
 
   Future<void> _cargarContadores() async {
     setState(() => _cargando = true);
+
+    // Ejecutar mantenimiento de registros antiguos (>15 días)
+    await _databaseService.limpiarYActualizarRegistros();
+
     final contadores = await _databaseService.getContadores();
 
     if (mounted) {
@@ -293,8 +297,8 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   }
 
   Future<void> _abrirRegistro(Contador contador) async {
-    // Verificar si ya tiene lectura hoy
-    final lecturaExistente = await _databaseService.getLecturaPorContadorHoy(
+    // Verificar si ya tiene lectura en el periodo activo (últimos 15 días)
+    final lecturaExistente = await _databaseService.getLecturaActiva(
       contador.id,
     );
 
@@ -325,7 +329,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Lectura registrada hoy', style: AppTextStyles.subtitulo),
+            Text('Lectura en periodo activo', style: AppTextStyles.subtitulo),
             IconButton(
               icon: const Icon(Icons.close, color: Colors.grey),
               onPressed: () => Navigator.pop(context),

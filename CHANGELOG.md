@@ -2,6 +2,15 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.5.5] - 2026-01-20
+
+### Agregado
+- **Ventana de Edición de 15 Días:** Ahora las lecturas pueden borrarse o corregirse hasta 15 días después de su registro.
+- **Auto-Limpieza de Evidencias:** Pasados los 15 días, las fotos se borran automáticamente del dispositivo para liberar espacio.
+
+### Cambios
+- **Ciclo Mensual Automático:** Tras el periodo de 15 días, el contador vuelve automáticamente a estado "Pendiente" y toma la lectura anterior como base para el nuevo mes.
+
 ## [0.5.4] - 2026-01-20
 
 ### Agregado
