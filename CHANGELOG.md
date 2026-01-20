@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.6.0] - 2026-01-20
+
+### Cambios
+- **Ajuste de UI en Tarjetas:** Se movió el código del contador a la parte inferior derecha de la tarjeta y se eliminó el símbolo `#`. Esto permite nombres de usuario más largos sin recortes visuales y mantiene la identificación de forma sutil.
+
 ## [0.5.9] - 2026-01-20
 
 ### Agregado

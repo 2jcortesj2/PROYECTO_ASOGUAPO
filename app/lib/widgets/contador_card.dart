@@ -29,27 +29,11 @@ class ContadorCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            contador.nombre,
-                            style: AppTextStyles.cardTitulo,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        // Código de contador "oculto a simple vista"
-                        Text(
-                          ' #${contador.id}',
-                          style: AppTextStyles.cardSubtitulo.copyWith(
-                            fontSize: 10,
-                            color: AppColors.textSecondary.withValues(
-                              alpha: 0.3,
-                            ),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      contador.nombre,
+                      style: AppTextStyles.cardTitulo,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -59,9 +43,27 @@ class ContadorCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      'Lectura mes anterior: ${contador.ultimaLecturaFormateada}',
-                      style: AppTextStyles.cardSubtitulo.copyWith(fontSize: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Lectura mes anterior: ${contador.ultimaLecturaFormateada}',
+                          style: AppTextStyles.cardSubtitulo.copyWith(
+                            fontSize: 12,
+                          ),
+                        ),
+                        // Código de contador "oculto a simple vista" en la parte inferior
+                        Text(
+                          contador.id,
+                          style: AppTextStyles.cardSubtitulo.copyWith(
+                            fontSize: 10,
+                            color: AppColors.textSecondary.withValues(
+                              alpha: 0.3,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
