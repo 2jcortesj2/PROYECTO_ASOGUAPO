@@ -3,7 +3,7 @@ class Lectura {
   final int? id;
   final String contadorId;
   final String nombreUsuario;
-  final String sector;
+  final String vereda;
   final double lectura;
   final String fotoPath;
   final double? latitud;
@@ -15,7 +15,7 @@ class Lectura {
     this.id,
     required this.contadorId,
     required this.nombreUsuario,
-    required this.sector,
+    required this.vereda,
     required this.lectura,
     required this.fotoPath,
     this.latitud,
@@ -30,7 +30,7 @@ class Lectura {
       id: map['id'] as int?,
       contadorId: map['contador_id'] as String,
       nombreUsuario: map['nombre_usuario'] as String,
-      sector: map['sector'] as String,
+      vereda: map['vereda'] as String,
       lectura: (map['lectura'] as num).toDouble(),
       fotoPath: map['foto_path'] as String,
       latitud: map['latitud'] as double?,
@@ -46,7 +46,7 @@ class Lectura {
       if (id != null) 'id': id,
       'contador_id': contadorId,
       'nombre_usuario': nombreUsuario,
-      'sector': sector,
+      'vereda': vereda,
       'lectura': lectura,
       'foto_path': fotoPath,
       'latitud': latitud,
@@ -95,7 +95,7 @@ class Lectura {
     int? id,
     String? contadorId,
     String? nombreUsuario,
-    String? sector,
+    String? vereda,
     double? lectura,
     String? fotoPath,
     double? latitud,
@@ -107,7 +107,7 @@ class Lectura {
       id: id ?? this.id,
       contadorId: contadorId ?? this.contadorId,
       nombreUsuario: nombreUsuario ?? this.nombreUsuario,
-      sector: sector ?? this.sector,
+      vereda: vereda ?? this.vereda,
       lectura: lectura ?? this.lectura,
       fotoPath: fotoPath ?? this.fotoPath,
       latitud: latitud ?? this.latitud,
@@ -122,7 +122,7 @@ class Lectura {
     return [
       contadorId,
       nombreUsuario,
-      sector,
+      vereda,
       lectura.toString(),
       fechaFormateada,
       latitud?.toString() ?? '',
@@ -135,7 +135,7 @@ class Lectura {
   static List<String> get csvHeaders => [
     'ID_Contador',
     'Nombre',
-    'Sector',
+    'Vereda',
     'Lectura',
     'Fecha',
     'Latitud',

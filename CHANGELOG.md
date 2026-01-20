@@ -13,6 +13,17 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - Estructura inicial del proyecto
 - Configuración de Git con flujo de trabajo de dos ramas
 
+## [0.3.1] - 2026-01-19
+
+### Agregado
+- **Selector de Veredas:** Nuevo selector dinámico en la pantalla principal para filtrar contadores.
+- **Botón de Exportar:** Acceso directo en la pantalla principal (posicionado bajo el de historial).
+
+### Cambios
+- **Refactorización de Terminología:** Se reemplazó "Sector" por **"Vereda"** en toda la aplicación (modelos, pantallas y documentación).
+- **Datos Reales:** Actualización de datos de ejemplo con las veredas: "El Recreo", "El Tendido" y "Pueblo Nuevo".
+- **Interfaz:** Mejora en el diseño de los botones flotantes (FABs) para mayor claridad.
+
 ---
 
 ## [0.3.0] - 2026-01-19

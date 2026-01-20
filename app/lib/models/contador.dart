@@ -4,7 +4,7 @@ import '../config/constants.dart';
 class Contador {
   final String id;
   final String nombre;
-  final String sector;
+  final String vereda;
   final String? lote;
   final double? ultimaLectura;
   final DateTime? fechaUltimaLectura;
@@ -13,7 +13,7 @@ class Contador {
   const Contador({
     required this.id,
     required this.nombre,
-    required this.sector,
+    required this.vereda,
     this.lote,
     this.ultimaLectura,
     this.fechaUltimaLectura,
@@ -25,7 +25,7 @@ class Contador {
     return Contador(
       id: map['id'] as String,
       nombre: map['nombre'] as String,
-      sector: map['sector'] as String,
+      vereda: map['vereda'] as String,
       lote: map['lote'] as String?,
       ultimaLectura: map['ultima_lectura'] as double?,
       fechaUltimaLectura: map['fecha_ultima_lectura'] != null
@@ -43,7 +43,7 @@ class Contador {
     return {
       'id': id,
       'nombre': nombre,
-      'sector': sector,
+      'vereda': vereda,
       'lote': lote,
       'ultima_lectura': ultimaLectura,
       'fecha_ultima_lectura': fechaUltimaLectura?.toIso8601String(),
@@ -54,9 +54,9 @@ class Contador {
   /// Texto formateado del sector y lote
   String get ubicacionCompleta {
     if (lote != null && lote!.isNotEmpty) {
-      return '$sector - $lote';
+      return '$vereda - $lote';
     }
-    return sector;
+    return vereda;
   }
 
   /// Texto formateado de la última lectura
@@ -69,7 +69,7 @@ class Contador {
   Contador copyWith({
     String? id,
     String? nombre,
-    String? sector,
+    String? vereda,
     String? lote,
     double? ultimaLectura,
     DateTime? fechaUltimaLectura,
@@ -78,7 +78,7 @@ class Contador {
     return Contador(
       id: id ?? this.id,
       nombre: nombre ?? this.nombre,
-      sector: sector ?? this.sector,
+      vereda: vereda ?? this.vereda,
       lote: lote ?? this.lote,
       ultimaLectura: ultimaLectura ?? this.ultimaLectura,
       fechaUltimaLectura: fechaUltimaLectura ?? this.fechaUltimaLectura,
@@ -88,6 +88,6 @@ class Contador {
 
   @override
   String toString() {
-    return 'Contador(id: $id, nombre: $nombre, sector: $sector)';
+    return 'Contador(id: $id, nombre: $nombre, vereda: $vereda)';
   }
 }

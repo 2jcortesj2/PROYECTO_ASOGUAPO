@@ -71,7 +71,7 @@ app/
 class Contador {
   final String id;
   final String nombre;
-  final String sector;
+  final String vereda;
   final String? lote;
   final double? ultimaLectura;
   final DateTime? fechaUltimaLectura;
@@ -86,7 +86,7 @@ class Lectura {
   final int id;
   final String contadorId;
   final String nombreUsuario;
-  final String sector;
+  final String vereda;
   final double lectura;
   final String fotoPath;
   final double? latitud;
@@ -106,7 +106,7 @@ class Lectura {
 CREATE TABLE contadores (
   id TEXT PRIMARY KEY,
   nombre TEXT NOT NULL,
-  sector TEXT,
+  vereda TEXT,
   lote TEXT,
   ultima_lectura REAL,
   fecha_ultima_lectura TEXT
@@ -116,7 +116,7 @@ CREATE TABLE lecturas (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   contador_id TEXT NOT NULL,
   nombre_usuario TEXT NOT NULL,
-  sector TEXT,
+  vereda TEXT,
   lectura REAL NOT NULL,
   foto_path TEXT NOT NULL,
   latitud REAL,

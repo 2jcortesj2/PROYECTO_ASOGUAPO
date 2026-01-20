@@ -418,7 +418,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
     final registro = Lectura(
       contadorId: widget.contador.id,
       nombreUsuario: widget.contador.nombre,
-      sector: widget.contador.sector,
+      vereda: widget.contador.vereda,
       lectura: lectura,
       fotoPath: _fotoPath!,
       latitud: _latitud,

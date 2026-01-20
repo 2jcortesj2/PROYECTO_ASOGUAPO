@@ -8,7 +8,7 @@ Permitir a lectores comunitarios registrar lecturas de contadores de agua de for
 
 ## ✨ Características Principales
 
-- 📋 Lista de contadores por sector
+- 📋 Lista de contadores por vereda
 - 📷 Captura de foto con cámara en vivo (embebida)
 - 🔢 Registro manual de lectura
 - 📍 Geolocalización automática (GPS)

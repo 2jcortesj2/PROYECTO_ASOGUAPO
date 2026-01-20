@@ -17,13 +17,15 @@ class ListaContadoresScreen extends StatefulWidget {
 class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  String _veredaSeleccionada = 'El Recreo';
+  final List<String> _veredas = ['El Recreo', 'Pueblo Nuevo', 'El Tendido'];
 
-  // Datos de prueba para el prototipo
+  // Datos de prueba para el prototipo con Veredas reales
   final List<Contador> _contadores = [
     const Contador(
       id: '1',
       nombre: 'Juan Pérez García',
-      sector: 'El Rosario',
+      vereda: 'El Recreo',
       lote: 'Lote 45',
       ultimaLectura: 1234,
       estado: EstadoContador.registrado,
@@ -31,7 +33,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     const Contador(
       id: '2',
       nombre: 'María Rodríguez López',
-      sector: 'Los Olivos',
+      vereda: 'El Tendido',
       lote: 'Lote 12',
       ultimaLectura: 1120,
       estado: EstadoContador.pendiente,
@@ -39,7 +41,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     const Contador(
       id: '3',
       nombre: 'Carlos Sánchez Ruiz',
-      sector: 'Vista Hermosa',
+      vereda: 'Pueblo Nuevo',
       lote: 'Lote 88',
       ultimaLectura: 1350,
       estado: EstadoContador.registrado,
@@ -47,7 +49,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     const Contador(
       id: '4',
       nombre: 'Ana Martínez Flores',
-      sector: 'San Felipe',
+      vereda: 'El Recreo',
       lote: 'Lote 30',
       ultimaLectura: 1210,
       estado: EstadoContador.pendiente,
@@ -55,7 +57,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     const Contador(
       id: '5',
       nombre: 'Pedro González Díaz',
-      sector: 'El Rosario',
+      vereda: 'El Tendido',
       lote: 'Lote 67',
       ultimaLectura: 980,
       estado: EstadoContador.conError,
@@ -63,7 +65,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     const Contador(
       id: '6',
       nombre: 'Lucía Hernández Castro',
-      sector: 'Los Olivos',
+      vereda: 'Pueblo Nuevo',
       lote: 'Lote 23',
       ultimaLectura: 1567,
       estado: EstadoContador.pendiente,
@@ -71,12 +73,16 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   ];
 
   List<Contador> get _contadoresFiltrados {
-    if (_searchQuery.isEmpty) return _contadores;
+    final porVereda = _contadores
+        .where((c) => c.vereda == _veredaSeleccionada)
+        .toList();
+
+    if (_searchQuery.isEmpty) return porVereda;
 
     final query = _searchQuery.toLowerCase();
-    return _contadores.where((c) {
+    return porVereda.where((c) {
       return c.nombre.toLowerCase().contains(query) ||
-          c.sector.toLowerCase().contains(query);
+          c.vereda.toLowerCase().contains(query);
     }).toList();
   }
 
@@ -150,6 +156,42 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
               ),
             ),
 
+            const SizedBox(height: 16),
+
+            // Selector de Vereda
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.paddingMedium,
+              ),
+              child: Row(
+                children: _veredas.map((vereda) {
+                  final seleccionada = _veredaSeleccionada == vereda;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(vereda),
+                      selected: seleccionada,
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() => _veredaSeleccionada = vereda);
+                        }
+                      },
+                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      labelStyle: TextStyle(
+                        color: seleccionada
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                        fontWeight: seleccionada
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+
             const SizedBox(height: 8),
 
             // Contador de resultados
@@ -185,11 +227,13 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
         ),
       ),
 
-      // FAB para historial
+      // FAB para exportación
       floatingActionButton: FloatingActionButton(
-        onPressed: _abrirHistorial,
-        tooltip: 'Ver historial',
-        child: const Icon(Icons.history),
+        heroTag: 'exportar_fab',
+        onPressed: _abrirExportar,
+        tooltip: 'Exportar datos',
+        backgroundColor: AppColors.primary,
+        child: const Icon(Icons.file_download, color: Colors.white),
       ),
     );
   }
@@ -230,5 +274,11 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
       context,
       MaterialPageRoute(builder: (context) => const HistorialScreen()),
     );
+  }
+
+  void _abrirExportar() {
+    // Por ahora redirigimos al historial que tiene la lógica de exportar
+    // o podríamos abrir el modal directamente aquí.
+    _abrirHistorial();
   }
 }

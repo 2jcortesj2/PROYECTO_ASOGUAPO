@@ -15,13 +15,13 @@ class HistorialScreen extends StatefulWidget {
 class _HistorialScreenState extends State<HistorialScreen> {
   String _filtroActivo = 'Hoy';
 
-  // Datos de prueba para el prototipo
+  // Datos de prueba para el prototipo con Veredas reales
   final List<Lectura> _lecturas = [
     Lectura(
       id: 1,
       contadorId: '1',
       nombreUsuario: 'María González',
-      sector: 'El Rosario',
+      vereda: 'El Recreo',
       lectura: 1567,
       fotoPath: '/path/foto1.jpg',
       latitud: 4.5923,
@@ -32,7 +32,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
       id: 2,
       contadorId: '2',
       nombreUsuario: 'Carlos Pérez',
-      sector: 'Los Olivos',
+      vereda: 'El Tendido',
       lectura: 1565,
       fotoPath: '/path/foto2.jpg',
       latitud: 4.5920,
@@ -43,7 +43,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
       id: 3,
       contadorId: '3',
       nombreUsuario: 'Ana López',
-      sector: 'Vista Hermosa',
+      vereda: 'Pueblo Nuevo',
       lectura: 1564,
       fotoPath: '/path/foto3.jpg',
       latitud: 4.5918,
@@ -54,7 +54,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
       id: 4,
       contadorId: '4',
       nombreUsuario: 'Pedro Martínez',
-      sector: 'San Felipe',
+      vereda: 'El Recreo',
       lectura: 1890,
       fotoPath: '/path/foto4.jpg',
       latitud: 4.5925,
@@ -65,7 +65,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
       id: 5,
       contadorId: '5',
       nombreUsuario: 'Lucía Castro',
-      sector: 'El Rosario',
+      vereda: 'El Tendido',
       lectura: 2100,
       fotoPath: '/path/foto5.jpg',
       latitud: 4.5930,
