@@ -31,7 +31,7 @@ class CameraService {
       // Usar cámara trasera (primera disponible)
       final camera = _cameras.first;
 
-      // Configurar resolución máxima (Solicitud explícita de usuario: NO bajar calidad)
+      // Configurar resolución máxima
       final resolution = ResolutionPreset.max;
 
       _controller = CameraController(

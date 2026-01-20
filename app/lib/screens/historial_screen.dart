@@ -7,6 +7,7 @@ import '../models/lectura.dart';
 import '../services/database_service.dart';
 import '../services/export_service.dart';
 import '../widgets/boton_principal.dart';
+import '../widgets/info_lectura_widget.dart';
 
 /// Pantalla de historial y exportación de lecturas
 class HistorialScreen extends StatefulWidget {
@@ -310,61 +311,95 @@ class _HistorialScreenState extends State<HistorialScreen> {
         horizontal: AppConstants.paddingMedium,
         vertical: AppConstants.paddingSmall,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppConstants.paddingMedium),
-        child: Row(
-          children: [
-            // Miniatura
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.border),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => _mostrarDetalleLectura(lectura),
+        child: Padding(
+          padding: const EdgeInsets.all(AppConstants.paddingMedium),
+          child: Row(
+            children: [
+              // Miniatura
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child:
+                      lectura.fotoPath.isNotEmpty &&
+                          File(lectura.fotoPath).existsSync()
+                      ? Image.file(
+                          File(lectura.fotoPath),
+                          fit: BoxFit.cover,
+                          cacheWidth:
+                              120, // Optimización para móviles de baja gama
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(
+                                Icons.broken_image,
+                                color: Colors.grey,
+                              ),
+                        )
+                      : const Icon(Icons.image, color: Colors.grey, size: 30),
+                ),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child:
-                    lectura.fotoPath.isNotEmpty &&
-                        File(lectura.fotoPath).existsSync()
-                    ? Image.file(
-                        File(lectura.fotoPath),
-                        fit: BoxFit.cover,
-                        cacheWidth:
-                            120, // Optimización para móviles de baja gama
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.broken_image, color: Colors.grey),
-                      )
-                    : const Icon(Icons.image, color: Colors.grey, size: 30),
-              ),
-            ),
 
-            const SizedBox(width: 16),
+              const SizedBox(width: 16),
 
-            // Información
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(lectura.nombreUsuario, style: AppTextStyles.cardTitulo),
-                  const SizedBox(height: 4),
-                  Text(
-                    lectura.lecturaFormateada,
-                    style: AppTextStyles.subtitulo.copyWith(
-                      color: AppColors.primary,
+              // Información
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      lectura.nombreUsuario,
+                      style: AppTextStyles.cardTitulo,
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    lectura.fechaFormateada,
-                    style: AppTextStyles.cardSubtitulo.copyWith(fontSize: 12),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      lectura.lecturaFormateada,
+                      style: AppTextStyles.subtitulo.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      lectura.fechaFormateada,
+                      style: AppTextStyles.cardSubtitulo.copyWith(fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              // Icono indicador de "ver más"
+              const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  void _mostrarDetalleLectura(Lectura lectura) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          lectura.nombreUsuario,
+          style: AppTextStyles.subtitulo,
+          textAlign: TextAlign.center,
+        ),
+        content: SingleChildScrollView(
+          child: InfoLecturaWidget(lectura: lectura),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('CERRAR'),
+          ),
+        ],
       ),
     );
   }

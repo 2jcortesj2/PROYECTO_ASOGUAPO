@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.9.9] - 2026-01-20
+
+### Mejoras de UX
+- **Detalle Histórico:** Ahora es posible tocar cualquier lectura en la pantalla de "Historial" para ver todos los detalles (foto grande, ubicación GPS, comentarios, fecha exacta) en una ventana emergente.
+
 ## [0.9.8] - 2026-01-20
 
 ### Rendimiento
