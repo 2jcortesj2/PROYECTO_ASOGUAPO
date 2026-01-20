@@ -2,6 +2,12 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.7.4] - 2026-01-20
+
+### Mejorado
+- **Control de Exportación:** Se bloquea el botón de exportación mientras un proceso está en curso para evitar ejecuciones duplicadas.
+- **Opción de Cancelación:** Si la exportación (compresión) tarda más de 5 segundos, aparece automáticamente una opción para cancelar el proceso.
+
 ## [0.7.3] - 2026-01-20
 
 ### Cambios

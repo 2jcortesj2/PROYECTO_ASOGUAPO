@@ -41,6 +41,7 @@ class ExportService {
     String? veredaFiltro,
     TipoExportacion tipo = TipoExportacion.todo,
     Function(ExportProgress)? onProgress,
+    bool Function()? checkCancel,
   }) async {
     try {
       final lecturas =
@@ -134,6 +135,9 @@ class ExportService {
         final contadoresMap = {for (var c in contadores) c.id: c};
 
         for (var lectura in lecturas) {
+          if (checkCancel != null && checkCancel()) {
+            throw Exception('Exportación cancelada por el usuario');
+          }
           final contador = contadoresMap[lectura.contadorId];
           final lecturaAnterior = contador?.ultimaLectura;
           final String consumoStr = lecturaAnterior == null
@@ -172,6 +176,9 @@ class ExportService {
         final totalPhotos = photosWithFile.length;
 
         for (var lectura in photosWithFile) {
+          if (checkCancel != null && checkCancel()) {
+            throw Exception('Exportación cancelada por el usuario');
+          }
           final file = File(lectura.fotoPath);
           if (await file.exists()) {
             final String nombreFoto = lectura.fotoPath.split('/').last;

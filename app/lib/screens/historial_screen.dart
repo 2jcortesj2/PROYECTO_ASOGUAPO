@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -33,6 +34,9 @@ class _HistorialScreenState extends State<HistorialScreen> {
   List<Lectura> _lecturas = [];
   bool _cargando = true;
   bool _exportando = false;
+  bool _cancelarExportacion = false;
+  int _segundosExportando = 0;
+  Timer? _exportTimer;
   ExportProgress? _progresoActual;
 
   @override
@@ -44,6 +48,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _exportTimer?.cancel();
     super.dispose();
   }
 
@@ -216,6 +221,29 @@ class _HistorialScreenState extends State<HistorialScreen> {
                             color: AppColors.primary,
                           ),
                         ),
+
+                        // Botón de cancelar después de 5 segundos
+                        if (_segundosExportando >= 5) ...[
+                          const SizedBox(height: 24),
+                          TextButton.icon(
+                            icon: const Icon(
+                              Icons.cancel,
+                              color: Colors.orange,
+                            ),
+                            label: const Text(
+                              'CANCELAR EXPORTACIÓN',
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _cancelarExportacion = true;
+                              });
+                            },
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -242,7 +270,9 @@ class _HistorialScreenState extends State<HistorialScreen> {
           child: BotonPrincipal(
             texto: 'EXPORTAR DATOS',
             icono: Icons.file_download,
-            onPressed: _lecturasFiltradas.isEmpty ? null : _exportarDatos,
+            onPressed: (_lecturasFiltradas.isEmpty || _exportando)
+                ? null
+                : _exportarDatos,
           ),
         ),
       ),
@@ -445,6 +475,17 @@ class _HistorialScreenState extends State<HistorialScreen> {
     setState(() {
       _exportando = true;
       _progresoActual = null;
+      _cancelarExportacion = false;
+      _segundosExportando = 0;
+    });
+
+    // Iniciar timer para dar opción de cancelar después de 5s
+    _exportTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _segundosExportando = timer.tick;
+        });
+      }
     });
 
     try {
@@ -453,13 +494,16 @@ class _HistorialScreenState extends State<HistorialScreen> {
         veredaFiltro: _filtroActivo,
         tipo: tipo,
         onProgress: (progreso) {
-          setState(() {
-            _progresoActual = progreso;
-          });
+          if (mounted) {
+            setState(() {
+              _progresoActual = progreso;
+            });
+          }
         },
+        checkCancel: () => _cancelarExportacion,
       );
     } catch (e) {
-      if (mounted) {
+      if (mounted && !_cancelarExportacion) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al exportar: $e'),
@@ -468,10 +512,20 @@ class _HistorialScreenState extends State<HistorialScreen> {
         );
       }
     } finally {
+      _exportTimer?.cancel();
       if (mounted) {
         setState(() {
           _exportando = false;
         });
+
+        if (_cancelarExportacion) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Exportación cancelada'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
       }
     }
   }
