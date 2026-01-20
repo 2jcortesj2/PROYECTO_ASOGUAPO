@@ -44,7 +44,7 @@ class ContadorCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Anterior: ${contador.ultimaLecturaFormateada} (Mes Pasado)',
+                      'Lectura mes anterior: ${contador.ultimaLecturaFormateada}',
                       style: AppTextStyles.cardSubtitulo.copyWith(fontSize: 12),
                     ),
                   ],
