@@ -299,11 +299,24 @@ class _HistorialScreenState extends State<HistorialScreen> {
                 ),
                 child: const Icon(Icons.table_chart, color: AppColors.primary),
               ),
-              title: const Text('Exportar como CSV'),
-              subtitle: const Text('Compatible con Excel'),
-              onTap: () {
-                _simularExportacion('CSV');
-              },
+              title: const Text('Solo reporte CSV'),
+              subtitle: const Text('Compatible con Excel (datos)'),
+              onTap: () => _ejecutarExportacion(TipoExportacion.csv),
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.photo_library, color: Colors.orange),
+              ),
+              title: const Text('Solo fotos (ZIP)'),
+              subtitle: const Text('Comprimido con todas las evidencias'),
+              onTap: () => _ejecutarExportacion(TipoExportacion.zip),
             ),
             const SizedBox(height: 8),
             ListTile(
@@ -314,13 +327,14 @@ class _HistorialScreenState extends State<HistorialScreen> {
                   color: AppColors.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.share, color: AppColors.secondary),
+                child: const Icon(
+                  Icons.all_inclusive,
+                  color: AppColors.secondary,
+                ),
               ),
-              title: const Text('Compartir'),
-              subtitle: const Text('Enviar por WhatsApp, Email...'),
-              onTap: () {
-                _simularExportacion('Compartir');
-              },
+              title: const Text('Exportar TODO'),
+              subtitle: const Text('CSV y fotos al mismo tiempo'),
+              onTap: () => _ejecutarExportacion(TipoExportacion.todo),
             ),
             const SizedBox(height: 24),
           ],
@@ -329,29 +343,21 @@ class _HistorialScreenState extends State<HistorialScreen> {
     );
   }
 
-  Future<void> _simularExportacion(String tipo) async {
-    Navigator.pop(context); // Cerrar modal si no se cerró antes
+  Future<void> _ejecutarExportacion(TipoExportacion tipo) async {
+    Navigator.pop(context);
 
     try {
-      if (tipo == 'CSV') {
-        await _exportService.exportarLecturas(
-          lecturasFiltradas: _lecturasFiltradas,
-          veredaFiltro: _filtroActivo,
-        );
-      } else {
-        // Reutilizamos la misma lógica
-        await _exportService.exportarLecturas(
-          lecturasFiltradas: _lecturasFiltradas,
-          veredaFiltro: _filtroActivo,
-        );
-      }
+      await _exportService.exportarLecturas(
+        lecturasFiltradas: _lecturasFiltradas,
+        veredaFiltro: _filtroActivo,
+        tipo: tipo,
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ Archivo generado exitosamente'),
-            duration: Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
+            content: Text('Exportación completada con éxito'),
+            backgroundColor: Colors.green,
           ),
         );
       }
@@ -359,10 +365,8 @@ class _HistorialScreenState extends State<HistorialScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('❌ Error al exportar: $e'),
-            duration: const Duration(seconds: 3),
+            content: Text('Error al exportar: $e'),
             backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
           ),
         );
       }

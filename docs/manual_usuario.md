@@ -78,10 +78,12 @@ Accede desde el botón flotante (ícono de descarga) en la lista principal.
 - **Exportación Inteligente:** Genera archivos CSV con el código de la vereda en el nombre (ej: LECTURAS_PUE_...csv).
 
 **Para exportar:**
-1. Selecciona la vereda específica que deseas exportar (El Recreo, Pueblo Nuevo o El Tendido).
-2. Toca "EXPORTAR DATOS" (El botón se activará solo cuando elijas una vereda).
-3. La aplicación generará los archivos CSV y ZIP en la memoria temporal del teléfono.
-4. Comparte los archivos por el medio deseado.
+1. Selecciona la vereda específica que deseas exportar (ej: El Recreo).
+2. Toca "EXPORTAR DATOS" y elige una de las 3 opciones:
+    - **Solo reporte CSV**: Descarga solo la tabla de datos.
+    - **Solo fotos (ZIP)**: Descarga solo las imágenes capturadas.
+    - **Exportar TODO**: Descarga ambos archivos para un reporte completo.
+3. Comparte los archivos por WhatsApp u otro medio.
 
 ---
 
