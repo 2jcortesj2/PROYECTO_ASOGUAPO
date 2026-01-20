@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.9.7] - 2026-01-20
+
+### Bug Fixes
+- **Visualización de Input Deshabilitado:** Se corrigió un error donde el campo de lectura permanecía con fondo blanco al bloquearse. Ahora respeta correctamente el estado gris cuando se ha ingresado un motivo de no lectura.
+
 ## [0.9.6] - 2026-01-20
 
 ### UI Tweaks

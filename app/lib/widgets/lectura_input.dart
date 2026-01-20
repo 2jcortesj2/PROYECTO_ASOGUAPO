@@ -62,6 +62,8 @@ class LecturaInput extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: AppTextStyles.lecturaGrande,
                   decoration: const InputDecoration(
+                    filled:
+                        false, // Permitir que se vea el color del contenedor
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: 16,
