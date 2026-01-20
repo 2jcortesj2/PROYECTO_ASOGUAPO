@@ -2,6 +2,13 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.7.0] - 2026-01-20
+
+### Mejorado
+- **Identidad Visual:** Se implementó el color secundario (azul) para representar estados de éxito y registros completados, diferenciándolos de las acciones primarias (verde).
+- **UI Historial:** El valor de consumo (m³) ahora resalta en color secundario para una lectura más rápida.
+- **Diálogo de Registro Existente:** Rediseño completo de la alerta "Lectura en periodo activo" con una estética más profesional, mejor jerarquía de información y acciones claras.
+
 ## [0.6.2] - 2026-01-20
 
 ### Mejorado

@@ -321,7 +321,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                   Text(
                     lectura.lecturaFormateada,
                     style: AppTextStyles.subtitulo.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.secondary,
                     ),
                   ),
                   const SizedBox(height: 2),

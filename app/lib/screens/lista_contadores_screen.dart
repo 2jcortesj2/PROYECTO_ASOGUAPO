@@ -358,86 +358,121 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   void _mostrarDialogoLecturaExistente(Contador contador, Lectura lectura) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Lectura en periodo activo', style: AppTextStyles.subtitulo),
-            IconButton(
-              icon: const Icon(Icons.close, color: Colors.grey),
-              onPressed: () => Navigator.pop(context),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
-          ],
-        ),
-        content: Column(
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetalleRow(Icons.speed, 'Lectura', lectura.lecturaFormateada),
-            const SizedBox(height: 12),
-            _buildDetalleRow(
-              Icons.calendar_today,
-              'Fecha',
-              '${lectura.fecha.day} ${_obtenerMes(lectura.fecha.month)} ${lectura.fecha.year}',
-            ),
-            const SizedBox(height: 12),
-            _buildDetalleRow(
-              Icons.access_time,
-              'Hora',
-              '${lectura.fecha.hour.toString().padLeft(2, '0')}:${lectura.fecha.minute.toString().padLeft(2, '0')}',
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.edit, size: 18),
-                  onPressed: () async {
-                    Navigator.pop(context); // Cerrar diálogo
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RegistroLecturaScreen(
-                          contador: contador,
-                          lecturaExistente: lectura,
-                          veredaOrigen: _veredaSeleccionada,
-                        ),
+            // Header con color secundario (Azul)
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                color: AppColors.secondary,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.white, size: 28),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Lectura Registrada',
+                      style: AppTextStyles.subtitulo.copyWith(
+                        color: Colors.white,
                       ),
-                    );
-                    _cargarContadores();
-                  },
-                  label: const Text('CORREGIR / EDITAR'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.delete_outline, size: 18),
-                  onPressed: () => _confirmarEliminarLectura(lectura),
-                  label: const Text('ELIMINAR REGISTRO'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    side: const BorderSide(color: Colors.red),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                ),
-              ],
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white70),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Este medidor ya tiene una lectura en el periodo activo.',
+                    style: AppTextStyles.cuerpoSecundario,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Caja de Info Sutil
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildDetalleRow(
+                          Icons.speed,
+                          'Valor Marcado',
+                          lectura.lecturaFormateada,
+                        ),
+                        const Divider(height: 24, thickness: 1),
+                        _buildDetalleRow(
+                          Icons.calendar_today,
+                          'Fecha Registro',
+                          '${lectura.fecha.day} ${_obtenerMes(lectura.fecha.month)} ${lectura.fecha.year}',
+                        ),
+                        const SizedBox(height: 12),
+                        _buildDetalleRow(
+                          Icons.access_time,
+                          'Hora exacta',
+                          '${lectura.fecha.hour.toString().padLeft(2, '0')}:${lectura.fecha.minute.toString().padLeft(2, '0')}',
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Botones de acción
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.edit, size: 18),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegistroLecturaScreen(
+                            contador: contador,
+                            lecturaExistente: lectura,
+                            veredaOrigen: _veredaSeleccionada,
+                          ),
+                        ),
+                      );
+                      _cargarContadores();
+                    },
+                    label: const Text('EDITAR REGISTRO'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    icon: const Icon(Icons.delete_outline, size: 18),
+                    onPressed: () => _confirmarEliminarLectura(lectura),
+                    label: const Text('ELIMINAR LECTURA'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.red[700],
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
