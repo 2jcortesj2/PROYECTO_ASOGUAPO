@@ -2,6 +2,12 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.9.4] - 2026-01-20
+
+### Funcionalidad y Datos
+- **Lecturas Nulas:** Ahora el sistema soporta guardar registros con valor de lectura `nulo` (vacío) en lugar de `0` cuando se reporta una anomalía. Esto se refleja como una celda vacía en el CSV y "Sin lectura" en la interfaz.
+- **UI Diálogo Anomalía:** Se actualizó el diálogo "¿Por qué no se puede leer?" para tener botones estilizados (Volver/Borrar) y limpiar automáticamente el campo de lectura numérica al aceptar una justificación.
+
 ## [0.9.3] - 2026-01-20
 
 ### UX y Conectividad
