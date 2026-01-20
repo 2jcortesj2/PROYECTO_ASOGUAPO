@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Gu&iacute;a de Testing - AguaLector v0&period;1&period;0</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="guía-de-testing---agualector-v010">Guía de Testing - AguaLector v0.1.0</h1>
+<p>Esta guía está diseñada para que QA testers o agentes de IA configuren, ejecuten y validen el prototipo funcional de la aplicación <strong>AguaLector</strong>.</p>
+<hr>
+<h2 id="1-configuración-del-entorno">1. Configuración del Entorno</h2>
+<h3 id="prerrequisitos">Prerrequisitos</h3>
+<ul>
+<li><strong>Flutter SDK</strong>: 3.x o superior instalado y en el PATH.</li>
+<li><strong>Android Studio</strong> con emulador configurado o dispositivo físico conectado.</li>
+<li><strong>Git</strong> instalado.</li>
+</ul>
+<h3 id="pasos-de-instalación">Pasos de Instalación</h3>
+<ol>
+<li>
+<p><strong>Clonar el repositorio</strong> (si aún no lo tienes):</p>
+<pre><code class="language-bash">git <span class="hljs-built_in">clone</span> https://github.com/2jcortesj2/PROYECTO_ASOGUAPO.git
+<span class="hljs-built_in">cd</span> PROYECTO_ASOGUAPO
+</code></pre>
+</li>
+<li>
+<p><strong>Cambiar a la rama de desarrollo</strong> (donde están los últimos cambios):</p>
+<pre><code class="language-bash">git checkout dev
+</code></pre>
+</li>
+<li>
+<p><strong>Instalar dependencias</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-built_in">cd</span> app
+flutter pub get
+</code></pre>
+</li>
+<li>
+<p><strong>Verificar instalación</strong>:</p>
+<pre><code class="language-bash">flutter doctor
+</code></pre>
+<p><em>Asegúrate de tener todos los checks en verde, especialmente Flutter y Android toolchain.</em></p>
+</li>
+</ol>
+<h3 id="ejecución-de-la-app">Ejecución de la App</h3>
+<p>Para correr la aplicación en el emulador o dispositivo conectado:</p>
+<pre><code class="language-bash">flutter run
+</code></pre>
+<hr>
+<h2 id="2-análisis-estático-de-código">2. Análisis Estático de Código</h2>
+<p>Antes de realizar pruebas manuales, verifica la salud del código.</p>
+<h3 id="linter-code-analysis">Linter (Code Analysis)</h3>
+<p>Ejecuta el analizador oficial de Flutter para detectar errores de sintaxis, tipos o malas prácticas.</p>
+<pre><code class="language-bash">flutter analyze
+</code></pre>
+<p><strong>Resultado Esperado:</strong></p>
+<ul>
+<li><code>No issues found!</code> o, en el peor de los casos, solo warnings de deprecación (como <code>withOpacity</code> en Flutter 3.27+). No debe haber errores (<code>errors</code>) que impidan la compilación.</li>
+</ul>
+<hr>
+<h2 id="3-suite-de-pruebas-manuales-prototipo-ui">3. Suite de Pruebas Manuales (Prototipo UI)</h2>
+<p>Ejecuta estos casos de prueba en orden para validar el flujo crítico de la aplicación.</p>
+<h3 id="tc-01-visualización-de-lista-de-contadores">TC-01: Visualización de Lista de Contadores</h3>
+<ul>
+<li><strong>Objetivo:</strong> Verificar que la pantalla principal carga datos y muestra estados.</li>
+<li><strong>Acciones:</strong>
+<ol>
+<li>Abrir la aplicación.</li>
+<li>Observar la lista de contadores.</li>
+</ol>
+</li>
+<li><strong>Resultado Esperado:</strong>
+<ul class="contains-task-list">
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Se muestra título &quot;Lecturas del Día&quot; con fecha actual.</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Se listan al menos 5 contadores de prueba.</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Hay contadores con estados visuales distintos: icono verde (registrado), gris (pendiente), naranja (error).</li>
+</ul>
+</li>
+</ul>
+<h3 id="tc-02-búsqueda-y-filtrado">TC-02: Búsqueda y Filtrado</h3>
+<ul>
+<li><strong>Objetivo:</strong> Validar la funcionalidad de búsqueda local.</li>
+<li><strong>Acciones:</strong>
+<ol>
+<li>En la pantalla principal, tocar la barra de búsqueda.</li>
+<li>Escribir &quot;Rosario&quot;.</li>
+</ol>
+</li>
+<li><strong>Resultado Esperado:</strong>
+<ul class="contains-task-list">
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> La lista se filtra dinámicamente.</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Solo aparecen contadores que contienen &quot;Rosario&quot; en su nombre o sector.</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> El contador de resultados (&quot;X contadores&quot;) se actualiza.</li>
+</ul>
+</li>
+</ul>
+<h3 id="tc-03-flujo-de-registro-de-lectura-happy-path">TC-03: Flujo de Registro de Lectura (Happy Path)</h3>
+<ul>
+<li><strong>Objetivo:</strong> Completar el registro de un medidor pendiente.</li>
+<li><strong>Acciones:</strong>
+<ol>
+<li>Tocar un contador con estado &quot;Pendiente&quot; (gris).</li>
+<li>Verificar que se abre la pantalla de &quot;Registro&quot;.</li>
+<li>Esperar 2 segundos a que el GPS simulado se active (pin verde).</li>
+<li>Tocar el botón de cámara (círculo) para simular captura.</li>
+<li>Ingresar &quot;1500&quot; en el campo de lectura.</li>
+<li>Tocar &quot;GUARDAR LECTURA&quot;.</li>
+</ol>
+</li>
+<li><strong>Resultado Esperado:</strong>
+<ul class="contains-task-list">
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Aparece snackbar &quot;Foto capturada&quot;.</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> GPS cambia a &quot;Activo&quot; con coordenadas simuladas.</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Transición a pantalla de Confirmación (Check verde animado).</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Se muestran los datos ingresados (1500 m³, fecha, ubicación).</li>
+</ul>
+</li>
+</ul>
+<h3 id="tc-04-validación-de-entradas">TC-04: Validación de Entradas</h3>
+<ul>
+<li><strong>Objetivo:</strong> Verificar que no se guarden datos inválidos.</li>
+<li><strong>Acciones:</strong>
+<ol>
+<li>Abrir un registro nuevo.</li>
+<li>No tomar foto.</li>
+<li>Dejar campo de lectura vacío o escribir texto no numérico (si el teclado lo permitiera).</li>
+<li>Tocar &quot;GUARDAR LECTURA&quot;.</li>
+</ol>
+</li>
+<li><strong>Resultado Esperado:</strong>
+<ul class="contains-task-list">
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> El botón guardar permanece deshabilitado o muestra error al presionar.</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Mensaje &quot;Ingresa la lectura&quot; o similar si se intenta forzar.</li>
+</ul>
+</li>
+</ul>
+<h3 id="tc-05-historial-y-exportación">TC-05: Historial y Exportación</h3>
+<ul>
+<li><strong>Objetivo:</strong> Verificar acceso a historial y menús de exportación.</li>
+<li><strong>Acciones:</strong>
+<ol>
+<li>Volver a la pantalla principal.</li>
+<li>Tocar el botón flotante (FAB) de Historial.</li>
+<li>Probar los chips de filtro &quot;Hoy&quot;, &quot;Semana&quot;, &quot;Mes&quot;.</li>
+<li>Tocar botón &quot;EXPORTAR DATOS&quot; al final.</li>
+</ol>
+</li>
+<li><strong>Resultado Esperado:</strong>
+<ul class="contains-task-list">
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Se muestran tarjetas de lecturas pasadas.</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Se abre un modal inferior (BottomSheet) con opciones &quot;Exportar CSV&quot; y &quot;Compartir&quot;.</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> Al seleccionar una opción, aparece un mensaje de confirmación &quot;Exportando...&quot;.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-reporte-de-incidencias">4. Reporte de Incidencias</h2>
+<p>Si encuentras un error, por favor repórtalo con el siguiente formato:</p>
+<pre><code class="language-markdown"><span class="hljs-section">### [BUG] Título descriptivo</span>
+<span class="hljs-bullet">-</span> <span class="hljs-strong">**Pantalla:**</span> (Main / Registro / Historial)
+<span class="hljs-bullet">-</span> <span class="hljs-strong">**Pasos para reproducir:**</span>
+<span class="hljs-bullet">  1.</span> ...
+<span class="hljs-bullet">  2.</span> ...
+<span class="hljs-bullet">-</span> <span class="hljs-strong">**Comportamiento esperado:**</span> ...
+<span class="hljs-bullet">-</span> <span class="hljs-strong">**Comportamiento actual:**</span> ...
+<span class="hljs-bullet">-</span> <span class="hljs-strong">**Screenshot/Log:**</span> (Opcional)
+</code></pre>
+
+            
+            
+        </body>
+        </html>

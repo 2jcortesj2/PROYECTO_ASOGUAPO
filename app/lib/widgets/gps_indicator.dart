@@ -7,6 +7,7 @@ class GpsIndicator extends StatelessWidget {
   final bool activo;
   final bool obteniendo;
   final String? coordenadas;
+  final bool timeoutMode;
   final VoidCallback? onRetry;
 
   const GpsIndicator({
@@ -14,6 +15,7 @@ class GpsIndicator extends StatelessWidget {
     required this.activo,
     this.obteniendo = false,
     this.coordenadas,
+    this.timeoutMode = false,
     this.onRetry,
   });
 
@@ -72,17 +74,20 @@ class GpsIndicator extends StatelessWidget {
   Color _getBackgroundColor() {
     if (obteniendo) return AppColors.primary.withValues(alpha: 0.1);
     if (activo) return AppColors.success.withValues(alpha: 0.1);
+    if (timeoutMode) return Colors.orange.withValues(alpha: 0.1);
     return AppColors.error.withValues(alpha: 0.1);
   }
 
   Color _getIconColor() {
     if (activo) return AppColors.success;
+    if (timeoutMode) return Colors.orange;
     return AppColors.error;
   }
 
   Color _getTextColor() {
     if (obteniendo) return AppColors.primary;
     if (activo) return AppColors.success;
+    if (timeoutMode) return Colors.orange;
     return AppColors.error;
   }
 
@@ -92,6 +97,7 @@ class GpsIndicator extends StatelessWidget {
       if (coordenadas != null) return coordenadas!;
       return 'GPS Activo';
     }
+    if (timeoutMode) return 'Sin GPS (Permitido)';
     return 'GPS Inactivo';
   }
 }

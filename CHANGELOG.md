@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.9.3] - 2026-01-20
+
+### UX y Conectividad
+- **GPS Tolerante a Fallos:** Se implementó un tiempo de espera de 6 segundos para la obtención de coordenadas. Si excede este tiempo (zonas techadas o rurales profundas), el sistema habilita el guardado en modo "Sin GPS" (indicador amarillo) para no detener la operación.
+
 ## [0.9.2] - 2026-01-20
 
 ### Mejoras de UI/UX

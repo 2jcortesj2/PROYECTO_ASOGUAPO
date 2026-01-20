@@ -1,3 +1,4 @@
+import 'dart:async'; // Necesario para Timer
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
@@ -103,29 +104,55 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
       _gpsError = null;
     });
 
-    // Intentar obtener ubicación actual (más precisa para este caso)
-    var result = await _gpsService.getCurrentLocation();
-
-    // Si falla la obtención actual (ej. timeout), intentar con última conocida como respaldo
-    if (!result.success) {
-      final lastKnown = await _gpsService.getLastKnownLocation();
-      if (lastKnown.success) {
-        result = lastKnown;
+    // Iniciar temporizador de timeout (6 segundos)
+    bool timeoutOcurrido = false;
+    final timeoutTimer = Timer(const Duration(seconds: 6), () {
+      if (_obteniendoGps && mounted) {
+        timeoutOcurrido = true;
+        setState(() {
+          _obteniendoGps = false;
+          _gpsActivo = false; // No activo, pero...
+          _gpsError = 'Guardado sin GPS habilitado'; // Estado especial
+        });
       }
-    }
+    });
 
-    if (mounted) {
-      setState(() {
-        _obteniendoGps = false;
-        if (result.success) {
-          _gpsActivo = true;
-          _latitud = result.latitude;
-          _longitud = result.longitude;
-        } else {
-          _gpsActivo = false;
-          _gpsError = result.errorMessage;
+    try {
+      // Intentar obtener ubicación actual
+      var result = await _gpsService.getCurrentLocation();
+
+      // Si falla, intentar con última conocida
+      if (!result.success && !timeoutOcurrido) {
+        final lastKnown = await _gpsService.getLastKnownLocation();
+        if (lastKnown.success) {
+          result = lastKnown;
         }
-      });
+      }
+
+      timeoutTimer.cancel();
+
+      if (mounted && !timeoutOcurrido) {
+        setState(() {
+          _obteniendoGps = false;
+          if (result.success) {
+            _gpsActivo = true;
+            _latitud = result.latitude;
+            _longitud = result.longitude;
+          } else {
+            _gpsActivo = false;
+            _gpsError = result.errorMessage;
+          }
+        });
+      }
+    } catch (e) {
+      timeoutTimer.cancel();
+      if (mounted && !timeoutOcurrido) {
+        setState(() {
+          _obteniendoGps = false;
+          _gpsActivo = false;
+          _gpsError = 'Error GPS: $e';
+        });
+      }
     }
   }
 
@@ -232,6 +259,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
                         coordenadas: _gpsActivo
                             ? '${_latitud?.toStringAsFixed(4)}, ${_longitud?.toStringAsFixed(4)}'
                             : null,
+                        timeoutMode: _gpsError == 'Guardado sin GPS habilitado',
                         onRetry: _gpsActivo ? null : _obtenerGps,
                       ),
                       const SizedBox(width: 16),

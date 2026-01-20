@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>L&oacute;gica de Negocio - AguaLector &#x1f4a7;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="lógica-de-negocio---agualector-">Lógica de Negocio - AguaLector 💧</h1>
+<p>En este documento se detallan las reglas y procesos automáticos que rigen el funcionamiento de la aplicación.</p>
+<hr>
+<h2 id="1-ciclo-de-vida-de-una-lectura-regla-de-los-15-días">1. Ciclo de Vida de una Lectura (Regla de los 15 Días)</h2>
+<p>Para equilibrar la flexibilidad del usuario y el rendimiento del dispositivo, se ha implementado un sistema de &quot;Periodo Activo&quot;.</p>
+<ul>
+<li><strong>Ventana de Edición:</strong> Una lectura registrada se considera &quot;Activa&quot; durante <strong>15 días calendarios</strong> a partir de la fecha de captura. Durante este tiempo, el usuario puede:
+<ul>
+<li>Ver el detalle de la lectura.</li>
+<li>Corregir el valor numérico.</li>
+<li>Eliminar el registro completo (incluyendo la foto).</li>
+</ul>
+</li>
+<li><strong>Cierre Automático:</strong> Pasados los 15 días, la lectura se marca internamente como &quot;Cerrada&quot;. Ya no aparecerá en la lista de contadores como un registro editable.</li>
+</ul>
+<h2 id="2-mantenimiento-automático-clean-up">2. Mantenimiento Automático (Clean-up)</h2>
+<p>Cada vez que el usuario ingresa a la <strong>Lista de Contadores</strong>, el sistema ejecuta un proceso de mantenimiento transparente:</p>
+<ol>
+<li><strong>Liberación de Almacenamiento:</strong> Todas las fotos asociadas a lecturas con más de 15 días de antigüedad son eliminadas físicamente del teléfono.</li>
+<li><strong>Depuración de Base de Datos:</strong> Los registros de lectura antiguos conservan sus datos numéricos y coordenadas, pero pierden el enlace al archivo de imagen para evitar errores de &quot;archivo no encontrado&quot;.</li>
+</ol>
+<h2 id="3-rollover-de-ciclo-mensual">3. Rollover de Ciclo Mensual</h2>
+<p>El sistema prepara automáticamente el siguiente mes de trabajo sin necesidad de &quot;Reiniciar&quot; la aplicación:</p>
+<ul>
+<li><strong>Cambio de Estado:</strong> Cuando una lectura supera los 15 días, el contador asociado vuelve automáticamente al estado <strong>Pendiente</strong> (Blanco/Gris).</li>
+<li><strong>Actualización de Baseline:</strong> El valor de la última lectura registrada se convierte automáticamente en la nueva <strong>Lectura Anterior</strong>.</li>
+<li><strong>Resultado:</strong> El lector ve el medidor disponible para una nueva toma, con el histórico actualizado, garantizando la continuidad del cálculo del consumo (Lectura Actual - Lectura Anterior).</li>
+</ul>
+<h2 id="4-estrategia-de-exportación-resiliencia">4. Estrategia de Exportación (Resiliencia)</h2>
+<p>Para garantizar que los datos lleguen completos a la junta administradora, la exportación sigue reglas estrictas:</p>
+<ul>
+<li><strong>ZIP Maestro:</strong> Todas las exportaciones se empaquetan en un único archivo comprimido. Esto soluciona problemas de compatibilidad con WhatsApp, donde a veces solo se enviaba un archivo cuando se seleccionaban varios.</li>
+<li><strong>Estructura Interna:</strong> El reporte CSV se ubica en la raíz del ZIP, y las evidencias fotográficas en una carpeta interna <code>/fotos/</code>.</li>
+<li><strong>Procesamiento Asíncrono (Isolates):</strong> La compresión de archivos se realiza en un hilo de ejecución separado del sistema operativo. Esto evita que la interfaz de la aplicación se congele o bloquee durante el empaquetado de grandes volúmenes de datos.</li>
+</ul>
+<h2 id="5-persistencia-de-filtros">5. Persistencia de Filtros</h2>
+<p>La aplicación prioriza la comodidad del usuario mediante la memoria de estado:</p>
+<ul>
+<li><strong>Sincronización:</strong> Si seleccionas una vereda específica en el Historial, al volver a la Lista principal, la aplicación mantendrá ese mismo filtro aplicado.</li>
+<li><strong>Filtro por Defecto:</strong> Al iniciar, la aplicación precarga la vereda de la última lectura capturada, asumiendo que el usuario continúa trabajando en la misma zona geográfica.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

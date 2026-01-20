@@ -58,6 +58,11 @@ Si el usuario ya tiene una lectura en el **periodo activo (últimos 15 días)**,
 > - La foto se guarda automáticamente en tu dispositivo
 > - Puedes volver a tomar la foto tocando el botón de refresh
 
+**Sobre el GPS:**
+La aplicación intentará obtener tu ubicación exacta durante 6 segundos.
+- Si tarda más de ese tiempo (ej: si estás en una zona muy rural o techada), el indicador se pondrá **amarillo**.
+- Esto significa que **PUEDES GUARDAR** la lectura aunque no tengas GPS activo. La prioridad es guardar el dato y la foto.
+
 **¿No puedes leer el contador?**
 Si el contador está rayado, tapado, es ilegible o no puedes acceder a él:
 1. Toca la opción discreta que dice **"¿No se puede leer el contador?"** bajo el campo de lectura.

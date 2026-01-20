@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Manual T&eacute;cnico - AguaLector</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="manual-técnico---agualector">Manual Técnico - AguaLector</h1>
+<h2 id="arquitectura-del-sistema">Arquitectura del Sistema</h2>
+<h3 id="stack-tecnológico">Stack Tecnológico</h3>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Tecnología</th>
+<th>Versión</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Framework</td>
+<td>Flutter</td>
+<td>3.x</td>
+</tr>
+<tr>
+<td>Lenguaje</td>
+<td>Dart</td>
+<td>3.x</td>
+</tr>
+<tr>
+<td>Base de datos</td>
+<td>SQLite</td>
+<td>sqflite 2.x</td>
+</tr>
+<tr>
+<td>Cámara</td>
+<td>camera</td>
+<td>Latest</td>
+</tr>
+<tr>
+<td>GPS</td>
+<td>geolocator</td>
+<td>Latest</td>
+</tr>
+<tr>
+<td>Permisos</td>
+<td>permission_handler</td>
+<td>Latest</td>
+</tr>
+<tr>
+<td>Exportación</td>
+<td>csv, share_plus, archive</td>
+<td>Latest</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="estructura-del-proyecto">Estructura del Proyecto</h2>
+<pre><code>app/
+├── lib/
+│   ├── main.dart              # Punto de entrada
+│   ├── app.dart               # Configuración de MaterialApp
+│   ├── config/
+│   │   ├── theme.dart         # Colores, tipografía
+│   │   └── constants.dart     # Constantes globales
+│   ├── models/
+│   │   ├── contador.dart      # Modelo de contador
+│   │   └── lectura.dart       # Modelo de lectura
+│   ├── screens/
+│   │   ├── lista_contadores_screen.dart
+│   │   ├── registro_lectura_screen.dart
+│   │   ├── confirmacion_screen.dart
+│   │   └── historial_screen.dart
+│   ├── widgets/
+│   │   ├── contador_card.dart
+│   │   ├── lectura_input.dart
+│   │   ├── gps_indicator.dart
+│   │   └── boton_principal.dart
+│   ├── services/
+│   │   ├── database_service.dart
+│   │   ├── camera_service.dart
+│   │   ├── gps_service.dart
+│   │   ├── permission_service.dart
+│   │   └── export_service.dart
+│   └── utils/
+│       └── formatters.dart
+├── android/
+├── test/
+│   └── widget_test.dart       # Pruebas de UI
+├── docs/
+│   ├── manual_usuario.md
+│   ├── manual_tecnico.md
+│   └── TESTING.md             # Guía de testing
+├── pubspec.yaml
+└── pubspec.lock
+</code></pre>
+<blockquote>
+<p>En la versión <strong>v0.5.5</strong>, se ha introducido la lógica de ventana de edición de 15 días y auto-limpieza de fotos. Para la exportación (v0.5.4), se utiliza <code>compute</code> (Isolates) para mover la compresión ZIP a un hilo separado, evitando bloqueos en la UI. Todas las exportaciones se consolidan en un único archivo ZIP para mayor compatibilidad con apps de mensajería (WhatsApp).</p>
+</blockquote>
+<hr>
+<h2 id="inicialización-y-primer-inicio">Inicialización y Primer Inicio</h2>
+<p>La aplicación está diseñada para operar &quot;fuera de la caja&quot; (out-of-the-box) mediante un proceso de importación automática de datos semilla.</p>
+<h3 id="proceso-de-importación-primer-inicio">Proceso de Importación (Primer Inicio)</h3>
+<p>Al abrir la aplicación por primera vez, el <code>CsvImportService</code> se activa automáticamente si detecta que la base de datos de contadores está vacía.</p>
+<ol>
+<li>Busca el archivo <code>assets/LECTURAS_PILOTO.csv</code> dentro del paquete de la app.</li>
+<li>Procesa los registros y los inserta en la tabla <code>contadores</code>.</li>
+<li>Establece la lectura histórica como <code>ultima_lectura</code> y deja el estado del medidor en <code>pendiente</code>.</li>
+</ol>
+<h3 id="propuesta-práctica-de-inicialización">Propuesta Práctica de Inicialización</h3>
+<p>Para configurar la aplicación con datos reales de una nueva comunidad o periodo:</p>
+<ol>
+<li>
+<p><strong>Preparar el Archivo CSV:</strong>
+Utilizar una plantilla de Excel y exportarla a CSV con codificación UTF-8 (delimitado por comas). Debe contener las siguientes columnas obligatorias:</p>
+<ul>
+<li><code>CODIGO_CONCATENADO</code>: ID único del medidor.</li>
+<li><code>NOMBRE_COMPLETO</code>: Nombre del suscriptor.</li>
+<li><code>VEREDA</code>: Sector geográfico.</li>
+<li><code>HISTORICO_DIC</code>: El valor de la última lectura realizada (servirá como base de comparación).</li>
+</ul>
+</li>
+<li>
+<p><strong>Actualizar Asset:</strong>
+Reemplazar el archivo en <code>app/assets/LECTURAS_PILOTO.csv</code> con el nuevo archivo.</p>
+</li>
+<li>
+<p><strong>Compilar y Desplegar:</strong>
+Al instalar el APK, la aplicación detectará que es la primera ejecución y cargará el nuevo listado automáticamente.</p>
+</li>
+</ol>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p><p>Si se desea forzar una re-inicialización en un dispositivo que ya tiene datos, se debe ir a <em>Ajustes &gt; Aplicaciones &gt; AguaLector &gt; Almacenamiento &gt; Borrar Datos</em>. Esto eliminará la base de datos SQLite y disparará la importación del CSV en el siguiente inicio.</p>
+</div>
+<h3 id="actualización-de-suscriptores-o-información">Actualización de Suscriptores o Información</h3>
+<p>Si durante la operación se requiere agregar nuevos usuarios o corregir nombres en la lista maestra, se debe seguir este flujo práctico:</p>
+<ol>
+<li>
+<p><strong>Modificación del Maestro:</strong>
+Actualizar el archivo fuente (Excel) agregando las nuevas filas o corrigiendo los campos necesarios. Asegurarse de asignar un <code>CODIGO_CONCATENADO</code> único a los nuevos usuarios.</p>
+</li>
+<li>
+<p><strong>Actualización del Asset:</strong>
+Sustituir el archivo <code>app/assets/LECTURAS_PILOTO.csv</code> en el código fuente.</p>
+</li>
+<li>
+<p><strong>Ciclo de Vida de Datos:</strong>
+Debido a que SQLite es persistente, instalar una nueva versión del APK sobre una existente <strong>no borrará</strong> los usuarios antiguos ni cargará los nuevos automáticamente (para proteger las lecturas ya tomadas).</p>
+</li>
+<li>
+<p><strong>Procedimiento Recomendado para Administradores:</strong></p>
+<ul>
+<li><strong>Opción A (Nueva instalación):</strong> Desinstalar la versión anterior e instalar la nueva. Esto garantiza que todos los teléfonos arranquen con la lista actualizada al 100%.</li>
+<li><strong>Opción B (Mantenimiento remoto):</strong> En futuras versiones se implementará un botón de &quot;Sincronizar Maestro&quot; para evitar la pérdida de datos, pero para la fase piloto, la <strong>Re-inicialización</strong> (borrar datos de la app) es el método más seguro y rápido.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="modelos-de-datos">Modelos de Datos</h2>
+<h3 id="contador">Contador</h3>
+<pre><code class="language-dart"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Contador</span> </span>{
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">String</span> id;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">String</span> nombre;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">String</span> vereda;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">String?</span> lote;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">double?</span> ultimaLectura;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">DateTime?</span> fechaUltimaLectura;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">bool</span> tieneRegistroHoy;
+}
+</code></pre>
+<h3 id="lectura">Lectura</h3>
+<pre><code class="language-dart"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Lectura</span> </span>{
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">int</span> id;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">String</span> contadorId;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">String</span> nombreUsuario;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">String</span> vereda;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">double</span> lectura;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">String</span> fotoPath;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">double?</span> latitud;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">double?</span> longitud;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">DateTime</span> fecha;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">bool</span> sincronizado;
+  <span class="hljs-keyword">final</span> <span class="hljs-built_in">String?</span> comentario;
+}
+</code></pre>
+<hr>
+<h2 id="base-de-datos-sqlite">Base de Datos SQLite</h2>
+<h3 id="esquema">Esquema</h3>
+<pre><code class="language-sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> contadores (
+  id TEXT <span class="hljs-keyword">PRIMARY</span> KEY,
+  nombre TEXT <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+  vereda TEXT <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+  lote TEXT,
+
+  ultima_lectura <span class="hljs-type">REAL</span>,
+  fecha_ultima_lectura TEXT,
+  estado TEXT
+);
+
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> lecturas (
+  id <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY</span> KEY AUTOINCREMENT,
+  contador_id TEXT <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+  nombre_usuario TEXT <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+  vereda TEXT <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+  lectura <span class="hljs-type">REAL</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+  foto_path TEXT <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+  latitud <span class="hljs-type">REAL</span>,
+  longitud <span class="hljs-type">REAL</span>,
+  fecha TEXT <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+  sincronizado <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-number">0</span>,
+  comentario TEXT,
+  <span class="hljs-keyword">FOREIGN</span> KEY (contador_id) <span class="hljs-keyword">REFERENCES</span> contadores(id)
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX idx_lecturas_fecha <span class="hljs-keyword">ON</span> lecturas(fecha);
+<span class="hljs-keyword">CREATE</span> INDEX idx_lecturas_contador <span class="hljs-keyword">ON</span> lecturas(contador_id);
+</code></pre>
+<hr>
+<h2 id="servicios">Servicios</h2>
+<h3 id="databaseservice">DatabaseService</h3>
+<pre><code class="language-dart"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DatabaseService</span> </span>{
+  Future&lt;Database&gt; <span class="hljs-keyword">get</span> database;
+  Future&lt;<span class="hljs-built_in">List</span>&lt;Contador&gt;&gt; getContadores();
+  Future&lt;<span class="hljs-keyword">void</span>&gt; insertLectura(Lectura lectura);
+  Future&lt;<span class="hljs-keyword">void</span>&gt; updateLectura(Lectura lectura);
+  Future&lt;<span class="hljs-keyword">void</span>&gt; deleteLectura(<span class="hljs-built_in">int</span> id);
+  Future&lt;Lectura?&gt; getLecturaActiva(<span class="hljs-built_in">String</span> contadorId); <span class="hljs-comment">// Ventana 15 días</span>
+  Future&lt;<span class="hljs-keyword">void</span>&gt; limpiarYActualizarRegistros(); <span class="hljs-comment">// Mantenimiento auto</span>
+  Future&lt;<span class="hljs-keyword">void</span>&gt; resetEstadoContadores();
+}
+</code></pre>
+<h3 id="gpsservice">GpsService</h3>
+<pre><code class="language-dart"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GpsService</span> </span>{
+  Future&lt;<span class="hljs-built_in">bool</span>&gt; isLocationServiceEnabled();
+  Future&lt;GpsResult&gt; getCurrentLocation();
+  Future&lt;GpsResult&gt; getLastKnownLocation();
+}
+</code></pre>
+<h3 id="permissionservice">PermissionService</h3>
+<pre><code class="language-dart"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PermissionService</span> </span>{
+  Future&lt;PermissionResult&gt; requestAllPermissions();
+  Future&lt;PermissionResult&gt; checkPermissions();
+}
+</code></pre>
+<h3 id="exportservice">ExportService</h3>
+<pre><code class="language-dart"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ExportService</span> </span>{
+  Future&lt;<span class="hljs-keyword">void</span>&gt; exportarLecturas({<span class="hljs-built_in">List</span>&lt;Lectura&gt;? lecturasFiltradas, <span class="hljs-built_in">String?</span> veredaFiltro});
+}
+</code></pre>
+<h3 id="csvimportservice">CsvImportService</h3>
+<pre><code class="language-dart"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CsvImportService</span> </span>{
+  Future&lt;<span class="hljs-keyword">void</span>&gt; importInitialData();
+}
+</code></pre>
+<hr>
+<h2 id="permisos-android">Permisos Android</h2>
+<p><code>android/app/src/main/AndroidManifest.xml</code>:</p>
+<pre><code class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">uses-permission</span> <span class="hljs-attr">android:name</span>=<span class="hljs-string">&quot;android.permission.CAMERA&quot;</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">uses-permission</span> <span class="hljs-attr">android:name</span>=<span class="hljs-string">&quot;android.permission.ACCESS_FINE_LOCATION&quot;</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">uses-permission</span> <span class="hljs-attr">android:name</span>=<span class="hljs-string">&quot;android.permission.ACCESS_COARSE_LOCATION&quot;</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">uses-permission</span> <span class="hljs-attr">android:name</span>=<span class="hljs-string">&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">uses-permission</span> <span class="hljs-attr">android:name</span>=<span class="hljs-string">&quot;android.permission.READ_EXTERNAL_STORAGE&quot;</span>/&gt;</span>
+</code></pre>
+<hr>
+<h2 id="dependencias-pubspecyaml">Dependencias (pubspec.yaml)</h2>
+<pre><code class="language-yaml"><span class="hljs-attr">dependencies:</span>
+  <span class="hljs-attr">flutter:</span>
+    <span class="hljs-attr">sdk:</span> <span class="hljs-string">flutter</span>
+  <span class="hljs-attr">sqflite:</span> <span class="hljs-string">^2.3.0</span>
+  <span class="hljs-attr">path_provider:</span> <span class="hljs-string">^2.1.2</span>
+  <span class="hljs-attr">camera:</span> <span class="hljs-string">^0.11.0+2</span>
+  <span class="hljs-attr">permission_handler:</span> <span class="hljs-string">^11.3.0</span>
+  <span class="hljs-attr">geolocator:</span> <span class="hljs-string">^10.1.0</span>
+  <span class="hljs-attr">csv:</span> <span class="hljs-string">^5.1.0</span>
+  <span class="hljs-attr">share_plus:</span> <span class="hljs-string">^10.0.0</span>
+  <span class="hljs-attr">archive:</span> <span class="hljs-string">^3.6.1</span>
+  <span class="hljs-attr">intl:</span> <span class="hljs-string">^0.19.0</span>
+  <span class="hljs-attr">provider:</span> <span class="hljs-string">^6.1.0</span>
+
+<span class="hljs-attr">dev_dependencies:</span>
+  <span class="hljs-attr">flutter_test:</span>
+    <span class="hljs-attr">sdk:</span> <span class="hljs-string">flutter</span>
+  <span class="hljs-attr">flutter_lints:</span> <span class="hljs-string">^3.0.0</span>
+</code></pre>
+<hr>
+<h2 id="compilación">Compilación</h2>
+<h3 id="debug">Debug</h3>
+<pre><code class="language-bash"><span class="hljs-built_in">cd</span> app
+flutter run
+</code></pre>
+<h3 id="release-apk">Release APK</h3>
+<pre><code class="language-bash">flutter build apk --release
+</code></pre>
+<p>El APK se genera en: <code>build/app/outputs/flutter-apk/app-release.apk</code></p>
+<hr>
+<h2 id="consideraciones-de-rendimiento">Consideraciones de Rendimiento</h2>
+<ul>
+<li><strong>Cámara:</strong> Resolución baja por defecto (<code>ResolutionPreset.low</code>) para ahorrar CPU y RAM.</li>
+<li><strong>Ciclo de Vida:</strong> Control estricto de recursos de cámara con <code>WidgetsBindingObserver</code>.</li>
+<li><strong>UI:</strong> Uso de <code>RepaintBoundary</code> para la vista previa de cámara en vivo para evitar repintados innecesarios del resto de la interfaz.</li>
+<li><strong>GPS:</strong> Uso de <code>getLastKnownLocation()</code> como primera opción para evitar esperas y consumo excesivo de batería.</li>
+<li><strong>Imágenes:</strong> Guardadas con nombres de archivo basados en timestamp para evitar colisiones.</li>
+<li><strong>Isolates:</strong> Uso de <code>compute</code> para operaciones de I/O pesadas (compresión ZIP) para mantener la tasa de refresco de la UI estable.</li>
+<li><strong>Limpieza Temporal:</strong> De eliminación de archivos físicas tras 15 días para prevenir el agotamiento de almacenamiento interno.</li>
+</ul>
+<hr>
+<h2 id="flujo-de-trabajo-git">Flujo de Trabajo Git</h2>
+<p>Ver <code>README.md</code> para detalles del flujo de trabajo con ramas <code>main</code> y <code>dev</code>.</p>
+<hr>
+<h2 id="hoja-de-ruta-y-desarrollos-futuros">Hoja de Ruta y Desarrollos Futuros</h2>
+<p>Para las siguientes fases del proyecto, se contemplan las siguientes mejoras arquitectónicas:</p>
+<h3 id="1-ordenamiento-inteligente-por-ubicación">1. Ordenamiento Inteligente por Ubicación</h3>
+<ul>
+<li><strong>Objetivo:</strong> Optimizar los tiempos de desplazamiento del lector en campo.</li>
+<li><strong>Implementación:</strong> Organizar automáticamente la lista de contadores basándose en la jerarquía <code>Vereda &gt; Ruta &gt; Predio</code>. De esta forma, el siguiente medidor en la lista será siempre el físicamente más cercano al anterior, reduciendo errores y fatiga.</li>
+</ul>
+<h3 id="2-gestión-externa-de-usuarios-pc-tool">2. Gestión Externa de Usuarios (PC Tool)</h3>
+<ul>
+<li><strong>Objetivo:</strong> Facilitar la administración de la base de datos sin depender de actualizaciones de APK.</li>
+<li><strong>Propuesta:</strong> Desarrollo de una aplicación de escritorio (AguaLector Admin) que, al conectar el dispositivo móvil al PC vía USB:
+<ul>
+<li>Permita leer la base de datos actual.</li>
+<li>Permita inyectar nuevos suscriptores desde un Excel/CSV de forma masiva.</li>
+<li>Permita corregir información de usuarios existentes directamente en el dispositivo.</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-gestión-de-excepciones-de-lectura-v090">4. Gestión de Excepciones de Lectura (v0.9.0)</h3>
+<ul>
+<li><strong>Implementación:</strong> Si el contador no es legible, el usuario activa el diálogo de excepción. Se registra una lectura técnica de <code>0 m³</code> y se guarda el motivo descriptivo. <strong>La toma de fotografía es obligatoria incluso en este caso</strong> para dejar constancia visual de la situación (ej. perro agresivo, contador obstruido). En el CSV exportado, este motivo aparece en la columna <code>MOTIVO_NO_LECTURA</code>.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

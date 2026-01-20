@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Changelog</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="changelog">Changelog</h1>
+<p>Todas las versiones importantes y cambios realizados en el proyecto AguaLector.</p>
+<h2 id="092---2026-01-20">[0.9.2] - 2026-01-20</h2>
+<h3 id="mejoras-de-uiux">Mejoras de UI/UX</h3>
+<ul>
+<li><strong>Unificación de Diseño:</strong> La caja de &quot;Lectura Registrada&quot; ahora tiene el mismo estilo premium que la pantalla de confirmación exitosa.</li>
+<li><strong>Visualización Completa:</strong> El diálogo de revisión ahora incluye la fotografía capturada y la ubicación GPS para una verificación rápida.</li>
+<li><strong>Optimización de Código:</strong> Se eliminaron redundancias mediante la creación de un widget reutilizable <code>InfoLecturaWidget</code>, mejorando la mantenibilidad del proyecto.</li>
+</ul>
+<h2 id="091---2026-01-20">[0.9.1] - 2026-01-20</h2>
+<h3 id="cambios">Cambios</h3>
+<ul>
+<li><strong>Seguridad y Auditoría:</strong> Se ha hecho obligatorio tomar una fotografía para todos los registros, incluso si el contador no es legible. Esto garantiza una evidencia visual en cada visita.</li>
+<li><strong>UI/UX:</strong> Se añadió la visualización de la ubicación GPS en el diálogo de revisión de lecturas existentes en la pantalla principal.</li>
+</ul>
+<h2 id="090---2026-01-20">[0.9.0] - 2026-01-20</h2>
+<h3 id="añadido">Añadido</h3>
+<ul>
+<li><strong>Reporte de Anomalías:</strong> Nueva opción &quot;No se puede leer el contador&quot; que permite registrar motivos descriptivos (ej: medidor roto, acceso denegado).</li>
+<li><strong>Esquema de Datos:</strong> Se añadió el campo <code>comentario</code> a la base de datos y a los reportes CSV.</li>
+<li><strong>Documentación:</strong> Renovación completa del <code>README.md</code> y actualización del Manual Técnico con la nueva hoja de ruta.</li>
+</ul>
+<h2 id="080---2026-01-20">[0.8.0] - 2026-01-20</h2>
+<h3 id="lanzamiento-piloto-fase-2">LANZAMIENTO: PILOTO FASE 2</h3>
+<ul>
+<li><strong>Despliegue Total:</strong> Transición oficial a la segunda fase del piloto, habilitando la carga de todos los contadores de la comunidad.</li>
+<li><strong>Estabilidad:</strong> Consolidación de una versión pulida y estable tras las correcciones de UI y optimización de exportación.</li>
+<li><strong>Hoja de Ruta:</strong> Se definieron los objetivos futuros en el Manual Técnico (Ordenamiento inteligente y Herramienta de PC).</li>
+</ul>
+<h2 id="074---2026-01-20">[0.7.4] - 2026-01-20</h2>
+<h3 id="mejorado">Mejorado</h3>
+<ul>
+<li><strong>Control de Exportación:</strong> Se bloquea el botón de exportación mientras un proceso está en curso para evitar ejecuciones duplicadas.</li>
+<li><strong>Opción de Cancelación:</strong> Si la exportación (compresión) tarda más de 5 segundos, aparece automáticamente una opción para cancelar el proceso.</li>
+</ul>
+<h2 id="073---2026-01-20">[0.7.3] - 2026-01-20</h2>
+<h3 id="cambios-1">Cambios</h3>
+<ul>
+<li><strong>Simplificación de UI:</strong> Se eliminaron las etiquetas de &quot;Sin referencia&quot; y cálculos de consumo en la pantalla de historial para ofrecer una vista más limpia y directa.</li>
+<li><strong>Optimización de Exportación:</strong> Se simplificó el reporte CSV eliminando textos descriptivos como &quot;sin referencia&quot;, dejando las celdas vacías para un reporte más profesional y menos saturado.</li>
+</ul>
+<h2 id="072---2026-01-20">[0.7.2] - 2026-01-20</h2>
+<h3 id="mejorado-1">Mejorado</h3>
+<ul>
+<li><strong>Control de Consumo:</strong> Se implementó la lógica de &quot;Sin referencia&quot; para casos donde no existe una lectura previa en el mes anterior.</li>
+<li><strong>Visualización en Historial:</strong> Ahora las tarjetas del historial muestran el consumo calculado (+X m³) o el estado &quot;Sin referencia&quot; de forma visual.</li>
+<li><strong>Exportación CSV:</strong> Se corrigió el cálculo de consumo en el reporte exportado para evitar valores erróneos cuando no hay lectura anterior, exportando &quot;sin referencia&quot; en su lugar.</li>
+</ul>
+<h2 id="071---2026-01-20">[0.7.1] - 2026-01-20</h2>
+<h3 id="cambios-2">Cambios</h3>
+<ul>
+<li><strong>Unificación de Color:</strong> Se revirtió el esquema de color a un verde esmeralda uniforme (Color Primario) en toda la aplicación, eliminando el uso del color secundario en estados de éxito e indicadores para mantener una estética monocromática coherente.</li>
+</ul>
+<h2 id="070---2026-01-20">[0.7.0] - 2026-01-20</h2>
+<h3 id="mejorado-2">Mejorado</h3>
+<ul>
+<li><strong>Identidad Visual:</strong> Se implementó el color secundario (azul) para representar estados de éxito y registros completados, diferenciándolos de las acciones primarias (verde).</li>
+<li><strong>UI Historial:</strong> El valor de consumo (m³) ahora resalta en color secundario para una lectura más rápida.</li>
+<li><strong>Diálogo de Registro Existente:</strong> Rediseño completo de la alerta &quot;Lectura en periodo activo&quot; con una estética más profesional, mejor jerarquía de información y acciones claras.</li>
+</ul>
+<h2 id="062---2026-01-20">[0.6.2] - 2026-01-20</h2>
+<h3 id="mejorado-3">Mejorado</h3>
+<ul>
+<li><strong>Buscador Inteligente:</strong> El buscador de la lista principal ahora ignora tildes y diéresis (ej. busca &quot;Sandoval&quot; y encuentra &quot;SANDOVAL&quot;).</li>
+<li><strong>Búsqueda por Fragmentos:</strong> Permite buscar por partes del nombre o código (ej. &quot;Juan 102&quot; encontrará registros que contengan ambos términos en cualquier orden).</li>
+</ul>
+<h2 id="061---2026-01-20">[0.6.1] - 2026-01-20</h2>
+<h3 id="corregido">Corregido</h3>
+<ul>
+<li><strong>Validación de Exportación:</strong> El botón &quot;EXPORTAR DATOS&quot; en el historial ahora se deshabilita automáticamente (se pone gris) si no hay registros presentes para la vereda seleccionada, evitando intentos de exportación vacíos.</li>
+</ul>
+<h2 id="060---2026-01-20">[0.6.0] - 2026-01-20</h2>
+<h3 id="cambios-3">Cambios</h3>
+<ul>
+<li><strong>Ajuste de UI en Tarjetas:</strong> Se movió el código del contador a la parte inferior derecha de la tarjeta y se eliminó el símbolo <code>#</code>. Esto permite nombres de usuario más largos sin recortes visuales y mantiene la identificación de forma sutil.</li>
+</ul>
+<h2 id="059---2026-01-20">[0.5.9] - 2026-01-20</h2>
+<h3 id="agregado">Agregado</h3>
+<ul>
+<li><strong>Feedback Detallado de Exportación:</strong> Nuevo sistema de progreso que calcula el tamaño total de las evidencias (MB) y estima el tiempo restante para grandes volúmenes de datos (ej. 500 fotos).</li>
+<li><strong>Fases de Exportación:</strong> Visualización clara de las etapas: Cálculo de tamaño, Empaquetado de fotos y Compresión final.</li>
+</ul>
+<h2 id="058---2026-01-20">[0.5.8] - 2026-01-20</h2>
+<h3 id="cambios-4">Cambios</h3>
+<ul>
+<li><strong>Exportación Total Restaurada:</strong> Se habilitó nuevamente la opción de exportar &quot;Todas&quot; las veredas simultáneamente desde el historial, permitiendo obtener un reporte consolidado global en un solo archivo ZIP.</li>
+</ul>
+<h2 id="057---2026-01-20">[0.5.7] - 2026-01-20</h2>
+<h3 id="agregado-1">Agregado</h3>
+<ul>
+<li><strong>Feedback Visual de Scroll:</strong> Implementación de un scrollbar (slider verde) sutil que solo aparece al mover la lista, con fondo transparente para una interfaz más limpia.</li>
+<li><strong>Identificación de Medidores:</strong> Se agregó el código del contador (<code>ID</code>) en cada tarjeta de usuario de forma estética y discreta (&quot;oculto a simple vista&quot;).</li>
+<li><strong>Base de Datos Completa:</strong> Se actualizó el importador para soportar el nuevo formato de reporte de usuarios completos, permitiendo la carga total de la base de datos de ASOGUAPO.</li>
+</ul>
+<h2 id="056---2026-01-20">[0.5.6] - 2026-01-20</h2>
+<h3 id="corregido-1">Corregido</h3>
+<ul>
+<li><strong>Precisión de GPS en Fotos:</strong> Se corrigió un bug donde múltiples fotos podían quedar con la misma ubicación. Ahora el sistema prioriza una ubicación fresca y se refresca automáticamente al reintentar una fotografía.</li>
+</ul>
+<h2 id="055---2026-01-20">[0.5.5] - 2026-01-20</h2>
+<h3 id="agregado-2">Agregado</h3>
+<ul>
+<li><strong>Ventana de Edición de 15 Días:</strong> Ahora las lecturas pueden borrarse o corregirse hasta 15 días después de su registro.</li>
+<li><strong>Auto-Limpieza de Evidencias:</strong> Pasados los 15 días, las fotos se borran automáticamente del dispositivo para liberar espacio.</li>
+</ul>
+<h3 id="cambios-5">Cambios</h3>
+<ul>
+<li><strong>Ciclo Mensual Automático:</strong> Tras el periodo de 15 días, el contador vuelve automáticamente a estado &quot;Pendiente&quot; y toma la lectura anterior como base para el nuevo mes.</li>
+</ul>
+<h2 id="054---2026-01-20">[0.5.4] - 2026-01-20</h2>
+<h3 id="agregado-3">Agregado</h3>
+<ul>
+<li><strong>Exportación en Segundo Plano (Isolates):</strong> Se movió el proceso de compresión ZIP a un hilo separado para evitar que la interfaz se congele.</li>
+<li><strong>Barra de Progreso Detallada:</strong> Nueva pantalla de carga que muestra el porcentaje real de avance durante el empaquetado de archivos.</li>
+<li><strong>Sincronización de Filtros:</strong> La vereda seleccionada ahora se mantiene sincronizada entre la lista principal y el historial.</li>
+</ul>
+<h3 id="cambios-6">Cambios</h3>
+<ul>
+<li><strong>Unificación de Archivos (ZIP Maestro):</strong> Para evitar fallos al compartir por WhatsApp, ahora todas las exportaciones generan un único archivo ZIP (incluyendo el CSV en su interior).</li>
+</ul>
+<h3 id="corregido-2">Corregido</h3>
+<ul>
+<li><strong>Bug de Envío de Archivos:</strong> Solución definitiva al problema donde WhatsApp no adjuntaba archivos al compartir.</li>
+<li><strong>Fluidez del Sistema:</strong> Eliminación de bloqueos visuales al procesar grandes cantidades de fotos.</li>
+</ul>
+<h2 id="053---2026-01-20">[0.5.3] - 2026-01-20</h2>
+<h3 id="corregido-3">Corregido</h3>
+<ul>
+<li><strong>Exportación en WhatsApp:</strong> Se corrigió un error donde algunos dispositivos (como al compartir por WhatsApp) solo enviaban el texto pero no los archivos adjuntos. Se implementaron tipos MIME explícitos y limpieza de buffer para asegurar la entrega de archivos.</li>
+</ul>
+<h2 id="052---2026-01-20">[0.5.2] - 2026-01-20</h2>
+<h3 id="agregado-4">Agregado</h3>
+<ul>
+<li><strong>Menú de Exportación Seleccionable:</strong> Ahora al presionar &quot;Exportar Datos&quot; se despliega un menú con 3 opciones:
+<ol>
+<li><strong>Solo reporte CSV</strong>: Solo el archivo de datos.</li>
+<li><strong>Solo fotos (ZIP)</strong>: Solo las fotos comprimidas.</li>
+<li><strong>Exportar TODO</strong>: Ambos archivos (CSV y ZIP) al mismo tiempo.</li>
+</ol>
+</li>
+<li><strong>Optimización para Baja Gama:</strong> Se implementó <code>cacheWidth</code> en la visualización de fotos del historial para reducir el consumo de memoria RAM al decodificar imágenes.</li>
+<li><strong>Gestión de Temporales:</strong> La exportación ahora utiliza el directorio de cache (<code>getTemporaryDirectory</code>), optimizando el almacenamiento interno y permitiendo que el SO limpie los archivos cuando sea necesario.</li>
+</ul>
+<h3 id="cambios-7">Cambios</h3>
+<ul>
+<li><strong>Restricción de Exportación:</strong> Se eliminó la opción de exportar &quot;Todas&quot; las veredas simultáneamente. Ahora es obligatorio filtrar por una vereda específica para exportar, mejorando la estabilidad del sistema.</li>
+<li><strong>Formato CSV:</strong> Se utiliza punto y coma (<code>;</code>) como separador estándar. Se eliminó el BOM para esta versión para asegurar compatibilidad con visores ligeros.</li>
+</ul>
+<h2 id="051---2026-01-20">[0.5.1] - 2026-01-20</h2>
+<h3 id="agregado-5">Agregado</h3>
+<ul>
+<li><strong>Exportación de Imágenes (ZIP):</strong> Generación automática de archivo ZIP con las fotos de los medidores.</li>
+<li><strong>Multi-Compartir:</strong> Compartir simultáneamente CSV y ZIP.</li>
+</ul>
+<h3 id="corregido-4">Corregido</h3>
+<ul>
+<li><strong>Nombres de Archivos:</strong> Mejora en la nomenclatura de archivos exportados.</li>
+</ul>
+<h2 id="050---2026-01-20">[0.5.0] - 2026-01-20</h2>
+<h3 id="agregado-6">Agregado</h3>
+<ul>
+<li><strong>Filtros por Vereda en Historial:</strong> Reemplazados los filtros temporales por filtros geográficos.</li>
+<li><strong>Miniaturas Reales:</strong> Visualización de la foto real capturada en la lista del historial.</li>
+<li><strong>Exportación Inteligente:</strong> Inclusión de códigos de vereda en nombres de archivos.</li>
+<li><strong>Gestión de Lecturas:</strong> Implementación de eliminación individual de registros con confirmación.</li>
+<li><strong>Ocultar Completados:</strong> Filtro para ver solo medidores pendientes en la lista principal.</li>
+</ul>
+<h2 id="041---2026-01-19">[0.4.1] - 2026-01-19</h2>
+<h3 id="cambios-8">Cambios</h3>
+<ul>
+<li><strong>Etiqueta en Tarjeta:</strong> Actualizada la etiqueta del contador para mayor claridad.</li>
+<li><strong>Navegación:</strong> Mejora en la persistencia del estado al navegar entre pantallas.</li>
+</ul>
+<h2 id="040---2026-01-18">[0.4.0] - 2026-01-18</h2>
+<h3 id="agregado-7">Agregado</h3>
+<ul>
+<li><strong>Persistencia SQLite:</strong> Integración completa de base de datos local para contadores y lecturas.</li>
+<li><strong>Carga Inicial:</strong> Importación automática de datos desde CSV piloto.</li>
+</ul>
+<h2 id="030---2026-01-12">[0.3.0] - 2026-01-12</h2>
+<h3 id="agregado-8">Agregado</h3>
+<ul>
+<li><strong>Cámara Embebida:</strong> Captura de fotos integrada directamente en la pantalla de registro.</li>
+<li><strong>GPS Real:</strong> Obtención de coordenadas geográficas mediante geolocator.</li>
+<li><strong>Gestión de Permisos:</strong> Sistema de solicitud de permisos al inicio.</li>
+</ul>
+<h2 id="020---2026-01-10">[0.2.0] - 2026-01-10</h2>
+<h3 id="agregado-9">Agregado</h3>
+<ul>
+<li>Estructura base de la aplicación con Flutter Material Design.</li>
+<li>Gestión inicial de temas y constantes.</li>
+</ul>
+<h2 id="010---2026-01-05">[0.1.0] - 2026-01-05</h2>
+<h3 id="agregado-10">Agregado</h3>
+<ul>
+<li>Estructura inicial del proyecto.</li>
+<li>Configuración de Git con flujo de trabajo de dos ramas.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>
