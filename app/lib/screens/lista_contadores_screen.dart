@@ -268,7 +268,18 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Usuario ya registrado', style: AppTextStyles.subtitulo),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Usuario ya registrado', style: AppTextStyles.subtitulo),
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.grey),
+              onPressed: () => Navigator.pop(context),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,7 +315,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
             _buildDetalleRow(
               Icons.calendar_today,
               'Fecha',
-              '${lectura.fecha.day}/${lectura.fecha.month}/${lectura.fecha.year}',
+              '${lectura.fecha.day} ${_obtenerMes(lectura.fecha.month)} ${lectura.fecha.year}',
             ),
             const Divider(height: 16),
             _buildDetalleRow(
@@ -313,20 +324,9 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
               '${lectura.fecha.hour.toString().padLeft(2, '0')}:${lectura.fecha.minute.toString().padLeft(2, '0')}',
             ),
             const SizedBox(height: 24),
-            Text(
-              '¿Qué deseas hacer?',
-              style: AppTextStyles.cuerpoSecundario.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(foregroundColor: Colors.grey),
-            child: const Text('CERRAR'),
-          ),
           ElevatedButton.icon(
             icon: const Icon(Icons.edit, size: 18),
             onPressed: () async {
@@ -373,6 +373,25 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
         ),
       ],
     );
+  }
+
+  String _obtenerMes(int month) {
+    const meses = [
+      '',
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
+    ];
+    return meses[month];
   }
 
   void _abrirHistorial() {

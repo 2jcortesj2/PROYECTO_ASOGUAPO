@@ -20,8 +20,14 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Validación de Fecha:** Verificación estricta (día/mes/año) para "Lectura Existente" hoy.
 
 ### Cambios
-- **UI:** Rediseño del diálogo "Usuario Registrado" con mejor organización visual y colores de estado.
-- **Optimización:** Eliminación de campos no utilizados (`Cedula`, `Celular`) para privacidad y ligereza.
+- **UI del Diálogo:** Rediseño completo del diálogo "Usuario Registrado":
+  - Botón X para cerrar en esquina superior derecha
+  - Formato de fecha mejorado: "19 Ene 2026"
+  - Eliminado texto "¿Qué deseas hacer?"
+  - Mejor organización visual con iconos y colores de estado
+- **Etiquetas Claras:** En las tarjetas de contadores se muestra "Anterior: XXX m³ (Mes Pasado)" para evitar confusiones
+- **CSV Headers:** Renombrados a `HISTORICO_NOV`, `HISTORICO_DIC`, `FECHA_HISTORICO_DIC` para mayor claridad
+- **Optimización:** Eliminación de campos no utilizados (`Cedula`, `Celular`) para privacidad y ligereza
 
 ## [0.4.0] - 2026-01-19
 

@@ -117,7 +117,15 @@ class CsvImportService {
             fecha: fechaLectura,
             sincronizado: true,
           );
+          // Insertamos la lectura histórica
           await _databaseService.insertLectura(lectura);
+
+          // IMPORTANTE: Forzamos el estado a PENDIENTE porque esta lectura es del mes anterior (piloto)
+          // y queremos que el usuario registre la actual.
+          await _databaseService.updateEstadoContador(
+            id,
+            EstadoContador.pendiente,
+          );
         }
       }
     } catch (e, stackTrace) {
