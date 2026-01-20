@@ -2,6 +2,17 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.9.6] - 2026-01-20
+
+### UI Tweaks
+- **Mejora Espaciado en Diálogo:** Se aumentó la separación entre el botón de "Borrar Motivo" y "Aceptar" en el diálogo de anomalías para prevenir pulsaciones accidentales y mejorar la estética.
+
+## [0.9.5] - 2026-01-20
+
+### UX Polishing
+- **Mejora en Diálogo de Anomalía:** Se reemplazó el botón "Volver" por un ícono de cierre 'X' y se mejoró el diseño del botón "Borrar Motivo".
+- **Feedback Visual:** Ahora el campo de lectura se torna gris (deshabilitado) visualmente cuando se ha registrado un motivo de no lectura, indicando claramente al usuario que no se ingresará un valor numérico.
+
 ## [0.9.4] - 2026-01-20
 
 ### Funcionalidad y Datos

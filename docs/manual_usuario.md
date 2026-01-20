@@ -66,9 +66,10 @@ La aplicación intentará obtener tu ubicación exacta durante 6 segundos.
 **¿No puedes leer el contador?**
 Si el contador está rayado, tapado, es ilegible o no puedes acceder a él:
 1. Toca la opción discreta que dice **"¿No se puede leer el contador?"** bajo el campo de lectura.
-2. Explica el motivo en la ventana que aparece (ej: "Perro agresivo", "Vidrio roto").
-3. **Toma la foto**: Aunque no se vea el número, es **OBLIGATORIO** tomar una foto para dejar constancia de la situación o del estado del medidor.
-4. Toca **"GUARDAR LECTURA"**. El registro se guardará con valor 0 y tu explicación.
+2. Explica el motivo en la ventana que aparece y pulsa **ACEPTAR**.
+3. Verás que el campo de lectura se pone en **gris** (bloqueado) para indicar que no se guardará número.
+4. **Toma la foto**: Es **OBLIGATORIO** tomar una foto para dejar constancia.
+5. Toca **"GUARDAR LECTURA"**.
 
 ---
 

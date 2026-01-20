@@ -41,7 +41,7 @@ class LecturaInput extends StatelessWidget {
 
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: enabled ? AppColors.surface : Colors.grey[200],
             borderRadius: BorderRadius.circular(AppConstants.borderRadius),
             border: Border.all(
               color: errorText != null ? AppColors.error : AppColors.border,

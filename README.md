@@ -1,4 +1,4 @@
-# AguaLector 💧 v0.9.4
+# AguaLector 💧 v0.9.6
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.x-blue.svg)](https://dart.dev/)

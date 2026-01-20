@@ -550,38 +550,55 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(
-          '¿Por qué no se puede leer?',
-          style: AppTextStyles.subtitulo,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Motivo de no lectura',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
         ),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'Ej: Contador roto, perro agresivo, empañado...',
-            border: OutlineInputBorder(),
-          ),
-          maxLines: 3,
-          textCapitalization: TextCapitalization.sentences,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Describe la razón por la cual no es posible tomar la lectura numérica:',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                hintText: 'Ej: Contador roto, perro agresivo...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+              textCapitalization: TextCapitalization.sentences,
+            ),
+          ],
         ),
         actions: [
-          // Botón cancelar estilizado (sin borrar acción anterior necesariamente, solo cerrar)
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.grey),
-            child: const Text('VOLVER'),
-          ),
           // Botón limpiar/borrar motivo si ya existía
           if (_comentario != null)
-            TextButton(
+            OutlinedButton.icon(
               onPressed: () {
                 setState(() => _comentario = null);
                 Navigator.pop(context);
               },
-              style: TextButton.styleFrom(foregroundColor: AppColors.error),
-              child: const Text('BORRAR MOTIVO'),
+              icon: const Icon(Icons.delete_outline, size: 18),
+              label: const Text('BORRAR MOTIVO'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.error,
+                side: const BorderSide(color: AppColors.error),
+              ),
             ),
+          if (_comentario != null) const SizedBox(width: 12),
           ElevatedButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
