@@ -5,6 +5,7 @@ import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart' as p;
 import 'database_service.dart';
 import '../models/lectura.dart';
 import '../config/constants.dart';
@@ -92,10 +93,17 @@ class ExportService {
         ).convert(csvData);
 
         final csvFileName = 'LECTURAS_${vCode}_$timestamp.csv';
-        final csvPath = '${directory.path}/$csvFileName';
+        final csvPath = p.join(directory.path, csvFileName);
         final csvFile = File(csvPath);
-        await csvFile.writeAsString(csv, encoding: utf8);
-        filesToShare.add(XFile(csvPath));
+
+        // Usar writeAsBytes para asegurar que no haya problemas de encoding o buffer
+        await csvFile.writeAsBytes(utf8.encode(csv), flush: true);
+
+        if (await csvFile.exists()) {
+          filesToShare.add(
+            XFile(csvPath, name: csvFileName, mimeType: 'text/csv'),
+          );
+        }
       }
 
       // 2. GENERAR ZIP (Si se solicita)
@@ -117,12 +125,18 @@ class ExportService {
 
         if (hasPhotos) {
           final zipFileName = 'FOTOS_${vCode}_$timestamp.zip';
-          final zipPath = '${directory.path}/$zipFileName';
+          final zipPath = p.join(directory.path, zipFileName);
           final zipData = ZipEncoder().encode(archive);
 
           if (zipData != null) {
-            await File(zipPath).writeAsBytes(zipData);
-            filesToShare.add(XFile(zipPath));
+            final zipFile = File(zipPath);
+            await zipFile.writeAsBytes(zipData, flush: true);
+
+            if (await zipFile.exists()) {
+              filesToShare.add(
+                XFile(zipPath, name: zipFileName, mimeType: 'application/zip'),
+              );
+            }
           }
         } else if (tipo == TipoExportacion.zip) {
           throw Exception('No hay fotos para exportar');

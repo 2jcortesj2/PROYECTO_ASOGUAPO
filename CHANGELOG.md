@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.5.3] - 2026-01-20
+
+### Corregido
+- **Exportación en WhatsApp:** Se corrigió un error donde algunos dispositivos (como al compartir por WhatsApp) solo enviaban el texto pero no los archivos adjuntos. Se implementaron tipos MIME explícitos y limpieza de buffer para asegurar la entrega de archivos.
+
 ## [0.5.2] - 2026-01-20
 
 ### Agregado

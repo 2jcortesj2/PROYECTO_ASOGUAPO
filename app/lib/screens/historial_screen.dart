@@ -352,15 +352,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
         veredaFiltro: _filtroActivo,
         tipo: tipo,
       );
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Exportación completada con éxito'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
