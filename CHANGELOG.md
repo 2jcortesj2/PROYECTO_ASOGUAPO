@@ -2,6 +2,20 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.5.4] - 2026-01-20
+
+### Agregado
+- **Exportación en Segundo Plano (Isolates):** Se movió el proceso de compresión ZIP a un hilo separado para evitar que la interfaz se congele.
+- **Barra de Progreso Detallada:** Nueva pantalla de carga que muestra el porcentaje real de avance durante el empaquetado de archivos.
+- **Sincronización de Filtros:** La vereda seleccionada ahora se mantiene sincronizada entre la lista principal y el historial.
+
+### Cambios
+- **Unificación de Archivos (ZIP Maestro):** Para evitar fallos al compartir por WhatsApp, ahora todas las exportaciones generan un único archivo ZIP (incluyendo el CSV en su interior).
+
+### Corregido
+- **Bug de Envío de Archivos:** Solución definitiva al problema donde WhatsApp no adjuntaba archivos al compartir.
+- **Fluidez del Sistema:** Eliminación de bloqueos visuales al procesar grandes cantidades de fotos.
+
 ## [0.5.3] - 2026-01-20
 
 ### Corregido
