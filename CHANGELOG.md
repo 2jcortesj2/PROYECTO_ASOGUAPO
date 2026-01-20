@@ -13,6 +13,16 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - Estructura inicial del proyecto
 - Configuración de Git con flujo de trabajo de dos ramas
 
+## [0.5.2] - 2026-01-20
+
+### Agregado
+- **Optimización para Baja Gama:** Se implementó `cacheWidth` en la visualización de fotos del historial para reducir el consumo de memoria RAM al decodificar imágenes.
+- **Gestión de Temporales:** La exportación ahora utiliza el directorio de cache (`getTemporaryDirectory`) para generar archivos ZIP y CSV, permitiendo que el sistema operativo limpie estos archivos automáticamente.
+
+### Cambios
+- **Restricción de Exportación:** Se eliminó la opción de exportar "Todas" las veredas simultáneamente. Ahora es obligatorio filtrar por una vereda específica (REC, PUE, TEN) para exportar, protegiendo la estabilidad en dispositivos con recursos limitados.
+- **Limpieza de Exportación:** Se eliminó el marcador BOM del CSV para simplificar la generación de archivos, manteniendo el soporte estándar de UTF-8.
+
 ## [0.5.1] - 2026-01-20
 
 ### Agregado

@@ -59,7 +59,7 @@ app/
 ```
 
 > [!NOTE]
-> En la versión **v0.5.1**, se ha implementado la exportación dual (CSV + ZIP) utilizando la librería `archive` para comprimir las fotos. Los archivos CSV se generan con codificación UTF-8 con BOM y separador `;` para asegurar la compatibilidad con Microsoft Excel.
+> En la versión **v0.5.2**, se han introducido optimizaciones críticas para dispositivos de baja gama, incluyendo la limitación de decodificación de imágenes mediante `cacheWidth` y el uso de `getTemporaryDirectory` para la gestión de archivos de exportación. Además, se ha restringido la exportación global para prevenir el agotamiento de recursos del sistema. Los archivos CSV utilizan codificación UTF-8 estándar sin BOM.
 
 ---
 

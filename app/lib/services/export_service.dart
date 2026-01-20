@@ -82,26 +82,29 @@ class ExportService {
         fieldDelimiter: AppConstants.csvDelimiter,
       ).convert(csvData);
 
-      final directory = await getApplicationDocumentsDirectory();
+      final directory =
+          await getTemporaryDirectory(); // Usar cache para archivos temporales
       final timestamp = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
 
-      // Determinar código de vereda para el nombre del archivo
-      String vCode = 'ALL';
-      if (veredaFiltro != null && veredaFiltro != 'Todas') {
-        if (veredaFiltro.toUpperCase().contains('RECREO')) {
-          vCode = 'REC';
-        } else if (veredaFiltro.toUpperCase().contains('PUEBLO')) {
-          vCode = 'PUE';
-        } else if (veredaFiltro.toUpperCase().contains('TENDIDO')) {
-          vCode = 'TEN';
-        }
+      // Validar vereda específica
+      if (veredaFiltro == null || veredaFiltro == 'Todas') {
+        throw Exception('Debe seleccionar una vereda específica para exportar');
       }
 
-      // Guardar CSV con BOM
+      String vCode = 'ALL';
+      if (veredaFiltro.toUpperCase().contains('RECREO')) {
+        vCode = 'REC';
+      } else if (veredaFiltro.toUpperCase().contains('PUEBLO')) {
+        vCode = 'PUE';
+      } else if (veredaFiltro.toUpperCase().contains('TENDIDO')) {
+        vCode = 'TEN';
+      }
+
+      // Guardar CSV (Sin BOM por ahora)
       final csvFileName = 'LECTURAS_${vCode}_$timestamp.csv';
       final csvPath = '${directory.path}/$csvFileName';
       final csvFile = File(csvPath);
-      await csvFile.writeAsBytes([0xEF, 0xBB, 0xBF, ...utf8.encode(csv)]);
+      await csvFile.writeAsString(csv, encoding: utf8);
 
       // Guardar ZIP
       final zipFileName = 'FOTOS_${vCode}_$timestamp.zip';

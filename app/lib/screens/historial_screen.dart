@@ -146,7 +146,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
           child: BotonPrincipal(
             texto: 'EXPORTAR DATOS',
             icono: Icons.file_download,
-            onPressed: _exportarDatos,
+            onPressed: _filtroActivo == 'Todas' ? null : _exportarDatos,
           ),
         ),
       ),
@@ -205,6 +205,8 @@ class _HistorialScreenState extends State<HistorialScreen> {
                     ? Image.file(
                         File(lectura.fotoPath),
                         fit: BoxFit.cover,
+                        cacheWidth:
+                            120, // Optimización para móviles de baja gama
                         errorBuilder: (context, error, stackTrace) =>
                             const Icon(Icons.broken_image, color: Colors.grey),
                       )
@@ -253,7 +255,9 @@ class _HistorialScreenState extends State<HistorialScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No hay lecturas en este período',
+            _filtroActivo == 'Todas'
+                ? 'Selecciona una vereda para exportar'
+                : 'No hay lecturas en este período',
             style: AppTextStyles.cuerpo.copyWith(
               color: AppColors.textSecondary,
             ),

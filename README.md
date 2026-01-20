@@ -1,10 +1,10 @@
-# AguaLector 💧 v0.5.1
+# AguaLector 💧 v0.5.2
 
 Aplicación móvil Android para registro de lecturas de contadores de agua potable en comunidades rurales.
 
-## 🎯 Estado Actual: Fase 5 - Organización de UI y Exportación Pulida (v0.5.1)
+## 🎯 Estado Actual: Fase 5 - Organización de UI y Optimización (v0.5.2)
 
-Esta versión se enfoca en la exportación masiva de datos y fotos, asegurando la compatibilidad con Excel y facilitando la gestión de evidencias visuales mediante archivos comprimidos ZIP.
+Esta versión se enfoca en la estabilidad y el rendimiento en dispositivos de baja gama, optimizando el uso de memoria durante la visualización de fotos y refinando el proceso de exportación segmentada.
 
 ## ✨ Características Principales
 
@@ -14,11 +14,10 @@ Esta versión se enfoca en la exportación masiva de datos y fotos, asegurando l
 - 📍 Geolocalización automática (GPS) con 6 decimales de precisión
 - 📅 Marca de tiempo automática y formateada
 - 💾 Almacenamiento local persistente (SQLite)
-- 📤 Exportación inteligente a CSV (Semicolón + UTF-8 BOM)
-- 📦 Exportación de fotos en formato ZIP
-- 🧹 Gestión de lecturas (edición y eliminación individual)
+- 📤 Exportación segmentada por vereda (CSV + ZIP)
+- 🚀 Optimización de memoria RAM (`cacheWidth` en imágenes)
+- 🧹 Gestión de archivos temporales mediante caché del sistema
 - 🌓 Soporte para visualización selectiva (ocultar completados)
-- 🔄 Compartir varios archivos a la vez (CSV + ZIP)
 
 ## 🛠️ Tecnologías
 
