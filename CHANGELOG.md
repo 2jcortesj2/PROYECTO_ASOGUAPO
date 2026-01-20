@@ -2,6 +2,12 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.6.2] - 2026-01-20
+
+### Mejorado
+- **Buscador Inteligente:** El buscador de la lista principal ahora ignora tildes y diéresis (ej. busca "Sandoval" y encuentra "SANDOVAL").
+- **Búsqueda por Fragmentos:** Permite buscar por partes del nombre o código (ej. "Juan 102" encontrará registros que contengan ambos términos en cualquier orden).
+
 ## [0.6.1] - 2026-01-20
 
 ### Corregido

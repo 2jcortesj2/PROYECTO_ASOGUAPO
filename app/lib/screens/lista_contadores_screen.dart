@@ -61,6 +61,16 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     }
   }
 
+  String _normalize(String text) {
+    var withAccents = 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑ';
+    var withoutAccents = 'aeiouAEIOUaeiouAEIOUnN';
+    String normalized = text;
+    for (int i = 0; i < withAccents.length; i++) {
+      normalized = normalized.replaceAll(withAccents[i], withoutAccents[i]);
+    }
+    return normalized.toLowerCase();
+  }
+
   List<Contador> get _contadoresFiltrados {
     final porVereda = _veredaSeleccionada == 'Todas'
         ? _contadores
@@ -79,10 +89,22 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
           : porVereda;
     }
 
-    final query = _searchQuery.toLowerCase();
+    final query = _normalize(_searchQuery);
     final filtrados = porVereda.where((c) {
-      return c.nombre.toLowerCase().contains(query) ||
-          c.vereda.toLowerCase().contains(query);
+      final nombreNorm = _normalize(c.nombre);
+      final veredaNorm = _normalize(c.vereda);
+      final idNorm = _normalize(c.id);
+
+      // Búsqueda por partes (si escribe "Juan Perez" busca que contenga ambas)
+      final partes = query.split(' ').where((p) => p.isNotEmpty);
+      if (partes.isEmpty) return true;
+
+      return partes.every(
+        (parte) =>
+            nombreNorm.contains(parte) ||
+            veredaNorm.contains(parte) ||
+            idNorm.contains(parte),
+      );
     }).toList();
 
     return _ocultarCompletados
