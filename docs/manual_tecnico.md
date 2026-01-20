@@ -306,3 +306,24 @@ El APK se genera en: `build/app/outputs/flutter-apk/app-release.apk`
 ## Flujo de Trabajo Git
 
 Ver `README.md` para detalles del flujo de trabajo con ramas `main` y `dev`.
+
+---
+
+## Hoja de Ruta y Desarrollos Futuros
+
+Para las siguientes fases del proyecto, se contemplan las siguientes mejoras arquitectónicas:
+
+### 1. Ordenamiento Inteligente por Ubicación
+- **Objetivo:** Optimizar los tiempos de desplazamiento del lector en campo.
+- **Implementación:** Organizar automáticamente la lista de contadores basándose en la jerarquía `Vereda > Ruta > Predio`. De esta forma, el siguiente medidor en la lista será siempre el físicamente más cercano al anterior, reduciendo errores y fatiga.
+
+### 2. Gestión Externa de Usuarios (PC Tool)
+- **Objetivo:** Facilitar la administración de la base de datos sin depender de actualizaciones de APK.
+- **Propuesta:** Desarrollo de una aplicación de escritorio (AguaLector Admin) que, al conectar el dispositivo móvil al PC vía USB:
+  - Permita leer la base de datos actual.
+  - Permita inyectar nuevos suscriptores desde un Excel/CSV de forma masiva.
+  - Permita corregir información de usuarios existentes directamente en el dispositivo.
+
+### 3. Sincronización en la Nube
+- **Objetivo:** Centralizar la información en tiempo real.
+- **Propuesta:** Implementar un backend para que las exportaciones se realicen vía API en lugar de envíos manuales de ZIP.

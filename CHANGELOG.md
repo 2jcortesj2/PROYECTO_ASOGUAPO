@@ -2,6 +2,13 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.8.0] - 2026-01-20
+
+### LANZAMIENTO: PILOTO FASE 2
+- **Despliegue Total:** Transición oficial a la segunda fase del piloto, habilitando la carga de todos los contadores de la comunidad.
+- **Estabilidad:** Consolidación de una versión pulida y estable tras las correcciones de UI y optimización de exportación.
+- **Hoja de Ruta:** Se definieron los objetivos futuros en el Manual Técnico (Ordenamiento inteligente y Herramienta de PC).
+
 ## [0.7.4] - 2026-01-20
 
 ### Mejorado
