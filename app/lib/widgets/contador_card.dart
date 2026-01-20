@@ -93,7 +93,7 @@ class ContadorCard extends StatelessWidget {
         break;
       case EstadoContador.registrado:
         icono = Icons.check_circle;
-        color = AppColors.secondary; // Azul secundario en lugar de verde éxito
+        color = AppColors.primary;
         break;
       case EstadoContador.conError:
         icono = Icons.warning_rounded;

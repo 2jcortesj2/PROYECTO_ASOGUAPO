@@ -367,7 +367,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
-                color: AppColors.secondary,
+                color: AppColors.primary,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Row(

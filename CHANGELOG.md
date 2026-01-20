@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.7.1] - 2026-01-20
+
+### Cambios
+- **Unificación de Color:** Se revirtió el esquema de color a un verde esmeralda uniforme (Color Primario) en toda la aplicación, eliminando el uso del color secundario en estados de éxito e indicadores para mantener una estética monocromática coherente.
+
 ## [0.7.0] - 2026-01-20
 
 ### Mejorado
