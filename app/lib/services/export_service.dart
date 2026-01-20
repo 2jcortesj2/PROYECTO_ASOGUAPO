@@ -137,7 +137,7 @@ class ExportService {
           final contador = contadoresMap[lectura.contadorId];
           final lecturaAnterior = contador?.ultimaLectura;
           final String consumoStr = lecturaAnterior == null
-              ? 'sin referencia'
+              ? ''
               : (lectura.lectura - lecturaAnterior).toStringAsFixed(0);
           final String nombreFoto = lectura.fotoPath.split('/').last;
 
@@ -145,7 +145,7 @@ class ExportService {
             lectura.contadorId,
             lectura.nombreUsuario,
             lectura.vereda,
-            lecturaAnterior?.toStringAsFixed(0) ?? 'sin lectura',
+            lecturaAnterior?.toStringAsFixed(0) ?? '',
             lectura.lectura.toStringAsFixed(0),
             consumoStr,
             DateFormat('yyyy-MM-dd').format(lectura.fecha),

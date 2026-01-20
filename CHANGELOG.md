@@ -2,6 +2,12 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.7.3] - 2026-01-20
+
+### Cambios
+- **Simplificación de UI:** Se eliminaron las etiquetas de "Sin referencia" y cálculos de consumo en la pantalla de historial para ofrecer una vista más limpia y directa.
+- **Optimización de Exportación:** Se simplificó el reporte CSV eliminando textos descriptivos como "sin referencia", dejando las celdas vacías para un reporte más profesional y menos saturado.
+
 ## [0.7.2] - 2026-01-20
 
 ### Mejorado

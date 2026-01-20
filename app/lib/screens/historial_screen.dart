@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
 import '../models/lectura.dart';
-import '../models/contador.dart';
 import '../services/database_service.dart';
 import '../services/export_service.dart';
 import '../widgets/boton_principal.dart';
@@ -32,7 +31,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
   final ExportService _exportService = ExportService();
 
   List<Lectura> _lecturas = [];
-  Map<String, Contador> _contadoresMap = {};
   bool _cargando = true;
   bool _exportando = false;
   ExportProgress? _progresoActual;
@@ -52,12 +50,10 @@ class _HistorialScreenState extends State<HistorialScreen> {
   Future<void> _cargarLecturas() async {
     setState(() => _cargando = true);
     final lecturas = await _databaseService.getLecturas();
-    final contadores = await _databaseService.getContadores();
 
     if (mounted) {
       setState(() {
         _lecturas = lecturas;
-        _contadoresMap = {for (var c in contadores) c.id: c};
 
         // Determinar qué vereda seleccionar
         if (widget.filtroInicial != null) {
@@ -323,19 +319,11 @@ class _HistorialScreenState extends State<HistorialScreen> {
                 children: [
                   Text(lectura.nombreUsuario, style: AppTextStyles.cardTitulo),
                   const SizedBox(height: 4),
-                  // Mostrar Lectura Actual y Consumo
-                  Row(
-                    children: [
-                      Text(
-                        lectura.lecturaFormateada,
-                        style: AppTextStyles.subtitulo.copyWith(
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Cálculo de consumo
-                      _buildConsumoBadge(lectura),
-                    ],
+                  Text(
+                    lectura.lecturaFormateada,
+                    style: AppTextStyles.subtitulo.copyWith(
+                      color: AppColors.primary,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -346,39 +334,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildConsumoBadge(Lectura lectura) {
-    final contador = _contadoresMap[lectura.contadorId];
-    final lecturaAnterior = contador?.ultimaLectura;
-
-    String textoConsumo;
-    if (lecturaAnterior == null) {
-      textoConsumo = 'Sin referencia';
-    } else {
-      final consumo = lectura.lectura - lecturaAnterior;
-      textoConsumo = '+${consumo.toStringAsFixed(0)} m³';
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: lecturaAnterior == null
-            ? Colors.grey[100]
-            : AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        textoConsumo,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-          color: lecturaAnterior == null
-              ? AppColors.textSecondary
-              : AppColors.primary,
         ),
       ),
     );
