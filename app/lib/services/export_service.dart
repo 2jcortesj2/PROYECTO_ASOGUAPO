@@ -4,6 +4,7 @@ import 'package:archive/archive_io.dart';
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'database_service.dart';
@@ -19,6 +20,7 @@ class ExportService {
     List<Lectura>? lecturasFiltradas,
     String? veredaFiltro,
     TipoExportacion tipo = TipoExportacion.todo,
+    Function(double)? onProgress,
   }) async {
     try {
       final lecturas =
@@ -44,10 +46,13 @@ class ExportService {
 
       final directory = await getTemporaryDirectory();
       final timestamp = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
-      final List<XFile> filesToShare = [];
+      final archive = Archive();
+      bool hasContent = false;
 
       // 1. GENERAR CSV (Si se solicita)
       if (tipo == TipoExportacion.csv || tipo == TipoExportacion.todo) {
+        if (onProgress != null) onProgress(0.1);
+
         List<List<dynamic>> csvData = [
           [
             'CODIGO_CONCATENADO',
@@ -93,71 +98,72 @@ class ExportService {
         ).convert(csvData);
 
         final csvFileName = 'LECTURAS_${vCode}_$timestamp.csv';
-        final csvPath = p.join(directory.path, csvFileName);
-        final csvFile = File(csvPath);
-
-        // Usar writeAsBytes para asegurar que no haya problemas de encoding o buffer
-        await csvFile.writeAsBytes(utf8.encode(csv), flush: true);
-
-        if (await csvFile.exists()) {
-          filesToShare.add(
-            XFile(csvPath, name: csvFileName, mimeType: 'text/csv'),
-          );
-        }
+        final csvBytes = utf8.encode(csv);
+        archive.addFile(ArchiveFile(csvFileName, csvBytes.length, csvBytes));
+        hasContent = true;
       }
 
-      // 2. GENERAR ZIP (Si se solicita)
+      // 2. AGREGAR FOTOS AL ARCHIVE (Si se solicita)
       if (tipo == TipoExportacion.zip || tipo == TipoExportacion.todo) {
-        final archive = Archive();
-        bool hasPhotos = false;
+        int processed = 0;
+        final photosWithFile = lecturas
+            .where((l) => l.fotoPath.isNotEmpty)
+            .toList();
+        final totalPhotos = photosWithFile.length;
 
-        for (var lectura in lecturas) {
-          if (lectura.fotoPath.isNotEmpty) {
-            final file = File(lectura.fotoPath);
-            if (await file.exists()) {
-              final String nombreFoto = lectura.fotoPath.split('/').last;
-              final bytes = await file.readAsBytes();
-              archive.addFile(ArchiveFile(nombreFoto, bytes.length, bytes));
-              hasPhotos = true;
-            }
+        for (var lectura in photosWithFile) {
+          final file = File(lectura.fotoPath);
+          if (await file.exists()) {
+            final String nombreFoto = lectura.fotoPath.split('/').last;
+            final bytes = await file.readAsBytes();
+            archive.addFile(
+              ArchiveFile('fotos/$nombreFoto', bytes.length, bytes),
+            );
+            hasContent = true;
           }
-        }
-
-        if (hasPhotos) {
-          final zipFileName = 'FOTOS_${vCode}_$timestamp.zip';
-          final zipPath = p.join(directory.path, zipFileName);
-          final zipData = ZipEncoder().encode(archive);
-
-          if (zipData != null) {
-            final zipFile = File(zipPath);
-            await zipFile.writeAsBytes(zipData, flush: true);
-
-            if (await zipFile.exists()) {
-              filesToShare.add(
-                XFile(zipPath, name: zipFileName, mimeType: 'application/zip'),
-              );
-            }
+          processed++;
+          if (onProgress != null && totalPhotos > 0) {
+            // Empezamos en 0.2 y llegamos a 0.8 durante el empaquetado de fotos
+            onProgress(0.2 + (processed / totalPhotos * 0.6));
           }
-        } else if (tipo == TipoExportacion.zip) {
-          throw Exception('No hay fotos para exportar');
         }
       }
 
-      // 3. COMPARTIR
-      if (filesToShare.isNotEmpty) {
-        String msgExtra = tipo == TipoExportacion.csv
-            ? 'Reporte CSV'
-            : tipo == TipoExportacion.zip
-            ? 'Fotos ZIP'
-            : 'Reporte y Fotos';
-
-        await Share.shareXFiles(
-          filesToShare,
-          text: '$msgExtra - Vereda: $veredaFiltro ($vCode)',
-        );
+      if (!hasContent) {
+        throw Exception('No hay datos o fotos para exportar');
       }
+
+      // 3. COMPRESIÓN Y COMPARTIR (SIEMPRE UN ZIP)
+      if (onProgress != null) onProgress(0.9);
+
+      final String suffix = tipo == TipoExportacion.csv
+          ? 'REPORTE'
+          : (tipo == TipoExportacion.zip ? 'FOTOS' : 'COMPLETO');
+      final zipFileName = 'EXPORT_${vCode}_${suffix}_$timestamp.zip';
+      final zipPath = p.join(directory.path, zipFileName);
+
+      // Ejecución pesada en Isolate
+      final zipData = await compute(_encodeZip, archive);
+
+      if (zipData == null)
+        throw Exception('Error al generar el archivo comprimido');
+
+      final zipFile = File(zipPath);
+      await zipFile.writeAsBytes(zipData, flush: true);
+
+      if (onProgress != null) onProgress(1.0);
+
+      await Share.shareXFiles([
+        XFile(zipPath, name: zipFileName, mimeType: 'application/zip'),
+      ], text: 'Exportación Asoguapo - Vereda: $veredaFiltro ($vCode)');
     } catch (e) {
       rethrow;
     }
+  }
+
+  /// Función estática requerida para compute (Isolate)
+  /// Realiza la codificación ZIP en un hilo separado
+  static List<int>? _encodeZip(Archive archive) {
+    return ZipEncoder().encode(archive);
   }
 }
