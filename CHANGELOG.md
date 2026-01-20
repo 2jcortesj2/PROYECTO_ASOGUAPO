@@ -2,6 +2,13 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.7.2] - 2026-01-20
+
+### Mejorado
+- **Control de Consumo:** Se implementó la lógica de "Sin referencia" para casos donde no existe una lectura previa en el mes anterior.
+- **Visualización en Historial:** Ahora las tarjetas del historial muestran el consumo calculado (+X m³) o el estado "Sin referencia" de forma visual.
+- **Exportación CSV:** Se corrigió el cálculo de consumo en el reporte exportado para evitar valores erróneos cuando no hay lectura anterior, exportando "sin referencia" en su lugar.
+
 ## [0.7.1] - 2026-01-20
 
 ### Cambios

@@ -135,17 +135,19 @@ class ExportService {
 
         for (var lectura in lecturas) {
           final contador = contadoresMap[lectura.contadorId];
-          final lecturaAnterior = contador?.ultimaLectura ?? 0;
-          final consumo = lectura.lectura - lecturaAnterior;
+          final lecturaAnterior = contador?.ultimaLectura;
+          final String consumoStr = lecturaAnterior == null
+              ? 'sin referencia'
+              : (lectura.lectura - lecturaAnterior).toStringAsFixed(0);
           final String nombreFoto = lectura.fotoPath.split('/').last;
 
           csvData.add([
             lectura.contadorId,
             lectura.nombreUsuario,
             lectura.vereda,
-            lecturaAnterior.toStringAsFixed(0),
+            lecturaAnterior?.toStringAsFixed(0) ?? 'sin lectura',
             lectura.lectura.toStringAsFixed(0),
-            consumo.toStringAsFixed(0),
+            consumoStr,
             DateFormat('yyyy-MM-dd').format(lectura.fecha),
             DateFormat('HH:mm:ss').format(lectura.fecha),
             lectura.latitud?.toStringAsFixed(6) ?? '',
