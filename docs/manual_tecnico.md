@@ -139,6 +139,7 @@ class Lectura {
   final double? longitud;
   final DateTime fecha;
   final bool sincronizado;
+  final String? comentario;
 }
 ```
 
@@ -171,6 +172,7 @@ CREATE TABLE lecturas (
   longitud REAL,
   fecha TEXT NOT NULL,
   sincronizado INTEGER DEFAULT 0,
+  comentario TEXT,
   FOREIGN KEY (contador_id) REFERENCES contadores(id)
 );
 
@@ -324,6 +326,6 @@ Para las siguientes fases del proyecto, se contemplan las siguientes mejoras arq
   - Permita inyectar nuevos suscriptores desde un Excel/CSV de forma masiva.
   - Permita corregir información de usuarios existentes directamente en el dispositivo.
 
-### 3. Sincronización en la Nube
-- **Objetivo:** Centralizar la información en tiempo real.
-- **Propuesta:** Implementar un backend para que las exportaciones se realicen vía API en lugar de envíos manuales de ZIP.
+### 4. Gestión de Excepciones de Lectura (v0.9.0)
+- **Objetivo:** Capturar información valiosa cuando la lectura física es imposible.
+- **Implementación:** Si el contador no es legible, el usuario activa el diálogo de excepción. Se registra una lectura técnica de `0 m³` y se guarda el motivo descriptivo. En el CSV exportado, este motivo aparece en la columna `MOTIVO_NO_LECTURA`.

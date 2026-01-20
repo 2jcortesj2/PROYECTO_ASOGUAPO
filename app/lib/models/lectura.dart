@@ -11,6 +11,8 @@ class Lectura {
   final DateTime fecha;
   final bool sincronizado;
 
+  final String? comentario;
+
   const Lectura({
     this.id,
     required this.contadorId,
@@ -22,6 +24,7 @@ class Lectura {
     this.longitud,
     required this.fecha,
     this.sincronizado = false,
+    this.comentario,
   });
 
   /// Crea una Lectura desde un Map (base de datos)
@@ -37,6 +40,7 @@ class Lectura {
       longitud: map['longitud'] as double?,
       fecha: DateTime.parse(map['fecha'] as String),
       sincronizado: (map['sincronizado'] as int? ?? 0) == 1,
+      comentario: map['comentario'] as String?,
     );
   }
 
@@ -53,6 +57,7 @@ class Lectura {
       'longitud': longitud,
       'fecha': fecha.toIso8601String(),
       'sincronizado': sincronizado ? 1 : 0,
+      'comentario': comentario,
     };
   }
 
@@ -102,6 +107,7 @@ class Lectura {
     double? longitud,
     DateTime? fecha,
     bool? sincronizado,
+    String? comentario,
   }) {
     return Lectura(
       id: id ?? this.id,
@@ -114,6 +120,7 @@ class Lectura {
       longitud: longitud ?? this.longitud,
       fecha: fecha ?? this.fecha,
       sincronizado: sincronizado ?? this.sincronizado,
+      comentario: comentario ?? this.comentario,
     );
   }
 
@@ -128,6 +135,7 @@ class Lectura {
       latitud?.toString() ?? '',
       longitud?.toString() ?? '',
       fotoPath,
+      comentario ?? '',
     ];
   }
 
@@ -141,6 +149,7 @@ class Lectura {
     'Latitud',
     'Longitud',
     'Foto',
+    'Comentario',
   ];
 
   @override

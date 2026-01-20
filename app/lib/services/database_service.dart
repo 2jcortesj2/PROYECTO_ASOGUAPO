@@ -29,14 +29,14 @@ class DatabaseService {
     // Increment version if schema changes
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
+    if (oldVersion < 3) {
       // Recrear tablas si cambia versión (o hacer alter table si se prefiere conservar datos)
       // Como estamos en piloto y se reimporta todo, vamos a redrop
       await db.execute('DROP TABLE IF EXISTS lecturas');
@@ -72,6 +72,7 @@ class DatabaseService {
         longitud REAL,
         fecha TEXT NOT NULL,
         sincronizado INTEGER DEFAULT 0,
+        comentario TEXT,
         FOREIGN KEY (contador_id) REFERENCES contadores(id)
       )
     ''');

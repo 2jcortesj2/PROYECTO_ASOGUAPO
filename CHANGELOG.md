@@ -2,6 +2,13 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.9.0] - 2026-01-20
+
+### Añadido
+- **Reporte de Anomalías:** Nueva opción "No se puede leer el contador" que permite registrar motivos descriptivos (ej: medidor roto, acceso denegado).
+- **Esquema de Datos:** Se añadió el campo `comentario` a la base de datos y a los reportes CSV.
+- **Documentación:** Renovación completa del `README.md` y actualización del Manual Técnico con la nueva hoja de ruta.
+
 ## [0.8.0] - 2026-01-20
 
 ### LANZAMIENTO: PILOTO FASE 2

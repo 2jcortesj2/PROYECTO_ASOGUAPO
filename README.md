@@ -1,130 +1,93 @@
-# AguaLector 💧 v0.8.0
+# AguaLector 💧 v0.9.0
 
-Aplicación móvil Android para registro de lecturas de contadores de agua potable en comunidades rurales.
+[![Flutter](https://img.shields.io/badge/Flutter-3.x-blue.svg)](https://flutter.dev/)
+[![Dart](https://img.shields.io/badge/Dart-3.x-blue.svg)](https://dart.dev/)
+[![SQLite](https://img.shields.io/badge/SQLite-3.x-green.svg)](https://sqlite.org/)
+[![Platform](https://img.shields.io/badge/Platform-Android-orange.svg)](https://android.com/)
 
-## 🎯 Estado Actual: Piloto Fase 2 - Despliegue Total (v0.8.0)
+**AguaLector** es una solución móvil diseñada específicamente para la gestión eficiente del registro de lecturas de contadores de agua potable en comunidades rurales y administraciones locales de acueducto (ASOGUAPO).
 
-Esta versión introduce mejoras visuales sutiles para una mejor navegación, incluye la carga de la base de datos completa de usuarios y optimiza la identificación de medidores.
+## 🚀 Misión del Proyecto
+Digitalizar y agilizar el proceso de toma de lecturas en campo, eliminando el uso de papel, reduciendo errores humanos y garantizando la trazabilidad mediante pruebas fotográficas y geolocalización.
 
-## ✨ Características Principales
+---
 
-- 📋 Lista de contadores organizada por veredas (REC, PUE, TEN)
-- 📷 Captura de foto con cámara en vivo (embebida)
-- 🔢 Registro manual de lectura con validación de historial
-- 📍 Geolocalización automática (GPS) con 6 decimales de precisión
-- 📅 Marca de tiempo automática y formateada
-- 💾 Almacenamiento local persistente (SQLite)
-- 📤 Exportación segmentada por vereda (CSV + ZIP)
-- 🚀 Optimización de memoria RAM (`cacheWidth` en imágenes)
-- 🧹 Gestión de archivos temporales mediante caché del sistema
-- 🌓 Soporte para visualización selectiva (ocultar completados)
-- 🎚️ Scrollbar dinámico (slider verde) con desvanecimiento automático
-- 🆔 Identificación sutil de códigos de medidor en tarjetas
-- 📊 Base de datos completa cargada desde reporte actualizado
+## 🎯 Estado Actual: Piloto Fase 2 - Despliegue Total (v0.9.0)
 
-## 🛠️ Tecnologías
+Esta versión consolida la madurez de la aplicación tras múltiples ciclos de retroalimentación, habilitando el despliegue para la totalidad de suscriptores y añadiendo flexibilidad para casos excepcionales de lectura.
 
-- **Framework:** Flutter 3.x
-- **Lenguaje:** Dart
-- **Base de datos:** SQLite (sqflite)
-- **Cámara:** camera (embebida)
-- **GPS:** geolocator
-- **Exportación:** csv, share_plus
+### ✨ Características Principales
 
-## 📁 Estructura del Proyecto
+- 📱 **Gestión Segmentada:** Listado de contadores organizado por zonas geográficas (Veredas: El Recreo, Pueblo Nuevo, El Tendido).
+- 📸 **Evidencia Fotográfica:** Cámara embebida de baja resolución optimizada para no saturar el almacenamiento, pero garantizando la legibilidad de la lectura.
+- 📍 **Auditoría GPS:** Registro automático de coordenadas exactas (6 decimales) en cada toma de lectura.
+- 🔢 **Validación Inteligente:** Sistema de alertas para consumos atípicos y ventana de edición protegida de 15 días.
+- ⚠️ **Gestión de Excepciones:** Opción discreta para registrar motivos por los cuales no se pudo realizar una lectura (contador roto, acceso denegado, etc.).
+- 💾 **Persistencia Robusta:** Base de Datos SQLite local que permite trabajar sin conexión a internet.
+- 📤 **Exportación Profesional:** Generación de reportes unificados en CSV y paquetes de fotos en ZIP, compartibles directamente vía WhatsApp o correo.
 
-```
-PROYECTO_ASOGUAPO/
-├── app/                    # Código Flutter
-│   ├── lib/
-│   │   ├── main.dart
-│   │   ├── config/         # Tema, constantes
-│   │   ├── models/         # Modelos de datos
-│   │   ├── screens/        # Pantallas
-│   │   ├── widgets/        # Componentes reutilizables
-│   │   ├── services/       # Lógica de negocio
-│   │   └── utils/          # Utilidades
-│   └── pubspec.yaml
-├── docs/                   # Documentación
-│   ├── manual_usuario.md
-│   ├── manual_tecnico.md
-│   └── TESTING.md          # Guía de pruebas
-├── .gitignore
-├── CHANGELOG.md
-└── README.md
-```
+---
 
-## 🧪 Pruebas
+## 🛠️ Stack Tecnológico
 
-El proyecto incluye una guía de testing detallada en [docs/TESTING.md](docs/TESTING.md) que cubre análisis estático y casos de prueba manuales.
+| Componente     | Tecnología                 |
+| :------------- | :------------------------- |
+| **Framework**  | Flutter 3.x                |
+| **Lenguaje**   | Dart                       |
+| **BBDD Local** | SQLite (sqflite)           |
+| **Cámara**     | camera (Isolate optimized) |
+| **GPS**        | geolocator (High Accuracy) |
+| **Compresión** | archive (compute isolate)  |
 
-Para ejecutar pruebas automáticas:
-```bash
-cd app
-flutter test
-```
+---
 
-## 🚀 Instalación
+## 💻 Instalación y Configuración
 
 ### Prerrequisitos
+- Flutter SDK instalado.
+- Android SDK (API 24 o superior).
+- Dispositivo Android físico para pruebas de Cámara y GPS.
 
-- Flutter SDK 3.x
-- Android Studio / VS Code
-- Dispositivo Android o emulador
-
-### Pasos
-
+### Clonación y Despliegue
 ```bash
-# Clonar repositorio
 git clone https://github.com/2jcortesj2/PROYECTO_ASOGUAPO.git
 cd PROYECTO_ASOGUAPO
-
-# Cambiar a rama de desarrollo
-git checkout dev
-
-# Instalar dependencias
 cd app
 flutter pub get
-
-# Ejecutar en modo debug
-flutter run
+flutter run --release
 ```
 
-## 📱 Pantallas
+---
 
-| Pantalla            | Descripción                     |
-| ------------------- | ------------------------------- |
-| Lista de Contadores | Listado con indicador de estado |
-| Registro de Lectura | Cámara + input numérico + GPS   |
-| Confirmación        | Resumen del registro guardado   |
-| Historial           | Lista de lecturas + exportación |
+## 📁 Estructura de Documentación
 
-## 📝 Flujo de Trabajo Git
+Para una comprensión profunda del sistema, consulta los siguientes manuales en la carpeta `/docs`:
 
-```
-dev → main → tag
- ↑
- trabajo diario
-```
+1. 📖 **[Manual de Usuario](docs/manual_usuario.md):** Guía paso a paso para los lectores en campo.
+2. 🛠️ **[Manual Técnico](docs/manual_tecnico.md):** Arquitectura, esquema de BD y lógica de negocio.
+3. 🧪 **[Guía de Testing](docs/TESTING.md):** Casos de prueba y validaciones.
 
-- `main` → versión estable
-- `dev` → desarrollo activo
-- Tags: `v0.1.0`, `v0.2.0`, etc.
+---
 
-## 🏷️ Convención de Commits
+## 📋 Flujo de Exportación/Importación
 
-| Prefijo    | Uso                 |
-| ---------- | ------------------- |
-| `feat`     | Nueva funcionalidad |
-| `fix`      | Corrección de error |
-| `docs`     | Documentación       |
-| `refactor` | Limpieza de código  |
-| `chore`    | Configuración       |
+1. **Importación:** La app carga automáticamente los usuarios desde `assets/LECTURAS_PILOTO.csv` en el primer inicio.
+2. **Toma de datos:** El lector registra lecturas o reporta anomalías.
+3. **Cierre:** Se exporta el ZIP desde la pantalla de Historial.
+4. **Procesamiento:** El reporte CSV incluye columnas de Lectura Anterior, Actual, Consumo, Coordenadas y Motivos de No Lectura.
 
-## 📄 Licencia
+---
 
-Este proyecto es de uso interno para ASOGUAPO.
+## 🏷️ Versiones Relevantes
+- **v0.5.x:** Implementación de compresión ZIP en hilos separados (Isolates).
+- **v0.7.x:** Refinamiento visual, scrollbars personalizados y unificación de colores (Verde ASOGUAPO).
+- **v0.8.0:** Despliegue total del padrón de usuarios.
+- **v0.9.0:** Introducción de registro de comentarios para lecturas fallidas.
 
-## 👥 Contacto
+---
 
-Desarrollado para la comunidad administrada por junta local de agua potable.
+## 📄 Licencia y Autoria
+Desarrollado para la **Asociación de Suscriptores de Acueducto (ASOGUAPO)**. Uso restringido para la administración comunal.
+
+---
+*AguaLector: Transparencia y eficiencia en cada gota.*

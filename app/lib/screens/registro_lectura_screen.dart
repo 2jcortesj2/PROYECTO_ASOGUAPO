@@ -48,6 +48,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
   bool _capturandoFoto = false;
   bool _cameraInitialized = false;
   String? _cameraError;
+  String? _comentario;
 
   @override
   void initState() {
@@ -61,6 +62,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
       if (widget.lecturaExistente!.fotoPath.isNotEmpty) {
         _fotoPath = widget.lecturaExistente!.fotoPath;
       }
+      _comentario = widget.lecturaExistente!.comentario;
     }
 
     _initCamera();
@@ -136,10 +138,14 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
   }
 
   bool get _puedeGuardar {
-    return _fotoPath != null &&
-        _lecturaController.text.isNotEmpty &&
-        !_guardando &&
-        !_capturandoFoto;
+    final tieneLectura = _lecturaController.text.isNotEmpty;
+    final tieneComentario = _comentario != null && _comentario!.isNotEmpty;
+
+    // Si no se puede leer (tiene comentario), permitimos guardar sin foto o sin lectura
+    if (tieneComentario) return !_guardando;
+
+    // Caso normal
+    return _fotoPath != null && tieneLectura && !_guardando && !_capturandoFoto;
   }
 
   @override
@@ -184,8 +190,33 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
                     onChanged: (value) {
                       setState(() {
                         _errorLectura = null;
+                        // Si empieza a escribir, quitamos el "no se puede leer"
+                        if (value.isNotEmpty) _comentario = null;
                       });
                     },
+                  ),
+
+                  // Opción discreta: No se puede leer
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _mostrarDialogoNoLectura,
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        foregroundColor: _comentario != null
+                            ? Colors.orange
+                            : AppColors.textSecondary,
+                      ),
+                      child: Text(
+                        _comentario != null
+                            ? 'Motivo: ${_comentario!.length > 15 ? _comentario!.substring(0, 15) + '...' : _comentario}'
+                            : '¿No se puede leer el contador?',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
                   ),
 
                   const SizedBox(height: 16),
@@ -411,20 +442,25 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
   void _guardarLectura() async {
     // Validar lectura
     final lecturaTexto = _lecturaController.text.trim();
-    if (lecturaTexto.isEmpty) {
-      setState(() => _errorLectura = 'Ingresa la lectura');
-      return;
-    }
+    double lectura = 0;
 
-    final lectura = double.tryParse(lecturaTexto);
-    if (lectura == null) {
-      setState(() => _errorLectura = 'Lectura inválida');
-      return;
-    }
+    if (_comentario == null) {
+      if (lecturaTexto.isEmpty) {
+        setState(() => _errorLectura = 'Ingresa la lectura');
+        return;
+      }
 
-    if (lectura < AppConstants.lecturaMinima) {
-      setState(() => _errorLectura = 'La lectura debe ser mayor a 0');
-      return;
+      final l = double.tryParse(lecturaTexto);
+      if (l == null) {
+        setState(() => _errorLectura = 'Lectura inválida');
+        return;
+      }
+
+      if (l < AppConstants.lecturaMinima) {
+        setState(() => _errorLectura = 'La lectura debe ser mayor a 0');
+        return;
+      }
+      lectura = l;
     }
 
     setState(() => _guardando = true);
@@ -444,6 +480,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
       longitud: _longitud,
       fecha: DateTime.now(),
       sincronizado: false,
+      comentario: _comentario,
     );
 
     // Guardar en BD
@@ -473,5 +510,48 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
         _errorLectura = 'Error al guardar: $e';
       });
     }
+  }
+
+  void _mostrarDialogoNoLectura() {
+    final controller = TextEditingController(text: _comentario);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          '¿Por qué no se puede leer?',
+          style: AppTextStyles.subtitulo,
+        ),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: 'Ej: Contador roto, perro agresivo, empañado...',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 3,
+          textCapitalization: TextCapitalization.sentences,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() => _comentario = null);
+              Navigator.pop(context);
+            },
+            child: const Text('CANCELAR'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                setState(() {
+                  _comentario = controller.text.trim();
+                  _errorLectura = null;
+                });
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('ACEPTAR'),
+          ),
+        ],
+      ),
+    );
   }
 }

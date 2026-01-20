@@ -128,6 +128,7 @@ class ExportService {
             'LATITUD',
             'LONGITUD',
             'NOMBRE_FOTO',
+            'MOTIVO_NO_LECTURA',
           ],
         ];
 
@@ -157,6 +158,7 @@ class ExportService {
             lectura.latitud?.toStringAsFixed(6) ?? '',
             lectura.longitud?.toStringAsFixed(6) ?? '',
             nombreFoto,
+            lectura.comentario ?? '',
           ]);
         }
 
