@@ -9,8 +9,13 @@ import 'lista_contadores_screen.dart';
 /// Pantalla de confirmación de lectura guardada
 class ConfirmacionScreen extends StatefulWidget {
   final Lectura lectura;
+  final String? veredaOrigen;
 
-  const ConfirmacionScreen({super.key, required this.lectura});
+  const ConfirmacionScreen({
+    super.key,
+    required this.lectura,
+    this.veredaOrigen,
+  });
 
   @override
   State<ConfirmacionScreen> createState() => _ConfirmacionScreenState();
@@ -234,7 +239,10 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
   void _volverALista() {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const ListaContadoresScreen()),
+      MaterialPageRoute(
+        builder: (context) =>
+            ListaContadoresScreen(veredaInicial: widget.veredaOrigen),
+      ),
       (route) => false,
     );
   }

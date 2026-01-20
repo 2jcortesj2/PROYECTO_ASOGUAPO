@@ -149,6 +149,10 @@ Future<void> updateLectura(Lectura lectura)
 // Limpiar todas las tablas (solo para desarrollo/testing)
 Future<void> deleteAllContadores()
 Future<void> deleteAllLecturas()
+
+// Resetear el estado de todos los contadores a 'pendiente'
+Future<void> resetEstadoContadores()
+  → UPDATE contadores SET estado = 'pendiente'
 ```
 
 ---

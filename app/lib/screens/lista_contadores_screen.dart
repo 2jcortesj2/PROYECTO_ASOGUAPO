@@ -10,7 +10,9 @@ import 'historial_screen.dart';
 
 /// Pantalla principal - Lista de contadores
 class ListaContadoresScreen extends StatefulWidget {
-  const ListaContadoresScreen({super.key});
+  final String? veredaInicial;
+
+  const ListaContadoresScreen({super.key, this.veredaInicial});
 
   @override
   State<ListaContadoresScreen> createState() => _ListaContadoresScreenState();
@@ -25,10 +27,15 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
 
   List<Contador> _contadores = [];
   bool _cargando = true;
+  bool _ocultarCompletados = false;
 
   @override
   void initState() {
     super.initState();
+    // Usar vereda inicial si se proporciona
+    if (widget.veredaInicial != null) {
+      _veredaSeleccionada = widget.veredaInicial!;
+    }
     _cargarContadores();
   }
 
@@ -51,13 +58,23 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
         )
         .toList();
 
-    if (_searchQuery.isEmpty) return porVereda;
+    if (_searchQuery.isEmpty) {
+      return _ocultarCompletados
+          ? porVereda
+                .where((c) => c.estado == EstadoContador.pendiente)
+                .toList()
+          : porVereda;
+    }
 
     final query = _searchQuery.toLowerCase();
-    return porVereda.where((c) {
+    final filtrados = porVereda.where((c) {
       return c.nombre.toLowerCase().contains(query) ||
           c.vereda.toLowerCase().contains(query);
     }).toList();
+
+    return _ocultarCompletados
+        ? filtrados.where((c) => c.estado == EstadoContador.pendiente).toList()
+        : filtrados;
   }
 
   @override
@@ -87,23 +104,23 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     final fechaHoy = '${now.day} ${meses[now.month]} ${now.year}';
 
     return Scaffold(
+      appBar: AppBar(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text('Lecturas del Día', style: AppTextStyles.titulo),
+            Text(
+              fechaHoy,
+              style: AppTextStyles.cuerpoSecundario.copyWith(fontSize: 12),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(AppConstants.paddingMedium),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Lecturas del Día', style: AppTextStyles.titulo),
-                  const SizedBox(height: 4),
-                  Text(fechaHoy, style: AppTextStyles.cuerpoSecundario),
-                ],
-              ),
-            ),
-
+            const SizedBox(height: 8),
             // Barra de búsqueda
             Padding(
               padding: const EdgeInsets.symmetric(
@@ -147,14 +164,40 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
 
             const SizedBox(height: 8),
 
-            // Contador de resultados
+            // Contador de resultados y toggle
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppConstants.paddingMedium,
               ),
-              child: Text(
-                '${_contadoresFiltrados.length} contadores',
-                style: AppTextStyles.cuerpoSecundario,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${_contadoresFiltrados.length} contadores',
+                    style: AppTextStyles.cuerpoSecundario,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'Ocultar completados',
+                        style: AppTextStyles.cuerpoSecundario.copyWith(
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Switch(
+                        value: _ocultarCompletados,
+                        onChanged: (value) {
+                          setState(() => _ocultarCompletados = value);
+                        },
+                        activeTrackColor: AppColors.primary.withValues(
+                          alpha: 0.5,
+                        ),
+                        activeThumbColor: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
 
@@ -256,7 +299,10 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => RegistroLecturaScreen(contador: contador),
+          builder: (context) => RegistroLecturaScreen(
+            contador: contador,
+            veredaOrigen: _veredaSeleccionada,
+          ),
         ),
       );
       // Recargar lista al volver
@@ -301,6 +347,11 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
           ],
         ),
         actions: [
+          TextButton.icon(
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            onPressed: () => _confirmarEliminarLectura(lectura),
+            label: const Text('ELIMINAR', style: TextStyle(color: Colors.red)),
+          ),
           ElevatedButton.icon(
             icon: const Icon(Icons.edit, size: 18),
             onPressed: () async {
@@ -311,6 +362,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
                   builder: (context) => RegistroLecturaScreen(
                     contador: contador,
                     lecturaExistente: lectura,
+                    veredaOrigen: _veredaSeleccionada,
                   ),
                 ),
               );
@@ -379,5 +431,42 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     // Por ahora redirigimos al historial que tiene la lógica de exportar
     // o podríamos abrir el modal directamente aquí.
     _abrirHistorial();
+  }
+
+  Future<void> _confirmarEliminarLectura(Lectura lectura) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Eliminar esta lectura?'),
+        content: const Text(
+          'Esta acción no se puede deshacer. Se borrará la lectura y la foto asociada.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('CANCELAR'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('ELIMINAR'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar == true && mounted) {
+      // Cerrar el diálogo de detalles
+      Navigator.pop(context);
+
+      await _databaseService.deleteLectura(lectura.id!);
+      _cargarContadores();
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Lectura eliminada')));
+      }
+    }
   }
 }

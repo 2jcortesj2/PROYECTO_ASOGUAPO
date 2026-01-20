@@ -59,7 +59,7 @@ app/
 ```
 
 > [!NOTE]
-> En la versión **v0.3.0**, se ha implementado la cámara real embebida (con el paquete `camera`) y el sistema de permisos al inicio de la aplicación. La persistencia en base de datos aún se encuentra en proceso de integración final.
+> En la versión **v0.5.0**, se ha consolidado el sistema de persistencia con SQLite, permitiendo la edición y eliminación individual de lecturas, visualización de fotos reales en el historial y exportación segmentada por veredas con nombres de archivo parametrizados (REC/PUE/TEN).
 
 ---
 
@@ -143,8 +143,10 @@ class DatabaseService {
   Future<Database> get database;
   Future<List<Contador>> getContadores();
   Future<void> insertLectura(Lectura lectura);
-  Future<List<Lectura>> getLecturasPorFecha(DateTime fecha);
-  Future<void> marcarSincronizado(int id);
+  Future<void> updateLectura(Lectura lectura);
+  Future<void> deleteLectura(int id);
+  Future<Lectura?> getLecturaPorContadorHoy(String contadorId);
+  Future<void> resetEstadoContadores();
 }
 ```
 
@@ -171,7 +173,7 @@ class PermissionService {
 
 ```dart
 class ExportService {
-  Future<void> exportarLecturas();
+  Future<void> exportarLecturas({List<Lectura>? lecturasFiltradas, String? veredaFiltro});
 }
 ```
 

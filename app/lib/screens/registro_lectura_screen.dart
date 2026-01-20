@@ -18,11 +18,13 @@ import '../services/database_service.dart';
 class RegistroLecturaScreen extends StatefulWidget {
   final Contador contador;
   final Lectura? lecturaExistente;
+  final String? veredaOrigen;
 
   const RegistroLecturaScreen({
     super.key,
     required this.contador,
     this.lecturaExistente,
+    this.veredaOrigen,
   });
 
   @override
@@ -452,7 +454,10 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ConfirmacionScreen(lectura: nuevaLectura),
+            builder: (context) => ConfirmacionScreen(
+              lectura: nuevaLectura,
+              veredaOrigen: widget.veredaOrigen,
+            ),
           ),
         );
       }

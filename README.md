@@ -1,20 +1,22 @@
-# AguaLector 💧 v0.3.0
+# AguaLector 💧 v0.5.0
 
 Aplicación móvil Android para registro de lecturas de contadores de agua potable en comunidades rurales.
 
-## 🎯 Estado Actual: Fase 3 - Cámara Embebida y Gestión de Permisos
+## 🎯 Estado Actual: Fase 5 - Organización de UI y Exportación Pulida
 
-Permitir a lectores comunitarios registrar lecturas de contadores de agua de forma simple, rápida y sin conexión a internet. La versión actual incluye captura de cámara en vivo integrada directamente en la interfaz.
+Esta versión se enfoca en refinar la experiencia de usuario (UX), mejorar la organización del historial con filtros geográficos y pulir la exportación de datos para la terminal de control.
 
 ## ✨ Características Principales
 
-- 📋 Lista de contadores por vereda
+- 📋 Lista de contadores organizada por veredas (REC, PUE, TEN)
 - 📷 Captura de foto con cámara en vivo (embebida)
-- 🔢 Registro manual de lectura
-- 📍 Geolocalización automática (GPS)
-- 📅 Marca de tiempo automática
-- 💾 Almacenamiento local (offline)
-- 📤 Exportación a CSV/Excel
+- 🔢 Registro manual de lectura con validación de historial
+- 📍 Geolocalización automática (GPS) con 6 decimales de precisión
+- 📅 Marca de tiempo automática y formateada
+- 💾 Almacenamiento local persistente (SQLite)
+- 📤 Exportación inteligente a CSV con códigos de vereda
+- 🧹 Gestión de lecturas (edición y eliminación individual)
+- 🌓 Soporte para visualización selectiva (ocultar completados)
 
 ## 🛠️ Tecnologías
 

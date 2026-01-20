@@ -4,14 +4,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'database_service.dart';
-// import '../models/lectura.dart';
+import '../models/lectura.dart';
 
 class ExportService {
   final DatabaseService _databaseService = DatabaseService();
 
-  Future<void> exportarLecturas() async {
+  Future<void> exportarLecturas({
+    List<Lectura>? lecturasFiltradas,
+    String? veredaFiltro,
+  }) async {
     try {
-      final lecturas = await _databaseService.getLecturas();
+      final lecturas =
+          lecturasFiltradas ?? await _databaseService.getLecturas();
       if (lecturas.isEmpty) {
         throw Exception('No hay datos para exportar');
       }
@@ -59,12 +63,28 @@ class ExportService {
       String csv = const ListToCsvConverter().convert(csvData);
 
       final directory = await getApplicationDocumentsDirectory();
-      final path =
-          '${directory.path}/lecturas_export_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}.csv';
+
+      // Determinar código de vereda para el nombre del archivo
+      String vCode = 'ALL';
+      if (veredaFiltro != null && veredaFiltro != 'Todas') {
+        if (veredaFiltro.toUpperCase().contains('RECREO'))
+          vCode = 'REC';
+        else if (veredaFiltro.toUpperCase().contains('PUEBLO'))
+          vCode = 'PUE';
+        else if (veredaFiltro.toUpperCase().contains('TENDIDO'))
+          vCode = 'TEN';
+      }
+
+      final fileName =
+          'LECTURAS_${vCode}_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}.csv';
+      final path = '${directory.path}/$fileName';
+
       final file = File(path);
       await file.writeAsString(csv);
 
-      await Share.shareXFiles([XFile(path)], text: 'Reporte de Lecturas');
+      await Share.shareXFiles([
+        XFile(path),
+      ], text: 'Reporte de Lecturas $vCode');
     } catch (e) {
       rethrow;
     }

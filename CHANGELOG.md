@@ -13,6 +13,22 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - Estructura inicial del proyecto
 - Configuración de Git con flujo de trabajo de dos ramas
 
+## [0.5.0] - 2026-01-20
+
+### Agregado
+- **Filtros por Vereda en Historial:** Reemplazados los filtros temporales (Hoy/Semana/Mes) por filtros geográficos (Todas, El Recreo, Pueblo Nuevo, El Tendido).
+- **Miniaturas Reales:** El historial ahora muestra la foto real capturada para cada lectura en lugar de un icono genérico.
+- **Exportación Inteligente:** 
+  - El nombre del archivo CSV ahora incluye el código de la vereda exportada (`REC`, `PUE`, `TEN` o `ALL`).
+  - Posibilidad de exportar solo las lecturas filtradas actualmente en pantalla.
+
+### Cambios
+- **Refinamiento UI Pantalla Confirmación:** 
+  - Fecha y hora ahora se muestran por separado.
+  - El botón "Siguiente Contador" fue eliminado para simplificar el flujo.
+  - El botón "Volver a la Lista" ahora usa el estilo primario (azul/verde) para mayor claridad.
+- **Limpieza de UI en Registro:** Eliminada la notificación de "Foto capturada exitosamente" para un flujo más rápido.
+
 ## [0.4.1] - 2026-01-20
 
 ### Corregido
@@ -20,14 +36,14 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Validación de Fecha:** Verificación estricta (día/mes/año) para "Lectura Existente" hoy.
 
 ### Cambios
-- **UI del Diálogo:** Rediseño completo del diálogo "Usuario Registrado":
-  - Botón X para cerrar en esquina superior derecha
-  - Formato de fecha mejorado: "19 Ene 2026"
-  - Eliminado texto "¿Qué deseas hacer?"
-  - Mejor organización visual con iconos y colores de estado
-- **Etiquetas Claras:** En las tarjetas de contadores se muestra "Anterior: XXX m³ (Mes Pasado)" para evitar confusiones
-- **CSV Headers:** Renombrados a `HISTORICO_NOV`, `HISTORICO_DIC`, `FECHA_HISTORICO_DIC` para mayor claridad
-- **Optimización:** Eliminación de campos no utilizados (`Cedula`, `Celular`) para privacidad y ligereza
+- **UI del Diálogo:** Rediseño completo del diálogo "Lectura registrada hoy":
+  - Título más claro y directo.
+  - Eliminación de barras divisorias y carteles para un diseño más limpio.
+  - Estilo visual consistente con la pantalla de confirmación.
+- **Notificaciones:** Eliminada la notificación intrusiva al capturar fotos.
+- **Etiquetas Claras:** En las tarjetas de contadores se muestra "Lectura mes anterior: XXX m³" para evitar confusiones.
+- **CSV Headers:** Renombrados a `HISTORICO_NOV`, `HISTORICO_DIC`, `FECHA_HISTORICO_DIC` para mayor claridad.
+- **Optimización:** Eliminación de campos no utilizados (`Cedula`, `Celular`) para privacidad y ligereza.
 
 ## [0.4.0] - 2026-01-19
 

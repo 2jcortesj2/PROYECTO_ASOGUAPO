@@ -22,13 +22,17 @@ AguaLector es una aplicación móvil diseñada para facilitar el registro de lec
 Al abrir la app verás la lista de todos los contadores de tu zona.
 
 **Indicadores de estado:**
-- ⚪ Gris = Pendiente de lectura
+- ⚪ Gris = Pendiente de lectura (Lectura mes anterior visible)
 - ✅ Verde = Lectura completada
 - 🟠 Naranja = Error en el contador / lectura previa irregular
 
-**Para buscar:** Usa la barra de búsqueda en la parte superior.
+**Opciones de visualización:**
+- **Filtro por Vereda:** Selecciona "El Recreo", "Pueblo Nuevo" o "El Tendido". La app recordará tu selección.
+- **Ocultar completados:** Activa el interruptor para ver solo los medidores que faltan por leer hoy.
 
-**Para registrar:** Toca el nombre del usuario para iniciar el registro.
+**Para buscar:** Usa la barra de búsqueda para encontrar a un usuario por nombre.
+
+**Para registrar:** Toca la tarjeta del usuario para iniciar el registro. Si ya registraste una lectura hoy, se abrirá un resumen con opción de **ELIMINAR** o **EDITAR**.
 
 ---
 
@@ -56,27 +60,28 @@ Después de guardar verás:
 - ✅ Mensaje de éxito
 - Miniatura de la foto
 - Lectura guardada
-- Fecha y ubicación
+- Fecha y Hora (separadas para mayor claridad)
+- Ubicación GPS
 
 **Opciones:**
-- "Siguiente Contador" → Continúa con el próximo
-- "Volver a la Lista" → Regresa al inicio
+- "Volver a la Lista" → Regresa a la lista principal manteniendo la vereda seleccionada.
 
 ---
 
 ### 4. Historial
 
-Accede desde el botón flotante en la lista principal.
+Accede desde el botón flotante (ícono de descarga) en la lista principal.
 
 **Funciones:**
-- Ver todas las lecturas realizadas
-- Filtrar por día, semana o mes
-- Exportar datos para enviar a la oficina
+- Ver todas las lecturas con su **foto real**.
+- **Filtros por Vereda:** Filtra rápidamente para ver solo "Pueblo Nuevo", "El Recreo" o "El Tendido".
+- **Exportación Inteligente:** Genera archivos CSV con el código de la vereda en el nombre (ej: LECTURAS_PUE_...csv).
 
 **Para exportar:**
-1. Toca "EXPORTAR DATOS"
-2. Selecciona "CSV" o "Compartir"
-3. Envía por WhatsApp o guarda el archivo
+1. Filtra por la vereda que deseas (o selecciona "Todas").
+2. Toca "EXPORTAR DATOS".
+3. El archivo incluirá solo lo que ves en pantalla.
+4. Envía por WhatsApp o comparte según sea necesario.
 
 ---
 

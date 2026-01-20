@@ -198,4 +198,38 @@ class DatabaseService {
     final db = await database;
     await db.delete('lecturas');
   }
+
+  Future<void> resetEstadoContadores() async {
+    final db = await database;
+    await db.update('contadores', {'estado': EstadoContador.pendiente.name});
+  }
+
+  Future<void> deleteLectura(int id) async {
+    final db = await database;
+
+    // Obtener la lectura para saber qué contador resetear
+    final List<Map<String, dynamic>> maps = await db.query(
+      'lecturas',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      final lectura = Lectura.fromMap(maps.first);
+
+      // Borrar la lectura
+      await db.delete('lecturas', where: 'id = ?', whereArgs: [id]);
+
+      // Resetear estado del contador a pendiente
+      await updateEstadoContador(lectura.contadorId, EstadoContador.pendiente);
+
+      // Borrar archivo de foto si existe
+      if (lectura.fotoPath.isNotEmpty) {
+        final file = File(lectura.fotoPath);
+        if (await file.exists()) {
+          await file.delete();
+        }
+      }
+    }
+  }
 }

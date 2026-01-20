@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -15,7 +16,13 @@ class HistorialScreen extends StatefulWidget {
 }
 
 class _HistorialScreenState extends State<HistorialScreen> {
-  String _filtroActivo = 'Hoy';
+  String _filtroActivo = 'Todas';
+  final List<String> _veredas = [
+    'Todas',
+    'El Recreo',
+    'Pueblo Nuevo',
+    'El Tendido',
+  ];
 
   final DatabaseService _databaseService = DatabaseService();
   final ExportService _exportService = ExportService();
@@ -41,19 +48,11 @@ class _HistorialScreenState extends State<HistorialScreen> {
   }
 
   List<Lectura> get _lecturasFiltradas {
-    final ahora = DateTime.now();
-    final hoyInicio = DateTime(ahora.year, ahora.month, ahora.day);
+    if (_filtroActivo == 'Todas') return _lecturas;
 
-    switch (_filtroActivo) {
-      case 'Hoy':
-        return _lecturas.where((l) => l.fecha.isAfter(hoyInicio)).toList();
-      case 'Semana':
-        final semanaInicio = hoyInicio.subtract(const Duration(days: 7));
-        return _lecturas.where((l) => l.fecha.isAfter(semanaInicio)).toList();
-      case 'Mes':
-      default:
-        return _lecturas;
-    }
+    return _lecturas.where((l) {
+      return l.vereda.toUpperCase() == _filtroActivo.toUpperCase();
+    }).toList();
   }
 
   @override
@@ -83,18 +82,18 @@ class _HistorialScreenState extends State<HistorialScreen> {
           const SizedBox(height: 12),
 
           // Filtros
-          Padding(
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(
               horizontal: AppConstants.paddingMedium,
             ),
             child: Row(
-              children: [
-                _buildFiltroChip('Hoy'),
-                const SizedBox(width: 8),
-                _buildFiltroChip('Semana'),
-                const SizedBox(width: 8),
-                _buildFiltroChip('Mes'),
-              ],
+              children: _veredas.map((v) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _buildFiltroChip(v),
+                );
+              }).toList(),
             ),
           ),
 
@@ -181,10 +180,23 @@ class _HistorialScreenState extends State<HistorialScreen> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.border),
               ),
-              child: const Icon(Icons.image, color: Colors.grey),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child:
+                    lectura.fotoPath.isNotEmpty &&
+                        File(lectura.fotoPath).existsSync()
+                    ? Image.file(
+                        File(lectura.fotoPath),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.broken_image, color: Colors.grey),
+                      )
+                    : const Icon(Icons.image, color: Colors.grey, size: 30),
+              ),
             ),
 
             const SizedBox(width: 16),
@@ -305,10 +317,16 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
     try {
       if (tipo == 'CSV') {
-        await _exportService.exportarLecturas();
+        await _exportService.exportarLecturas(
+          lecturasFiltradas: _lecturasFiltradas,
+          veredaFiltro: _filtroActivo,
+        );
       } else {
         // Reutilizamos la misma lógica
-        await _exportService.exportarLecturas();
+        await _exportService.exportarLecturas(
+          lecturasFiltradas: _lecturasFiltradas,
+          veredaFiltro: _filtroActivo,
+        );
       }
 
       if (mounted) {
