@@ -80,8 +80,9 @@ Accede desde el botón flotante (ícono de descarga) en la lista principal.
 **Para exportar:**
 1. Filtra por la vereda que deseas (o selecciona "Todas").
 2. Toca "EXPORTAR DATOS".
-3. El archivo incluirá solo lo que ves en pantalla.
-4. Envía por WhatsApp o comparte según sea necesario.
+3. La aplicación generará **dos archivos**: un CSV con los datos y un ZIP con las fotos.
+4. Se abrirá el menú de compartir; selecciona WhatsApp, Gmail o Drive para enviar ambos archivos juntos.
+5. Los archivos están optimizados para abrirse directamente en Excel con todas las tildes correctas.
 
 ---
 

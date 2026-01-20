@@ -13,6 +13,16 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - Estructura inicial del proyecto
 - Configuración de Git con flujo de trabajo de dos ramas
 
+## [0.5.1] - 2026-01-20
+
+### Agregado
+- **Exportación de Imágenes (ZIP):** Ahora al exportar datos, se genera automáticamente un archivo ZIP con todas las fotos de los medidores correspondientes al filtro seleccionado.
+- **Multi-Compartir:** El botón de exportar ahora comparte simultáneamente el archivo CSV de datos y el archivo ZIP de fotos.
+
+### Corregido
+- **Compatibilidad con Excel:** Se implementó el uso de punto y coma (`;`) como separador y la codificación UTF-8 con BOM para asegurar que las tildes y caracteres especiales se vean correctamente en Excel.
+- **Nombres de Archivos:** Mejora en la nomenclatura de archivos exportados e imágenes dentro del ZIP.
+
 ## [0.5.0] - 2026-01-20
 
 ### Agregado

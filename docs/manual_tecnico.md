@@ -4,15 +4,15 @@
 
 ### Stack Tecnológico
 
-| Componente    | Tecnología         | Versión     |
-| ------------- | ------------------ | ----------- |
-| Framework     | Flutter            | 3.x         |
-| Lenguaje      | Dart               | 3.x         |
-| Base de datos | SQLite             | sqflite 2.x |
-| Cámara        | camera             | Latest      |
-| GPS           | geolocator         | Latest      |
-| Permisos      | permission_handler | Latest      |
-| Exportación   | csv, share_plus    | Latest      |
+| Componente    | Tecnología               | Versión     |
+| ------------- | ------------------------ | ----------- |
+| Framework     | Flutter                  | 3.x         |
+| Lenguaje      | Dart                     | 3.x         |
+| Base de datos | SQLite                   | sqflite 2.x |
+| Cámara        | camera                   | Latest      |
+| GPS           | geolocator               | Latest      |
+| Permisos      | permission_handler       | Latest      |
+| Exportación   | csv, share_plus, archive | Latest      |
 
 ---
 
@@ -59,7 +59,7 @@ app/
 ```
 
 > [!NOTE]
-> En la versión **v0.5.0**, se ha consolidado el sistema de persistencia con SQLite, permitiendo la edición y eliminación individual de lecturas, visualización de fotos reales en el historial y exportación segmentada por veredas con nombres de archivo parametrizados (REC/PUE/TEN).
+> En la versión **v0.5.1**, se ha implementado la exportación dual (CSV + ZIP) utilizando la librería `archive` para comprimir las fotos. Los archivos CSV se generan con codificación UTF-8 con BOM y separador `;` para asegurar la compatibilidad con Microsoft Excel.
 
 ---
 
@@ -213,8 +213,9 @@ dependencies:
   permission_handler: ^11.3.0
   geolocator: ^10.1.0
   csv: ^5.1.0
-  share_plus: ^7.2.0
-  intl: ^0.18.0
+  share_plus: ^10.0.0
+  archive: ^3.6.1
+  intl: ^0.19.0
   provider: ^6.1.0
 
 dev_dependencies:
