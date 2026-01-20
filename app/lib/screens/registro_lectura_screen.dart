@@ -140,12 +140,13 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
   bool get _puedeGuardar {
     final tieneLectura = _lecturaController.text.isNotEmpty;
     final tieneComentario = _comentario != null && _comentario!.isNotEmpty;
+    final tieneFoto = _fotoPath != null;
 
-    // Si no se puede leer (tiene comentario), permitimos guardar sin foto o sin lectura
-    if (tieneComentario) return !_guardando;
+    if (_guardando || _capturandoFoto || !tieneFoto) return false;
 
-    // Caso normal
-    return _fotoPath != null && tieneLectura && !_guardando && !_capturandoFoto;
+    // Si tiene comentario (excepción), se permite guardar (con la foto obligatoria)
+    // Si no tiene comentario, debe tener obligatoriamente la lectura numérica
+    return tieneComentario || tieneLectura;
   }
 
   @override

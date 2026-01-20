@@ -327,5 +327,4 @@ Para las siguientes fases del proyecto, se contemplan las siguientes mejoras arq
   - Permita corregir información de usuarios existentes directamente en el dispositivo.
 
 ### 4. Gestión de Excepciones de Lectura (v0.9.0)
-- **Objetivo:** Capturar información valiosa cuando la lectura física es imposible.
-- **Implementación:** Si el contador no es legible, el usuario activa el diálogo de excepción. Se registra una lectura técnica de `0 m³` y se guarda el motivo descriptivo. En el CSV exportado, este motivo aparece en la columna `MOTIVO_NO_LECTURA`.
+- **Implementación:** Si el contador no es legible, el usuario activa el diálogo de excepción. Se registra una lectura técnica de `0 m³` y se guarda el motivo descriptivo. **La toma de fotografía es obligatoria incluso en este caso** para dejar constancia visual de la situación (ej. perro agresivo, contador obstruido). En el CSV exportado, este motivo aparece en la columna `MOTIVO_NO_LECTURA`.

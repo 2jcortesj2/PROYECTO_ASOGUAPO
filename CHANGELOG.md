@@ -2,6 +2,12 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.9.1] - 2026-01-20
+
+### Cambios
+- **Seguridad y Auditoría:** Se ha hecho obligatorio tomar una fotografía para todos los registros, incluso si el contador no es legible. Esto garantiza una evidencia visual en cada visita.
+- **UI/UX:** Se añadió la visualización de la ubicación GPS en el diálogo de revisión de lecturas existentes en la pantalla principal.
+
 ## [0.9.0] - 2026-01-20
 
 ### Añadido
