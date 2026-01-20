@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart'; // For debugPrint
 import 'package:csv/csv.dart';
 import 'database_service.dart';
 import '../models/contador.dart';
-import '../models/lectura.dart';
+
 import '../config/constants.dart';
 
 class CsvImportService {
@@ -103,30 +103,9 @@ class CsvImportService {
 
         await _databaseService.insertContador(contador);
 
-        // Insertamos la lectura del CSV en el historial para referencia,
-        // pero NO afectará el estado (ya que la fecha es vieja, Diciembre 20)
-        if (lecturaActual != null &&
-            lecturaActual > 0 &&
-            fechaLectura != null) {
-          final lectura = Lectura(
-            contadorId: id,
-            nombreUsuario: nombre,
-            vereda: vereda,
-            lectura: lecturaActual,
-            fotoPath: '',
-            fecha: fechaLectura,
-            sincronizado: true,
-          );
-          // Insertamos la lectura histórica
-          await _databaseService.insertLectura(lectura);
-
-          // IMPORTANTE: Forzamos el estado a PENDIENTE porque esta lectura es del mes anterior (piloto)
-          // y queremos que el usuario registre la actual.
-          await _databaseService.updateEstadoContador(
-            id,
-            EstadoContador.pendiente,
-          );
-        }
+        // NO insertamos la lectura histórica en la tabla 'lecturas'
+        // Solo la usamos como referencia en 'ultimaLectura' del contador
+        // Esto deja la app completamente vacía para registrar las lecturas de Enero
       }
     } catch (e, stackTrace) {
       debugPrint('Error importando CSV: $e');
