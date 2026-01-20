@@ -4,7 +4,7 @@ class Lectura {
   final String contadorId;
   final String nombreUsuario;
   final String vereda;
-  final double lectura;
+  final double? lectura;
   final String fotoPath;
   final double? latitud;
   final double? longitud;
@@ -18,7 +18,7 @@ class Lectura {
     required this.contadorId,
     required this.nombreUsuario,
     required this.vereda,
-    required this.lectura,
+    this.lectura,
     required this.fotoPath,
     this.latitud,
     this.longitud,
@@ -34,7 +34,9 @@ class Lectura {
       contadorId: map['contador_id'] as String,
       nombreUsuario: map['nombre_usuario'] as String,
       vereda: map['vereda'] as String,
-      lectura: (map['lectura'] as num).toDouble(),
+      lectura: map['lectura'] != null
+          ? (map['lectura'] as num).toDouble()
+          : null,
       fotoPath: map['foto_path'] as String,
       latitud: map['latitud'] as double?,
       longitud: map['longitud'] as double?,
@@ -65,7 +67,8 @@ class Lectura {
   bool get tieneGps => latitud != null && longitud != null;
 
   /// Texto formateado de la lectura
-  String get lecturaFormateada => '${lectura.toStringAsFixed(0)} m³';
+  String get lecturaFormateada =>
+      lectura != null ? '${lectura!.toStringAsFixed(0)} m³' : 'Sin lectura';
 
   /// Texto formateado de la ubicación GPS
   String get ubicacionFormateada {
@@ -136,7 +139,7 @@ class Lectura {
       contadorId,
       nombreUsuario,
       vereda,
-      lectura.toString(),
+      lectura?.toString() ?? '',
       fechaFormateada,
       latitud?.toString() ?? '',
       longitud?.toString() ?? '',

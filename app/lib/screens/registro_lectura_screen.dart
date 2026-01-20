@@ -58,8 +58,8 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
 
     // Si hay lectura existente, pre-llenar datos
     if (widget.lecturaExistente != null) {
-      _lecturaController.text = widget.lecturaExistente!.lectura
-          .toStringAsFixed(0);
+      _lecturaController.text =
+          widget.lecturaExistente!.lectura?.toStringAsFixed(0) ?? '';
       if (widget.lecturaExistente!.fotoPath.isNotEmpty) {
         _fotoPath = widget.lecturaExistente!.fotoPath;
       }
@@ -211,10 +211,11 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Input de lectura
+                  // Input de lectura (Deshabilitado si hay comentario)
                   LecturaInput(
                     controller: _lecturaController,
                     errorText: _errorLectura,
+                    enabled: _comentario == null, // Bloquear si hay motivo
                     onChanged: (value) {
                       setState(() {
                         _errorLectura = null;
@@ -471,7 +472,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
   void _guardarLectura() async {
     // Validar lectura
     final lecturaTexto = _lecturaController.text.trim();
-    double lectura = 0;
+    double? lectura;
 
     if (_comentario == null) {
       if (lecturaTexto.isEmpty) {
@@ -490,6 +491,9 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
         return;
       }
       lectura = l;
+    } else {
+      // Si hay comentario, la lectura es explícitamente NULL
+      lectura = null;
     }
 
     setState(() => _guardando = true);
@@ -560,23 +564,39 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
           textCapitalization: TextCapitalization.sentences,
         ),
         actions: [
+          // Botón cancelar estilizado (sin borrar acción anterior necesariamente, solo cerrar)
           TextButton(
             onPressed: () {
-              setState(() => _comentario = null);
               Navigator.pop(context);
             },
-            child: const Text('CANCELAR'),
+            style: TextButton.styleFrom(foregroundColor: Colors.grey),
+            child: const Text('VOLVER'),
           ),
+          // Botón limpiar/borrar motivo si ya existía
+          if (_comentario != null)
+            TextButton(
+              onPressed: () {
+                setState(() => _comentario = null);
+                Navigator.pop(context);
+              },
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              child: const Text('BORRAR MOTIVO'),
+            ),
           ElevatedButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
                 setState(() {
                   _comentario = controller.text.trim();
                   _errorLectura = null;
+                  _lecturaController.clear(); // Limpiar lectura visualmente
                 });
                 Navigator.pop(context);
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('ACEPTAR'),
           ),
         ],

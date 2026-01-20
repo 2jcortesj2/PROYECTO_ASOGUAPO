@@ -141,9 +141,14 @@ class ExportService {
           }
           final contador = contadoresMap[lectura.contadorId];
           final lecturaAnterior = contador?.ultimaLectura;
-          final String consumoStr = lecturaAnterior == null
-              ? ''
-              : (lectura.lectura - lecturaAnterior).toStringAsFixed(0);
+          final double? valorLectura = lectura.lectura;
+
+          // Calcular consumo solo si tenemos ambas lecturas (actual y anterior)
+          String consumoStr = '';
+          if (valorLectura != null && lecturaAnterior != null) {
+            consumoStr = (valorLectura - lecturaAnterior).toStringAsFixed(0);
+          }
+
           final String nombreFoto = lectura.fotoPath.split('/').last;
 
           csvData.add([
@@ -151,7 +156,7 @@ class ExportService {
             lectura.nombreUsuario,
             lectura.vereda,
             lecturaAnterior?.toStringAsFixed(0) ?? '',
-            lectura.lectura.toStringAsFixed(0),
+            valorLectura?.toStringAsFixed(0) ?? '', // Dejar vacío si es nulo
             consumoStr,
             DateFormat('yyyy-MM-dd').format(lectura.fecha),
             DateFormat('HH:mm:ss').format(lectura.fecha),
