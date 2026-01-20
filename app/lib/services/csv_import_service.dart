@@ -43,9 +43,9 @@ class CsvImportService {
 
       final idxVereda = headers.indexOf('VEREDA');
 
-      final idxLecturaAct = headers.indexOf('LECTURA_ACTUAL');
-      final idxFecha = headers.indexOf('FECHA_LECTURA');
-      final idxHora = headers.indexOf('HORA_LECTURA');
+      final idxLecturaAct = headers.indexOf('HISTORICO_DIC');
+      final idxFecha = headers.indexOf('FECHA_HISTORICO_DIC');
+      final idxHora = headers.indexOf('HORA_HISTORICO_DIC');
 
       if (idxId == -1 || idxNombre == -1) {
         debugPrint(
