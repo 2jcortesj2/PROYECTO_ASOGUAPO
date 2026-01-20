@@ -29,11 +29,27 @@ class ContadorCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      contador.nombre,
-                      style: AppTextStyles.cardTitulo,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            contador.nombre,
+                            style: AppTextStyles.cardTitulo,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        // Código de contador "oculto a simple vista"
+                        Text(
+                          ' #${contador.id}',
+                          style: AppTextStyles.cardSubtitulo.copyWith(
+                            fontSize: 10,
+                            color: AppColors.textSecondary.withValues(
+                              alpha: 0.3,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(

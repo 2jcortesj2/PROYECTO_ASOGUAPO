@@ -37,15 +37,20 @@ class CsvImportService {
       // Asumimos que la primera fila es encabezado
       final headers = csvTable.first.map((e) => e.toString().trim()).toList();
 
-      // Indices de columnas
+      // Indices de columnas (con soporte para nuevos encabezados)
       final idxId = headers.indexOf('CODIGO_CONCATENADO');
       final idxNombre = headers.indexOf('NOMBRE_COMPLETO');
-
       final idxVereda = headers.indexOf('VEREDA');
 
-      final idxLecturaAct = headers.indexOf('HISTORICO_DIC');
-      final idxFecha = headers.indexOf('FECHA_HISTORICO_DIC');
-      final idxHora = headers.indexOf('HORA_HISTORICO_DIC');
+      // Soporte para encabezados antiguos y nuevos
+      int idxLecturaAct = headers.indexOf('LECTURA_ACTUAL');
+      if (idxLecturaAct == -1) idxLecturaAct = headers.indexOf('HISTORICO_DIC');
+
+      int idxFecha = headers.indexOf('FECHA_LECTURA');
+      if (idxFecha == -1) idxFecha = headers.indexOf('FECHA_HISTORICO_DIC');
+
+      int idxHora = headers.indexOf('HORA_LECTURA');
+      if (idxHora == -1) idxHora = headers.indexOf('HORA_HISTORICO_DIC');
 
       if (idxId == -1 || idxNombre == -1) {
         debugPrint(

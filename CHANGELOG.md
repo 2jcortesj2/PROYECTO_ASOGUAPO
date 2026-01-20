@@ -2,6 +2,13 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.5.7] - 2026-01-20
+
+### Agregado
+- **Feedback Visual de Scroll:** Implementación de un scrollbar (slider verde) sutil que solo aparece al mover la lista, con fondo transparente para una interfaz más limpia.
+- **Identificación de Medidores:** Se agregó el código del contador (`ID`) en cada tarjeta de usuario de forma estética y discreta ("oculto a simple vista").
+- **Base de Datos Completa:** Se actualizó el importador para soportar el nuevo formato de reporte de usuarios completos, permitiendo la carga total de la base de datos de ASOGUAPO.
+
 ## [0.5.6] - 2026-01-20
 
 ### Corregido

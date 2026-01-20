@@ -20,6 +20,7 @@ class ListaContadoresScreen extends StatefulWidget {
 
 class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
   String _veredaSeleccionada = 'El Recreo';
   final List<String> _veredas = [
@@ -92,6 +93,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -221,16 +223,25 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
                   ? const Center(child: CircularProgressIndicator())
                   : _contadoresFiltrados.isEmpty
                   ? _buildEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 100),
-                      itemCount: _contadoresFiltrados.length,
-                      itemBuilder: (context, index) {
-                        final contador = _contadoresFiltrados[index];
-                        return ContadorCard(
-                          contador: contador,
-                          onTap: () => _abrirRegistro(contador),
-                        );
-                      },
+                  : RawScrollbar(
+                      controller: _scrollController,
+                      thumbColor: AppColors.primary.withValues(alpha: 0.8),
+                      radius: const Radius.circular(10),
+                      thickness: 4,
+                      fadeDuration: const Duration(milliseconds: 500),
+                      timeToFade: const Duration(milliseconds: 1000),
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.only(bottom: 100),
+                        itemCount: _contadoresFiltrados.length,
+                        itemBuilder: (context, index) {
+                          final contador = _contadoresFiltrados[index];
+                          return ContadorCard(
+                            contador: contador,
+                            onTap: () => _abrirRegistro(contador),
+                          );
+                        },
+                      ),
                     ),
             ),
           ],

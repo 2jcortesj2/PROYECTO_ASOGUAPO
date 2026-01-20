@@ -18,6 +18,7 @@ class HistorialScreen extends StatefulWidget {
 }
 
 class _HistorialScreenState extends State<HistorialScreen> {
+  final ScrollController _scrollController = ScrollController();
   String _filtroActivo = 'Todas';
   final List<String> _veredas = [
     'El Recreo',
@@ -38,6 +39,12 @@ class _HistorialScreenState extends State<HistorialScreen> {
   void initState() {
     super.initState();
     _cargarLecturas();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _cargarLecturas() async {
@@ -139,12 +146,23 @@ class _HistorialScreenState extends State<HistorialScreen> {
                       ? const Center(child: CircularProgressIndicator())
                       : _lecturasFiltradas.isEmpty
                       ? _buildEmptyState()
-                      : ListView.builder(
-                          padding: const EdgeInsets.only(bottom: 100),
-                          itemCount: _lecturasFiltradas.length,
-                          itemBuilder: (context, index) {
-                            return _buildLecturaCard(_lecturasFiltradas[index]);
-                          },
+                      : RawScrollbar(
+                          controller: _scrollController,
+                          thumbColor: AppColors.primary.withValues(alpha: 0.8),
+                          radius: const Radius.circular(10),
+                          thickness: 4,
+                          fadeDuration: const Duration(milliseconds: 500),
+                          timeToFade: const Duration(milliseconds: 1000),
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.only(bottom: 100),
+                            itemCount: _lecturasFiltradas.length,
+                            itemBuilder: (context, index) {
+                              return _buildLecturaCard(
+                                _lecturasFiltradas[index],
+                              );
+                            },
+                          ),
                         ),
                 ),
               ],
