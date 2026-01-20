@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.6.1] - 2026-01-20
+
+### Corregido
+- **Validación de Exportación:** El botón "EXPORTAR DATOS" en el historial ahora se deshabilita automáticamente (se pone gris) si no hay registros presentes para la vereda seleccionada, evitando intentos de exportación vacíos.
+
 ## [0.6.0] - 2026-01-20
 
 ### Cambios
