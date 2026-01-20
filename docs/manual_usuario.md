@@ -32,7 +32,13 @@ Al abrir la app verás la lista de todos los contadores de tu zona.
 
 **Para buscar:** Usa la barra de búsqueda para encontrar a un usuario por nombre.
 
-**Para registrar:** Toca la tarjeta del usuario para iniciar el registro. Si ya registraste una lectura hoy, se abrirá un resumen con opción de **ELIMINAR** o **EDITAR**.
+**Para registrar:** Toca la tarjeta del usuario para iniciar el registro. 
+
+Si el usuario ya tiene una lectura en el **periodo activo (últimos 15 días)**, se abrirá un resumen donde podrás:
+- **Corregir / Editar**: Si te equivocaste en el número.
+- **Eliminar Registro**: Si deseas borrar la lectura por completo.
+
+> 💡 **Nota sobre almacenamiento:** Para que tu teléfono no se llene de fotos, la aplicación borrará automáticamente las imágenes de las lecturas que tengan más de 15 días. Los datos numéricos se guardarán siempre en el historial, pero la foto se elimina para liberar espacio.
 
 ---
 

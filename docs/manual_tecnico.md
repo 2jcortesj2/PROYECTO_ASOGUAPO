@@ -59,7 +59,7 @@ app/
 ```
 
 > [!NOTE]
-> En la versión **v0.5.2**, se han introducido optimizaciones críticas para dispositivos de baja gama, incluyendo la limitación de decodificación de imágenes mediante `cacheWidth` y el uso de `getTemporaryDirectory` para la gestión de archivos de exportación. Además, se ha restringido la exportación global para prevenir el agotamiento de recursos del sistema. Los archivos CSV utilizan codificación UTF-8 estándar sin BOM.
+> En la versión **v0.5.5**, se ha introducido la lógica de ventana de edición de 15 días y auto-limpieza de fotos. Para la exportación (v0.5.4), se utiliza `compute` (Isolates) para mover la compresión ZIP a un hilo separado, evitando bloqueos en la UI. Todas las exportaciones se consolidan en un único archivo ZIP para mayor compatibilidad con apps de mensajería (WhatsApp).
 
 ---
 
@@ -145,7 +145,8 @@ class DatabaseService {
   Future<void> insertLectura(Lectura lectura);
   Future<void> updateLectura(Lectura lectura);
   Future<void> deleteLectura(int id);
-  Future<Lectura?> getLecturaPorContadorHoy(String contadorId);
+  Future<Lectura?> getLecturaActiva(String contadorId); // Ventana 15 días
+  Future<void> limpiarYActualizarRegistros(); // Mantenimiento auto
   Future<void> resetEstadoContadores();
 }
 ```
@@ -251,8 +252,9 @@ El APK se genera en: `build/app/outputs/flutter-apk/app-release.apk`
 - **Ciclo de Vida:** Control estricto de recursos de cámara con `WidgetsBindingObserver`.
 - **UI:** Uso de `RepaintBoundary` para la vista previa de cámara en vivo para evitar repintados innecesarios del resto de la interfaz.
 - **GPS:** Uso de `getLastKnownLocation()` como primera opción para evitar esperas y consumo excesivo de batería.
-- **Imágenes:** Guardadas con nombres de archivo basados en timestamp para evitar colisiones y organizadas en subdirectorios.
-
+- **Imágenes:** Guardadas con nombres de archivo basados en timestamp para evitar colisiones.
+- **Isolates:** Uso de `compute` para operaciones de I/O pesadas (compresión ZIP) para mantener la tasa de refresco de la UI estable.
+- **Limpieza Temporal:** De eliminación de archivos físicas tras 15 días para prevenir el agotamiento de almacenamiento interno.
 ---
 
 ## Flujo de Trabajo Git

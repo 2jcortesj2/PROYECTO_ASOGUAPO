@@ -359,31 +359,49 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
           ],
         ),
         actions: [
-          TextButton.icon(
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
-            onPressed: () => _confirmarEliminarLectura(lectura),
-            label: const Text('ELIMINAR', style: TextStyle(color: Colors.red)),
-          ),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.edit, size: 18),
-            onPressed: () async {
-              Navigator.pop(context); // Cerrar diálogo
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RegistroLecturaScreen(
-                    contador: contador,
-                    lecturaExistente: lectura,
-                    veredaOrigen: _veredaSeleccionada,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.edit, size: 18),
+                  onPressed: () async {
+                    Navigator.pop(context); // Cerrar diálogo
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RegistroLecturaScreen(
+                          contador: contador,
+                          lecturaExistente: lectura,
+                          veredaOrigen: _veredaSeleccionada,
+                        ),
+                      ),
+                    );
+                    _cargarContadores();
+                  },
+                  label: const Text('CORREGIR / EDITAR'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
-              );
-              _cargarContadores();
-            },
-            label: const Text('CORREGIR / EDITAR'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.delete_outline, size: 18),
+                  onPressed: () => _confirmarEliminarLectura(lectura),
+                  label: const Text('ELIMINAR REGISTRO'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                    side: const BorderSide(color: Colors.red),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
