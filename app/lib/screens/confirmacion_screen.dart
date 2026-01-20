@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
@@ -113,7 +114,13 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
               _buildDetalleRow(
                 icono: Icons.calendar_today,
                 label: 'Fecha',
-                valor: widget.lectura.fechaFormateada,
+                valor: _formatearFecha(widget.lectura.fecha),
+              ),
+              const SizedBox(height: 12),
+              _buildDetalleRow(
+                icono: Icons.access_time,
+                label: 'Hora',
+                valor: _formatearHora(widget.lectura.fecha),
               ),
               const SizedBox(height: 12),
               _buildDetalleRow(
@@ -124,16 +131,10 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
               const Spacer(),
 
-              // Botones de acción
-              BotonPrincipal(
-                texto: 'SIGUIENTE CONTADOR',
-                icono: Icons.arrow_forward,
-                onPressed: _siguienteContador,
-              ),
-              const SizedBox(height: 12),
+              // Botón de acción
               BotonPrincipal(
                 texto: 'VOLVER A LA LISTA',
-                esSecundario: true,
+                icono: Icons.arrow_forward,
                 onPressed: _volverALista,
               ),
 
@@ -146,8 +147,23 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
   }
 
   Widget _buildFotoPreview() {
-    // En el prototipo mostramos un placeholder
-    // En producción usaríamos Image.file(File(widget.lectura.fotoPath))
+    // Mostrar la foto real si existe
+    if (widget.lectura.fotoPath.isNotEmpty) {
+      final file = File(widget.lectura.fotoPath);
+      if (file.existsSync()) {
+        return Image.file(
+          file,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildPlaceholder();
+          },
+        );
+      }
+    }
+    return _buildPlaceholder();
+  }
+
+  Widget _buildPlaceholder() {
     return Container(
       color: Colors.grey[400],
       child: const Center(
@@ -192,14 +208,27 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
     );
   }
 
-  void _siguienteContador() {
-    // En producción, iría al siguiente contador pendiente
-    // Por ahora volvemos a la lista
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const ListaContadoresScreen()),
-      (route) => false,
-    );
+  String _formatearFecha(DateTime fecha) {
+    const meses = [
+      '',
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
+    ];
+    return '${fecha.day} ${meses[fecha.month]} ${fecha.year}';
+  }
+
+  String _formatearHora(DateTime fecha) {
+    return '${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}';
   }
 
   void _volverALista() {
