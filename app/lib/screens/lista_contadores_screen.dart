@@ -4,6 +4,7 @@ import '../config/constants.dart';
 import '../models/contador.dart';
 import '../models/lectura.dart';
 import '../widgets/contador_card.dart';
+import '../widgets/info_lectura_widget.dart';
 import '../services/database_service.dart';
 import 'registro_lectura_screen.dart';
 import 'historial_screen.dart';
@@ -401,42 +402,8 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Caja de Info Sutil
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      children: [
-                        _buildDetalleRow(
-                          Icons.speed,
-                          'Valor Marcado',
-                          lectura.lecturaFormateada,
-                        ),
-                        const Divider(height: 24, thickness: 1),
-                        _buildDetalleRow(
-                          Icons.calendar_today,
-                          'Fecha Registro',
-                          '${lectura.fecha.day} ${_obtenerMes(lectura.fecha.month)} ${lectura.fecha.year}',
-                        ),
-                        const SizedBox(height: 12),
-                        _buildDetalleRow(
-                          Icons.access_time,
-                          'Hora exacta',
-                          '${lectura.fecha.hour.toString().padLeft(2, '0')}:${lectura.fecha.minute.toString().padLeft(2, '0')}',
-                        ),
-                        const SizedBox(height: 12),
-                        _buildDetalleRow(
-                          Icons.location_on,
-                          'Ubicación',
-                          lectura.ubicacionFormateada,
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Caja unificada de detalles (Con foto y GPS)
+                  InfoLecturaWidget(lectura: lectura),
 
                   const SizedBox(height: 32),
 
@@ -481,47 +448,6 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildDetalleRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: AppColors.textSecondary),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            Text(
-              value,
-              style: AppTextStyles.cuerpo.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  String _obtenerMes(int month) {
-    const meses = [
-      '',
-      'Ene',
-      'Feb',
-      'Mar',
-      'Abr',
-      'May',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dic',
-    ];
-    return meses[month];
   }
 
   Future<void> _abrirHistorial() async {

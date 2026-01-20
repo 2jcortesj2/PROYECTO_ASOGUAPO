@@ -73,9 +73,9 @@ class Lectura {
     return '${latitud!.toStringAsFixed(4)}, ${longitud!.toStringAsFixed(4)}';
   }
 
-  /// Texto formateado de la fecha
-  String get fechaFormateada {
-    final meses = [
+  /// Texto formateado de la fecha (Solo Día Mes Año)
+  String get diaMesAno {
+    const meses = [
       '',
       'Ene',
       'Feb',
@@ -90,10 +90,16 @@ class Lectura {
       'Nov',
       'Dic',
     ];
-    return '${fecha.day} ${meses[fecha.month]} ${fecha.year}, '
-        '${fecha.hour.toString().padLeft(2, '0')}:'
-        '${fecha.minute.toString().padLeft(2, '0')}';
+    return '${fecha.day} ${meses[fecha.month]} ${fecha.year}';
   }
+
+  /// Texto formateado de la hora (HH:mm)
+  String get horaMinuto {
+    return '${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}';
+  }
+
+  /// Texto formateado de la fecha completa
+  String get fechaFormateada => '$diaMesAno, $horaMinuto';
 
   /// Copia la lectura con nuevos valores
   Lectura copyWith({

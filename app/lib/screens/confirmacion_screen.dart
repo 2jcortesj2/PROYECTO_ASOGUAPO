@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
 import '../models/lectura.dart';
 import '../widgets/boton_principal.dart';
+import '../widgets/info_lectura_widget.dart';
 import 'lista_contadores_screen.dart';
 
 /// Pantalla de confirmación de lectura guardada
@@ -87,52 +87,8 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
 
               const SizedBox(height: 32),
 
-              // Miniatura de la foto
-              Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: _buildFotoPreview(),
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Detalles de la lectura
-              _buildDetalleRow(
-                icono: Icons.speed,
-                label: 'Lectura',
-                valor: widget.lectura.lecturaFormateada,
-              ),
-              const SizedBox(height: 12),
-              _buildDetalleRow(
-                icono: Icons.calendar_today,
-                label: 'Fecha',
-                valor: _formatearFecha(widget.lectura.fecha),
-              ),
-              const SizedBox(height: 12),
-              _buildDetalleRow(
-                icono: Icons.access_time,
-                label: 'Hora',
-                valor: _formatearHora(widget.lectura.fecha),
-              ),
-              const SizedBox(height: 12),
-              _buildDetalleRow(
-                icono: Icons.location_on,
-                label: 'Ubicación',
-                valor: widget.lectura.ubicacionFormateada,
-              ),
+              // Detalles de la lectura (Widget unificado)
+              InfoLecturaWidget(lectura: widget.lectura),
 
               const Spacer(),
 
@@ -149,91 +105,6 @@ class _ConfirmacionScreenState extends State<ConfirmacionScreen>
         ),
       ),
     );
-  }
-
-  Widget _buildFotoPreview() {
-    // Mostrar la foto real si existe
-    if (widget.lectura.fotoPath.isNotEmpty) {
-      final file = File(widget.lectura.fotoPath);
-      if (file.existsSync()) {
-        return Image.file(
-          file,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildPlaceholder();
-          },
-        );
-      }
-    }
-    return _buildPlaceholder();
-  }
-
-  Widget _buildPlaceholder() {
-    return Container(
-      color: Colors.grey[400],
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.image, size: 48, color: Colors.white),
-            SizedBox(height: 8),
-            Text(
-              'Foto del\ncontador',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 12),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetalleRow({
-    required IconData icono,
-    required String label,
-    required String valor,
-  }) {
-    return Row(
-      children: [
-        Icon(icono, size: 20, color: AppColors.textSecondary),
-        const SizedBox(width: 12),
-        Text(
-          '$label:',
-          style: AppTextStyles.cuerpo.copyWith(fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            valor,
-            style: AppTextStyles.cuerpo,
-            textAlign: TextAlign.right,
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _formatearFecha(DateTime fecha) {
-    const meses = [
-      '',
-      'Ene',
-      'Feb',
-      'Mar',
-      'Abr',
-      'May',
-      'Jun',
-      'Jul',
-      'Ago',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dic',
-    ];
-    return '${fecha.day} ${meses[fecha.month]} ${fecha.year}';
-  }
-
-  String _formatearHora(DateTime fecha) {
-    return '${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}';
   }
 
   void _volverALista() {

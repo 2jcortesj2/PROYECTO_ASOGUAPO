@@ -2,6 +2,13 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.9.2] - 2026-01-20
+
+### Mejoras de UI/UX
+- **Unificación de Diseño:** La caja de "Lectura Registrada" ahora tiene el mismo estilo premium que la pantalla de confirmación exitosa.
+- **Visualización Completa:** El diálogo de revisión ahora incluye la fotografía capturada y la ubicación GPS para una verificación rápida.
+- **Optimización de Código:** Se eliminaron redundancias mediante la creación de un widget reutilizable `InfoLecturaWidget`, mejorando la mantenibilidad del proyecto.
+
 ## [0.9.1] - 2026-01-20
 
 ### Cambios
