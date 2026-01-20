@@ -58,8 +58,54 @@ app/
 └── pubspec.lock
 ```
 
-> [!NOTE]
 > En la versión **v0.5.5**, se ha introducido la lógica de ventana de edición de 15 días y auto-limpieza de fotos. Para la exportación (v0.5.4), se utiliza `compute` (Isolates) para mover la compresión ZIP a un hilo separado, evitando bloqueos en la UI. Todas las exportaciones se consolidan en un único archivo ZIP para mayor compatibilidad con apps de mensajería (WhatsApp).
+
+---
+
+## Inicialización y Primer Inicio
+
+La aplicación está diseñada para operar "fuera de la caja" (out-of-the-box) mediante un proceso de importación automática de datos semilla.
+
+### Proceso de Importación (Primer Inicio)
+Al abrir la aplicación por primera vez, el `CsvImportService` se activa automáticamente si detecta que la base de datos de contadores está vacía. 
+1. Busca el archivo `assets/LECTURAS_PILOTO.csv` dentro del paquete de la app.
+2. Procesa los registros y los inserta en la tabla `contadores`.
+3. Establece la lectura histórica como `ultima_lectura` y deja el estado del medidor en `pendiente`.
+
+### Propuesta Práctica de Inicialización
+Para configurar la aplicación con datos reales de una nueva comunidad o periodo:
+
+1. **Preparar el Archivo CSV:** 
+   Utilizar una plantilla de Excel y exportarla a CSV con codificación UTF-8 (delimitado por comas). Debe contener las siguientes columnas obligatorias:
+   - `CODIGO_CONCATENADO`: ID único del medidor.
+   - `NOMBRE_COMPLETO`: Nombre del suscriptor.
+   - `VEREDA`: Sector geográfico.
+   - `HISTORICO_DIC`: El valor de la última lectura realizada (servirá como base de comparación).
+
+2. **Actualizar Asset:**
+   Reemplazar el archivo en `app/assets/LECTURAS_PILOTO.csv` con el nuevo archivo.
+
+3. **Compilar y Desplegar:**
+   Al instalar el APK, la aplicación detectará que es la primera ejecución y cargará el nuevo listado automáticamente.
+
+> [!TIP]
+> Si se desea forzar una re-inicialización en un dispositivo que ya tiene datos, se debe ir a *Ajustes > Aplicaciones > AguaLector > Almacenamiento > Borrar Datos*. Esto eliminará la base de datos SQLite y disparará la importación del CSV en el siguiente inicio.
+
+### Actualización de Suscriptores o Información
+Si durante la operación se requiere agregar nuevos usuarios o corregir nombres en la lista maestra, se debe seguir este flujo práctico:
+
+1. **Modificación del Maestro:**
+   Actualizar el archivo fuente (Excel) agregando las nuevas filas o corrigiendo los campos necesarios. Asegurarse de asignar un `CODIGO_CONCATENADO` único a los nuevos usuarios.
+
+2. **Actualización del Asset:**
+   Sustituir el archivo `app/assets/LECTURAS_PILOTO.csv` en el código fuente.
+
+3. **Ciclo de Vida de Datos:**
+   Debido a que SQLite es persistente, instalar una nueva versión del APK sobre una existente **no borrará** los usuarios antiguos ni cargará los nuevos automáticamente (para proteger las lecturas ya tomadas). 
+
+4. **Procedimiento Recomendado para Administradores:**
+   - **Opción A (Nueva instalación):** Desinstalar la versión anterior e instalar la nueva. Esto garantiza que todos los teléfonos arranquen con la lista actualizada al 100%.
+   - **Opción B (Mantenimiento remoto):** En futuras versiones se implementará un botón de "Sincronizar Maestro" para evitar la pérdida de datos, pero para la fase piloto, la **Re-inicialización** (borrar datos de la app) es el método más seguro y rápido.
 
 ---
 

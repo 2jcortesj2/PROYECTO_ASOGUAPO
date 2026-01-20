@@ -1,82 +1,76 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:agualector/models/lectura.dart';
 
 void main() {
-  group('Lógica de Periodo de Edición (15 días)', () {
-    test('Debe permitir edición si la lectura fue hace menos de 15 días', () {
-      final fechaReciente = DateTime.now().subtract(const Duration(days: 10));
-      final lectura = Lectura(
-        contadorId: '1',
-        nombreUsuario: 'Test',
-        vereda: 'Test',
-        lectura: 100,
-        fotoPath: 'path/to/photo.jpg',
-        fecha: fechaReciente,
-      );
+  group('Lógica de Ciclo Global (15 días desde la PRIMERA toma)', () {
+    test(
+      'Ciclo Activo: Si la primera toma fue hace 10 días, todo es editable',
+      () {
+        final ahora = DateTime.now();
+        final fechaPrimeraToma = ahora.subtract(const Duration(days: 10));
 
-      final now = DateTime.now();
-      final diferencia = now.difference(lectura.fecha).inDays;
+        // Simula la lógica de getLecturaActiva
+        final diferenciaGlobal = ahora.difference(fechaPrimeraToma).inDays;
 
-      expect(diferencia < 15, isTrue, reason: '10 días es menor a 15');
-    });
+        expect(
+          diferenciaGlobal < 15,
+          isTrue,
+          reason: 'Ciclo global (10 días) está activo',
+        );
+      },
+    );
 
-    test('No debe permitir edición si la lectura fue hace más de 15 días', () {
-      final fechaAntigua = DateTime.now().subtract(const Duration(days: 16));
-      final lectura = Lectura(
-        contadorId: '1',
-        nombreUsuario: 'Test',
-        vereda: 'Test',
-        lectura: 100,
-        fotoPath: 'path/to/photo.jpg',
-        fecha: fechaAntigua,
-      );
+    test(
+      'Ciclo Vencido: Si la primera toma fue hace 16 días, NADA es editable (aunque la lectura sea de ayer)',
+      () {
+        final ahora = DateTime.now();
+        final fechaPrimeraToma = ahora.subtract(const Duration(days: 16));
 
-      final now = DateTime.now();
-      final diferencia = now.difference(lectura.fecha).inDays;
+        // Simula la lógica de getLecturaActiva
+        final diferenciaGlobal = ahora.difference(fechaPrimeraToma).inDays;
 
-      expect(diferencia < 15, isFalse, reason: '16 días es mayor a 15');
-    });
+        expect(
+          diferenciaGlobal < 15,
+          isFalse,
+          reason:
+              'Ciclo global (16 días) vencido. Bloquea todas las lecturas del periodo',
+        );
+      },
+    );
 
-    test('Límite exacto de 15 días debe ser bloqueado', () {
-      final fechaLimite = DateTime.now().subtract(const Duration(days: 15));
-      final lectura = Lectura(
-        contadorId: '1',
-        nombreUsuario: 'Test',
-        vereda: 'Test',
-        lectura: 100,
-        fotoPath: 'path/to/photo.jpg',
-        fecha: fechaLimite,
-      );
+    test('Lógica de Rollover Masivo', () {
+      final ahora = DateTime.now();
+      final fechaPrimeraToma = ahora.subtract(const Duration(days: 15));
 
-      final now = DateTime.now();
-      final diferencia = now.difference(lectura.fecha).inDays;
+      // Simulamos la lógica de limpiarYActualizarRegistros
+      final diasDesdeInicio = ahora.difference(fechaPrimeraToma).inDays;
+      final debeHacerRollover = diasDesdeInicio >= 15;
 
       expect(
-        diferencia < 15,
-        isFalse,
-        reason: '15 días exactos ya no es menor a 15',
-      );
-    });
-
-    test('Cálculo de límite para limpieza automática', () {
-      final now = DateTime.now();
-      // Simulamos la lógica de DatabaseService.limpiarYActualizarRegistros
-      final builtInLimit = now.subtract(const Duration(days: 15));
-
-      final lecturaAntigua = now.subtract(const Duration(days: 16));
-      final lecturaReciente = now.subtract(const Duration(days: 14));
-
-      expect(
-        lecturaAntigua.isBefore(builtInLimit),
+        debeHacerRollover,
         isTrue,
-        reason: 'Lectura de 16 días debe ser limpiada (es anterior al límite)',
-      );
-      expect(
-        lecturaReciente.isBefore(builtInLimit),
-        isFalse,
         reason:
-            'Lectura de 14 días NO debe ser limpiada (es posterior al límite)',
+            'Exactamente a los 15 días desde la PRIMERA toma se debe disparar el rollover',
       );
     });
+
+    test(
+      'Independencia de Lecturas: Una lectura nueva sin ciclo previo NO dispara rollover',
+      () {
+        // Si no hay lecturas con estado 'registrado', el MIN(fecha) es NULL
+        DateTime? primeraFechaEnBD;
+
+        bool dispararRollover = false;
+        if (primeraFechaEnBD != null) {
+          final ahora = DateTime.now();
+          dispararRollover = ahora.difference(primeraFechaEnBD).inDays >= 15;
+        }
+
+        expect(
+          dispararRollover,
+          isFalse,
+          reason: 'Sin lecturas activas no hay ciclo que vencer',
+        );
+      },
+    );
   });
 }
