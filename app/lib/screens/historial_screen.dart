@@ -18,10 +18,10 @@ class HistorialScreen extends StatefulWidget {
 class _HistorialScreenState extends State<HistorialScreen> {
   String _filtroActivo = 'Todas';
   final List<String> _veredas = [
-    'Todas',
     'El Recreo',
     'Pueblo Nuevo',
     'El Tendido',
+    'Todas',
   ];
 
   final DatabaseService _databaseService = DatabaseService();
@@ -42,6 +42,18 @@ class _HistorialScreenState extends State<HistorialScreen> {
     if (mounted) {
       setState(() {
         _lecturas = lecturas;
+        // Seleccionar la vereda de la última lectura tomada si existe
+        if (_lecturas.isNotEmpty) {
+          final ultimaVereda = _lecturas.first.vereda;
+          // Validar que la vereda esté en nuestra lista (ignorar mayúsculas)
+          final veredaEnLista = _veredas.firstWhere(
+            (v) => v.toUpperCase() == ultimaVereda.toUpperCase(),
+            orElse: () => 'Todas',
+          );
+          _filtroActivo = veredaEnLista;
+        } else {
+          _filtroActivo = 'Todas';
+        }
         _cargando = false;
       });
     }
@@ -68,6 +80,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 8),
           // Subtítulo
           Padding(
             padding: const EdgeInsets.symmetric(
@@ -79,7 +92,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
           // Filtros
           SingleChildScrollView(
