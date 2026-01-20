@@ -31,16 +31,18 @@ class ExportService {
       }
 
       // 0. DETERMINAR CÓDIGO DE VEREDA Y TIMESTAMP
-      if (veredaFiltro == null || veredaFiltro == 'Todas') {
-        throw Exception('Debe seleccionar una vereda específica para exportar');
-      }
+      // if (veredaFiltro == null || veredaFiltro == 'Todas') {
+      //   throw Exception('Debe seleccionar una vereda específica para exportar');
+      // }
 
       String vCode = 'ALL';
-      if (veredaFiltro.toUpperCase().contains('RECREO')) {
+      final filtro = veredaFiltro ?? 'Todas';
+
+      if (filtro.toUpperCase().contains('RECREO')) {
         vCode = 'REC';
-      } else if (veredaFiltro.toUpperCase().contains('PUEBLO')) {
+      } else if (filtro.toUpperCase().contains('PUEBLO')) {
         vCode = 'PUE';
-      } else if (veredaFiltro.toUpperCase().contains('TENDIDO')) {
+      } else if (filtro.toUpperCase().contains('TENDIDO')) {
         vCode = 'TEN';
       }
 
@@ -155,7 +157,7 @@ class ExportService {
 
       await Share.shareXFiles([
         XFile(zipPath, name: zipFileName, mimeType: 'application/zip'),
-      ], text: 'Exportación Asoguapo - Vereda: $veredaFiltro ($vCode)');
+      ], text: 'Exportación Asoguapo - Vereda: $filtro ($vCode)');
     } catch (e) {
       rethrow;
     }

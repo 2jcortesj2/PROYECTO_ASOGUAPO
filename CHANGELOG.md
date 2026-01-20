@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.5.8] - 2026-01-20
+
+### Cambios
+- **Exportación Total Restaurada:** Se habilitó nuevamente la opción de exportar "Todas" las veredas simultáneamente desde el historial, permitiendo obtener un reporte consolidado global en un solo archivo ZIP.
+
 ## [0.5.7] - 2026-01-20
 
 ### Agregado

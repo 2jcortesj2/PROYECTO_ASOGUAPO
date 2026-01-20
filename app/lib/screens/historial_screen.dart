@@ -236,7 +236,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
           child: BotonPrincipal(
             texto: 'EXPORTAR DATOS',
             icono: Icons.file_download,
-            onPressed: _filtroActivo == 'Todas' ? null : _exportarDatos,
+            onPressed: _exportarDatos,
           ),
         ),
       ),
