@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.9.8] - 2026-01-20
+
+### Rendimiento
+- **Optimización de Teclado:** Se implementó una pausa automática del feed de la cámara al abrir diálogos de entrada de texto. Esto elimina el "lag" severo que ocurría al desplegar el teclado mientras la cámara estaba activa, sin sacrificar la calidad de la imagen (se mantiene en resolución máxima).
+
 ## [0.9.7] - 2026-01-20
 
 ### Bug Fixes

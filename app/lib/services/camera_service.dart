@@ -31,7 +31,7 @@ class CameraService {
       // Usar cámara trasera (primera disponible)
       final camera = _cameras.first;
 
-      // Configurar resolución máxima
+      // Configurar resolución máxima (Solicitud explícita de usuario: NO bajar calidad)
       final resolution = ResolutionPreset.max;
 
       _controller = CameraController(
@@ -102,18 +102,25 @@ class CameraService {
     return savedPath;
   }
 
-  /// Pausa la cámara para ahorrar recursos
+  /// Pausa la vista previa para ahorrar recursos (útil al abrir teclados/diálogos)
   Future<void> pause() async {
     if (_controller != null && _controller!.value.isInitialized) {
-      // No hay método pause directo, pero podemos reducir impacto
-      // dejando el controller en su estado actual
+      try {
+        await _controller!.pausePreview();
+      } catch (e) {
+        debugPrint('CameraService: Error pausando preview: $e');
+      }
     }
   }
 
-  /// Reanuda la cámara después de pausa
+  /// Reanuda la vista previa
   Future<void> resume() async {
-    if (_controller != null && !_controller!.value.isInitialized) {
-      await _controller!.initialize();
+    if (_controller != null && _controller!.value.isInitialized) {
+      try {
+        await _controller!.resumePreview();
+      } catch (e) {
+        debugPrint('CameraService: Error reanudando preview: $e');
+      }
     }
   }
 

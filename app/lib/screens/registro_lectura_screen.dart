@@ -546,9 +546,14 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
   }
 
   void _mostrarDialogoNoLectura() {
+    // Pausar cámara para evitar lag con el teclado
+    _cameraService.pause();
+
     final controller = TextEditingController(text: _comentario);
     showDialog(
       context: context,
+      barrierDismissible:
+          false, // Obligar a usar botones para cerrar y manejar el resume
       builder: (context) => AlertDialog(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -627,6 +632,9 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
           ),
         ],
       ),
-    );
+    ).then((_) {
+      // Reanudar cámara al cerrar diálogo para restaurar el feed en vivo
+      _cameraService.resume();
+    });
   }
 }
