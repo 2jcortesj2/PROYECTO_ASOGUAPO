@@ -33,7 +33,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
   List<Lectura> _lecturas = [];
   bool _cargando = true;
   bool _exportando = false;
-  double _progresoExportacion = 0;
+  ExportProgress? _progresoActual;
 
   @override
   void initState() {
@@ -186,17 +186,22 @@ class _HistorialScreenState extends State<HistorialScreen> {
                         const CircularProgressIndicator(),
                         const SizedBox(height: 24),
                         Text(
-                          'Empaquetando evidencias...',
+                          _progresoActual?.mensaje ?? 'Procesando...',
                           style: AppTextStyles.subtitulo,
+                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Preparando archivos para compartir',
-                          style: AppTextStyles.cuerpoSecundario,
-                        ),
+                        if (_progresoActual?.tamanoEstimado != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tamaño: ${_progresoActual!.tamanoEstimado} | Quedan: ${_progresoActual!.tiempoRestante}',
+                            style: AppTextStyles.cuerpoSecundario.copyWith(
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 20),
                         LinearProgressIndicator(
-                          value: _progresoExportacion,
+                          value: _progresoActual?.porcentaje ?? 0,
                           backgroundColor: Colors.grey[200],
                           valueColor: const AlwaysStoppedAnimation<Color>(
                             AppColors.primary,
@@ -204,7 +209,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          '${(_progresoExportacion * 100).toInt()}%',
+                          '${((_progresoActual?.porcentaje ?? 0) * 100).toInt()}%',
                           style: AppTextStyles.cuerpo.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
@@ -438,7 +443,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
     setState(() {
       _exportando = true;
-      _progresoExportacion = 0;
+      _progresoActual = null;
     });
 
     try {
@@ -448,7 +453,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
         tipo: tipo,
         onProgress: (progreso) {
           setState(() {
-            _progresoExportacion = progreso;
+            _progresoActual = progreso;
           });
         },
       );

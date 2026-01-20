@@ -1,8 +1,8 @@
-# AguaLector 💧 v0.5.7
+# AguaLector 💧 v0.5.9
 
 Aplicación móvil Android para registro de lecturas de contadores de agua potable en comunidades rurales.
 
-## 🎯 Estado Actual: Fase 6 - Pulido de UI y Datos Completos (v0.5.7)
+## 🎯 Estado Actual: Fase 6 - Pulido de UI y Datos Completos (v0.5.9)
 
 Esta versión introduce mejoras visuales sutiles para una mejor navegación, incluye la carga de la base de datos completa de usuarios y optimiza la identificación de medidores.
 

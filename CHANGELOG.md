@@ -2,6 +2,12 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.5.9] - 2026-01-20
+
+### Agregado
+- **Feedback Detallado de Exportación:** Nuevo sistema de progreso que calcula el tamaño total de las evidencias (MB) y estima el tiempo restante para grandes volúmenes de datos (ej. 500 fotos).
+- **Fases de Exportación:** Visualización clara de las etapas: Cálculo de tamaño, Empaquetado de fotos y Compresión final.
+
 ## [0.5.8] - 2026-01-20
 
 ### Cambios

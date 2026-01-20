@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:archive/archive_io.dart';
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,6 +14,25 @@ import '../config/constants.dart';
 
 enum TipoExportacion { csv, zip, todo }
 
+/// Metadatos de progreso para la exportación
+class ExportProgress {
+  final double porcentaje;
+  final String mensaje;
+  final String? tiempoRestante;
+  final String? tamanoEstimado;
+  final int totalArchivos;
+  final int procesados;
+
+  ExportProgress({
+    required this.porcentaje,
+    required this.mensaje,
+    this.tiempoRestante,
+    this.tamanoEstimado,
+    this.totalArchivos = 0,
+    this.procesados = 0,
+  });
+}
+
 class ExportService {
   final DatabaseService _databaseService = DatabaseService();
 
@@ -20,7 +40,7 @@ class ExportService {
     List<Lectura>? lecturasFiltradas,
     String? veredaFiltro,
     TipoExportacion tipo = TipoExportacion.todo,
-    Function(double)? onProgress,
+    Function(ExportProgress)? onProgress,
   }) async {
     try {
       final lecturas =
@@ -51,9 +71,48 @@ class ExportService {
       final archive = Archive();
       bool hasContent = false;
 
-      // 1. GENERAR CSV (Si se solicita)
+      // 1. ESTIMACIÓN INICIAL DE TAMAÑO Y TIEMPO
+      int tamanoTotalBytes = 0;
+      final photosWithFile = lecturas
+          .where((l) => l.fotoPath.isNotEmpty)
+          .toList();
+
+      if (tipo != TipoExportacion.csv) {
+        if (onProgress != null) {
+          onProgress(
+            ExportProgress(
+              porcentaje: 0.05,
+              mensaje: 'Calculando tamaño total...',
+            ),
+          );
+        }
+
+        for (var l in photosWithFile) {
+          final f = File(l.fotoPath);
+          if (await f.exists()) {
+            tamanoTotalBytes += await f.length();
+          }
+        }
+      }
+
+      final String tamanoLegible = _formatBytes(tamanoTotalBytes);
+      // Estimación: ~10MB por segundo de compresión en Isolate (conservador)
+      final int segundosEstimados =
+          (tamanoTotalBytes / (1024 * 1024 * 8)).ceil() + 2;
+      final String tiempoLegible = _formatTime(segundosEstimados);
+
+      // 2. GENERAR CSV (Si se solicita)
       if (tipo == TipoExportacion.csv || tipo == TipoExportacion.todo) {
-        if (onProgress != null) onProgress(0.1);
+        if (onProgress != null) {
+          onProgress(
+            ExportProgress(
+              porcentaje: 0.1,
+              mensaje: 'Generando reporte CSV...',
+              tamanoEstimado: tamanoLegible,
+              tiempoRestante: tiempoLegible,
+            ),
+          );
+        }
 
         List<List<dynamic>> csvData = [
           [
@@ -105,12 +164,9 @@ class ExportService {
         hasContent = true;
       }
 
-      // 2. AGREGAR FOTOS AL ARCHIVE (Si se solicita)
+      // 3. AGREGAR FOTOS AL ARCHIVE (Si se solicita)
       if (tipo == TipoExportacion.zip || tipo == TipoExportacion.todo) {
         int processed = 0;
-        final photosWithFile = lecturas
-            .where((l) => l.fotoPath.isNotEmpty)
-            .toList();
         final totalPhotos = photosWithFile.length;
 
         for (var lectura in photosWithFile) {
@@ -125,8 +181,19 @@ class ExportService {
           }
           processed++;
           if (onProgress != null && totalPhotos > 0) {
-            // Empezamos en 0.2 y llegamos a 0.8 durante el empaquetado de fotos
-            onProgress(0.2 + (processed / totalPhotos * 0.6));
+            // Fase de empaquetado: 0.2 a 0.5
+            double p = 0.2 + (processed / totalPhotos * 0.3);
+            int segResta = (segundosEstimados * (1 - p)).ceil();
+            onProgress(
+              ExportProgress(
+                porcentaje: p,
+                mensaje: 'Empaquetando fotos ($processed de $totalPhotos)...',
+                tamanoEstimado: tamanoLegible,
+                tiempoRestante: _formatTime(segResta),
+                totalArchivos: totalPhotos,
+                procesados: processed,
+              ),
+            );
           }
         }
       }
@@ -135,8 +202,17 @@ class ExportService {
         throw Exception('No hay datos o fotos para exportar');
       }
 
-      // 3. COMPRESIÓN Y COMPARTIR (SIEMPRE UN ZIP)
-      if (onProgress != null) onProgress(0.9);
+      // 4. COMPRESIÓN PESADA (ZIP)
+      if (onProgress != null) {
+        onProgress(
+          ExportProgress(
+            porcentaje: 0.6,
+            mensaje: 'Comprimiendo archivo (Casi listo)...',
+            tamanoEstimado: tamanoLegible,
+            tiempoRestante: _formatTime((segundosEstimados * 0.4).ceil()),
+          ),
+        );
+      }
 
       final String suffix = tipo == TipoExportacion.csv
           ? 'REPORTE'
@@ -153,7 +229,16 @@ class ExportService {
       final zipFile = File(zipPath);
       await zipFile.writeAsBytes(zipData, flush: true);
 
-      if (onProgress != null) onProgress(1.0);
+      if (onProgress != null) {
+        onProgress(
+          ExportProgress(
+            porcentaje: 1.0,
+            mensaje: '¡Listo! Preparando para compartir...',
+            tamanoEstimado: tamanoLegible,
+            tiempoRestante: '0s',
+          ),
+        );
+      }
 
       await Share.shareXFiles([
         XFile(zipPath, name: zipFileName, mimeType: 'application/zip'),
@@ -167,5 +252,19 @@ class ExportService {
   /// Realiza la codificación ZIP en un hilo separado
   static List<int>? _encodeZip(Archive archive) {
     return ZipEncoder().encode(archive);
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes <= 0) return '0 B';
+    const suffixes = ['B', 'KB', 'MB', 'GB'];
+    var i = (log(bytes) / log(1024)).floor();
+    return ((bytes / pow(1024, i)).toStringAsFixed(1)) + ' ' + suffixes[i];
+  }
+
+  String _formatTime(int seconds) {
+    if (seconds < 60) return '${seconds}s';
+    int minutes = (seconds / 60).floor();
+    int remSeconds = seconds % 60;
+    return '${minutes}m ${remSeconds}s';
   }
 }
