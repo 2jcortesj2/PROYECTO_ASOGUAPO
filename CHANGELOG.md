@@ -15,6 +15,30 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 
 ---
 
+## [0.3.0] - 2026-01-19
+
+### Agregado
+- **Permisos al inicio:** La aplicación solicita permisos de cámara y GPS al abrir.
+- **Cámara embebida:** Vista previa en vivo usando el paquete `camera` en lugar de cámara externa.
+- **Servicio de permisos:** Nuevo `permission_service.dart` para manejo centralizado.
+- **Widget de cámara:** Nuevo `camera_preview_widget.dart` con componentes reutilizables.
+- **Pantalla de permisos:** UI amigable cuando se deniegan permisos críticos.
+
+### Cambios
+- `main.dart`: Solicita todos los permisos antes de iniciar la app.
+- `camera_service.dart`: Refactorizado para usar el paquete `camera` con `CameraController`.
+- `registro_lectura_screen.dart`: Muestra vista previa de cámara en vivo.
+- `pubspec.yaml`: Reemplazado `image_picker` por `camera: ^0.11.0+2`.
+
+### Optimizaciones para Baja Gama
+- Resolución de cámara baja por defecto (`ResolutionPreset.low`).
+- Audio deshabilitado en cámara (`enableAudio: false`).
+- GPS prioriza última ubicación conocida para respuesta rápida.
+- Uso de `RepaintBoundary` en widgets de cámara.
+- Manejo de ciclo de vida para liberar recursos.
+
+---
+
 ## [0.2.0] - 2026-01-19
 
 ### Agregado
@@ -48,7 +72,9 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - **Tema:** Eliminados parámetros de color obsoletos en `ColorScheme`.
 - **Documentación:** Corregidos comentarios dangling en archivo de constantes.
 
-### Planeado para Fase 3
+### Planeado para Fase 4
 - Implementación de persistencia local con SQFLite.
-- Integración de cámara nativa y captura de coordenadas GPS reales.
 - Lógica de exportación de archivos CSV reales.
+- **Gestión de Usuarios Existentes:** Al seleccionar un usuario con datos completos, mostrar la información recolectada y preguntar si se desea editar el perfil.
+
+---

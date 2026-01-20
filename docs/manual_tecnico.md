@@ -4,14 +4,15 @@
 
 ### Stack Tecnológico
 
-| Componente    | Tecnología            | Versión     |
-| ------------- | --------------------- | ----------- |
-| Framework     | Flutter               | 3.x         |
-| Lenguaje      | Dart                  | 3.x         |
-| Base de datos | SQLite                | sqflite 2.x |
-| Cámara        | camera / image_picker | Latest      |
-| GPS           | geolocator            | Latest      |
-| Exportación   | csv, share_plus       | Latest      |
+| Componente    | Tecnología         | Versión     |
+| ------------- | ------------------ | ----------- |
+| Framework     | Flutter            | 3.x         |
+| Lenguaje      | Dart               | 3.x         |
+| Base de datos | SQLite             | sqflite 2.x |
+| Cámara        | camera             | Latest      |
+| GPS           | geolocator         | Latest      |
+| Permisos      | permission_handler | Latest      |
+| Exportación   | csv, share_plus    | Latest      |
 
 ---
 
@@ -42,6 +43,7 @@ app/
 │   │   ├── database_service.dart
 │   │   ├── camera_service.dart
 │   │   ├── gps_service.dart
+│   │   ├── permission_service.dart
 │   │   └── export_service.dart
 │   └── utils/
 │       └── formatters.dart
@@ -57,7 +59,7 @@ app/
 ```
 
 > [!NOTE]
-> En esta versión (v0.1.0 Prototipo UI), los servicios de Cámara, GPS y Base de Datos están **simulados** mediante lógica interna para demostrar el flujo de usuario sin requerir hardware real o persistencia.
+> En la versión **v0.3.0**, se ha implementado la cámara real embebida (con el paquete `camera`) y el sistema de permisos al inicio de la aplicación. La persistencia en base de datos aún se encuentra en proceso de integración final.
 
 ---
 
@@ -148,9 +150,18 @@ class DatabaseService {
 
 ```dart
 class GpsService {
-  Future<bool> checkPermissions();
-  Future<Position?> getCurrentPosition();
-  Stream<ServiceStatus> get serviceStatusStream;
+  Future<bool> isLocationServiceEnabled();
+  Future<GpsResult> getCurrentLocation();
+  Future<GpsResult> getLastKnownLocation();
+}
+```
+
+### PermissionService
+
+```dart
+class PermissionService {
+  Future<PermissionResult> requestAllPermissions();
+  Future<PermissionResult> checkPermissions();
 }
 ```
 
@@ -186,9 +197,9 @@ dependencies:
   flutter:
     sdk: flutter
   sqflite: ^2.3.0
-  path_provider: ^2.1.0
-  camera: ^0.10.5
-  image_picker: ^1.0.0
+  path_provider: ^2.1.2
+  camera: ^0.11.0+2
+  permission_handler: ^11.3.0
   geolocator: ^10.1.0
   csv: ^5.1.0
   share_plus: ^7.2.0
@@ -224,10 +235,11 @@ El APK se genera en: `build/app/outputs/flutter-apk/app-release.apk`
 
 ## Consideraciones de Rendimiento
 
-- **Imágenes:** Comprimidas a 80% calidad JPEG, máx 1280px
-- **Base de datos:** Índices en campos de fecha y contador_id
-- **GPS:** Timeout de 10 segundos con opción de continuar sin ubicación
-- **Memoria:** Límite de 50 registros en memoria, paginación para historial
+- **Cámara:** Resolución baja por defecto (`ResolutionPreset.low`) para ahorrar CPU y RAM.
+- **Ciclo de Vida:** Control estricto de recursos de cámara con `WidgetsBindingObserver`.
+- **UI:** Uso de `RepaintBoundary` para la vista previa de cámara en vivo para evitar repintados innecesarios del resto de la interfaz.
+- **GPS:** Uso de `getLastKnownLocation()` como primera opción para evitar esperas y consumo excesivo de batería.
+- **Imágenes:** Guardadas con nombres de archivo basados en timestamp para evitar colisiones y organizadas en subdirectorios.
 
 ---
 

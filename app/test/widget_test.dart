@@ -9,13 +9,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:agualector/main.dart';
+import 'package:agualector/services/permission_service.dart';
 
 void main() {
   testWidgets('AguaLector loads and displays list', (
     WidgetTester tester,
   ) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const AguaLectorApp());
+    // Build our app with mocked permission result (all granted)
+    final mockResult = PermissionResult(
+      cameraGranted: true,
+      locationGranted: true,
+    );
+    await tester.pumpWidget(AguaLectorApp(permissionResult: mockResult));
 
     // Verify key elements of the main screen
     expect(find.text('Lecturas del Día'), findsOneWidget);

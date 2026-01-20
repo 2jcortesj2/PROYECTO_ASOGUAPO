@@ -9,10 +9,11 @@ import '../services/gps_service.dart';
 import '../widgets/boton_principal.dart';
 import '../widgets/lectura_input.dart';
 import '../widgets/gps_indicator.dart';
+import '../widgets/camera_preview_widget.dart';
 import 'confirmacion_screen.dart';
 
 /// Pantalla de registro de lectura
-/// Incluye cámara real, input de lectura y GPS real
+/// Incluye cámara embebida en vivo, input de lectura y GPS real
 class RegistroLecturaScreen extends StatefulWidget {
   final Contador contador;
 
@@ -22,7 +23,8 @@ class RegistroLecturaScreen extends StatefulWidget {
   State<RegistroLecturaScreen> createState() => _RegistroLecturaScreenState();
 }
 
-class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
+class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
+    with WidgetsBindingObserver {
   final TextEditingController _lecturaController = TextEditingController();
   final CameraService _cameraService = CameraService();
   final GpsService _gpsService = GpsService();
@@ -36,21 +38,58 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
   bool _guardando = false;
   String? _errorLectura;
   bool _capturandoFoto = false;
+  bool _cameraInitialized = false;
+  String? _cameraError;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _initCamera();
     _obtenerGps();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Manejar ciclo de vida para optimizar recursos
+    if (!_cameraInitialized) return;
+
+    if (state == AppLifecycleState.inactive) {
+      _cameraService.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      _initCamera();
+    }
+  }
+
+  /// Inicializa la cámara embebida
+  Future<void> _initCamera() async {
+    final success = await _cameraService.initialize(lowResolution: true);
+
+    if (mounted) {
+      setState(() {
+        _cameraInitialized = success;
+        if (!success) {
+          _cameraError = 'No se pudo inicializar la cámara';
+        }
+      });
+    }
+  }
+
   /// Obtiene la ubicación GPS real
+  /// Prioriza última ubicación conocida para mejor rendimiento
   Future<void> _obtenerGps() async {
     setState(() {
       _obteniendoGps = true;
       _gpsError = null;
     });
 
-    final result = await _gpsService.getCurrentLocation();
+    // Primero intentar con última ubicación conocida (más rápido)
+    var result = await _gpsService.getLastKnownLocation();
+
+    // Si no hay última ubicación, obtener actual
+    if (!result.success) {
+      result = await _gpsService.getCurrentLocation();
+    }
 
     if (mounted) {
       setState(() {
@@ -69,7 +108,9 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _lecturaController.dispose();
+    _cameraService.dispose();
     super.dispose();
   }
 
@@ -93,10 +134,10 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Vista de cámara / foto
+            // Vista de cámara en vivo / foto capturada
             Expanded(flex: 5, child: _buildCameraSection()),
 
-            // Sección inferior
+            // Sección inferior con inputs
             Container(
               padding: const EdgeInsets.all(AppConstants.paddingMedium),
               decoration: BoxDecoration(
@@ -180,7 +221,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Fondo / foto capturada
+          // Mostrar foto capturada o vista previa en vivo
           if (_fotoPath != null)
             Image.file(
               File(_fotoPath!),
@@ -188,48 +229,15 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
               width: double.infinity,
               height: double.infinity,
             )
+          else if (_cameraInitialized && _cameraService.controller != null)
+            CameraPreviewWidget(
+              controller: _cameraService.controller!,
+              overlay: const CameraGuideFrame(),
+            )
+          else if (_cameraError != null)
+            _buildCameraError()
           else
-            Container(
-              color: Colors.grey[900],
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      _capturandoFoto
-                          ? Icons.hourglass_top
-                          : Icons.camera_alt_outlined,
-                      size: 64,
-                      color: Colors.white54,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _capturandoFoto
-                          ? 'Abriendo cámara...'
-                          : 'Toca el botón para tomar foto',
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-          // Marco guía
-          if (_fotoPath == null && !_capturandoFoto)
-            Container(
-              width: 200,
-              height: 150,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+            _buildCameraLoading(),
 
           // Indicador de foto tomada
           if (_fotoPath != null)
@@ -266,39 +274,10 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
           // Botón de captura
           Positioned(
             bottom: 20,
-            child: GestureDetector(
-              onTap: _capturandoFoto ? null : _tomarFoto,
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  color: _capturandoFoto ? Colors.grey : Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    width: 4,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 10,
-                    ),
-                  ],
-                ),
-                child: _capturandoFoto
-                    ? const Center(
-                        child: SizedBox(
-                          width: 32,
-                          height: 32,
-                          child: CircularProgressIndicator(strokeWidth: 3),
-                        ),
-                      )
-                    : Icon(
-                        _fotoPath != null ? Icons.refresh : Icons.camera_alt,
-                        size: 32,
-                        color: AppColors.textPrimary,
-                      ),
-              ),
+            child: CaptureButton(
+              isLoading: _capturandoFoto,
+              hasPhoto: _fotoPath != null,
+              onPressed: _tomarFoto,
             ),
           ),
         ],
@@ -306,8 +285,78 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen> {
     );
   }
 
-  /// Captura una foto real usando el servicio de cámara
+  Widget _buildCameraLoading() {
+    return Container(
+      color: Colors.grey[900],
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Colors.white54, strokeWidth: 2),
+            SizedBox(height: 16),
+            Text(
+              'Iniciando cámara...',
+              style: TextStyle(color: Colors.white54, fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCameraError() {
+    return Container(
+      color: Colors.grey[900],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.camera_alt_outlined,
+              size: 64,
+              color: Colors.white54,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _cameraError ?? 'Error con la cámara',
+              style: const TextStyle(color: Colors.white54, fontSize: 16),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _initCamera,
+              child: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Captura una foto desde la vista previa en vivo
   Future<void> _tomarFoto() async {
+    // Si ya existe una foto, al tocar el botón de "refresh" volvemos a la cámara
+    if (_fotoPath != null) {
+      final oldPath = _fotoPath!;
+      setState(() {
+        _fotoPath = null;
+      });
+      // Eliminar el archivo anterior para ahorrar espacio
+      _cameraService.deletePhoto(oldPath);
+      return;
+    }
+
+    if (!_cameraInitialized) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('❌ La cámara no está lista'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() => _capturandoFoto = true);
 
     final path = await _cameraService.capturePhoto();

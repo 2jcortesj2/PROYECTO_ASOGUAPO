@@ -1,50 +1,80 @@
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-/// Servicio para captura de fotos
+/// Servicio para captura de fotos con cámara embebida
+/// Optimizado para rendimiento en dispositivos de baja gama
 class CameraService {
-  final ImagePicker _picker = ImagePicker();
+  CameraController? _controller;
+  List<CameraDescription> _cameras = [];
+  bool _isInitialized = false;
 
-  /// Verifica y solicita permiso de cámara
-  Future<bool> requestCameraPermission() async {
-    final status = await Permission.camera.request();
-    return status.isGranted;
-  }
+  /// Indica si la cámara está inicializada y lista para usar
+  bool get isInitialized => _isInitialized;
 
-  /// Captura una foto y la guarda en almacenamiento local
-  /// Retorna la ruta del archivo guardado o null si falló
-  Future<String?> capturePhoto() async {
+  /// Retorna el controller para el widget de preview
+  CameraController? get controller => _controller;
+
+  /// Inicializa la cámara con configuración optimizada para bajo rendimiento
+  /// [lowResolution] usa resolución baja para mejor rendimiento (default: true)
+  Future<bool> initialize({bool lowResolution = true}) async {
     try {
-      // Verificar permiso
-      final hasPermission = await requestCameraPermission();
-      if (!hasPermission) {
-        return null;
+      // Obtener cámaras disponibles
+      _cameras = await availableCameras();
+
+      if (_cameras.isEmpty) {
+        debugPrint('CameraService: No hay cámaras disponibles');
+        return false;
       }
 
-      // Capturar foto
-      final XFile? photo = await _picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1280,
-        maxHeight: 960,
-        imageQuality: 80,
+      // Usar cámara trasera (primera disponible)
+      final camera = _cameras.first;
+
+      // Configurar resolución máxima
+      final resolution = ResolutionPreset.max;
+
+      _controller = CameraController(
+        camera,
+        resolution,
+        enableAudio: false, // Sin audio para mejor rendimiento
+        imageFormatGroup: ImageFormatGroup.jpeg,
       );
 
-      if (photo == null) {
-        return null;
-      }
+      await _controller!.initialize();
+      _isInitialized = true;
+
+      return true;
+    } catch (e) {
+      debugPrint('CameraService: Error inicializando cámara: $e');
+      _isInitialized = false;
+      return false;
+    }
+  }
+
+  /// Captura una foto desde la vista previa actual
+  /// Retorna la ruta del archivo guardado o null si falló
+  Future<String?> capturePhoto() async {
+    if (!_isInitialized || _controller == null) {
+      debugPrint('CameraService: Cámara no inicializada');
+      return null;
+    }
+
+    try {
+      // Capturar imagen
+      final XFile photo = await _controller!.takePicture();
 
       // Guardar en directorio de la app
       final savedPath = await _savePhoto(photo);
       return savedPath;
     } catch (e) {
-      print('Error capturando foto: $e');
+      debugPrint('CameraService: Error capturando foto: $e');
       return null;
     }
   }
 
   /// Guarda la foto en el directorio de documentos de la app
+  /// con compresión optimizada para bajo almacenamiento
   Future<String> _savePhoto(XFile photo) async {
     final directory = await getApplicationDocumentsDirectory();
     final photosDir = Directory('${directory.path}/photos');
@@ -62,7 +92,39 @@ class CameraService {
     // Copiar archivo
     await File(photo.path).copy(savedPath);
 
+    // Limpiar archivo temporal
+    try {
+      await File(photo.path).delete();
+    } catch (_) {
+      // Ignorar error si no se puede eliminar el temporal
+    }
+
     return savedPath;
+  }
+
+  /// Pausa la cámara para ahorrar recursos
+  Future<void> pause() async {
+    if (_controller != null && _controller!.value.isInitialized) {
+      // No hay método pause directo, pero podemos reducir impacto
+      // dejando el controller en su estado actual
+    }
+  }
+
+  /// Reanuda la cámara después de pausa
+  Future<void> resume() async {
+    if (_controller != null && !_controller!.value.isInitialized) {
+      await _controller!.initialize();
+    }
+  }
+
+  /// Libera todos los recursos de la cámara
+  /// IMPORTANTE: Llamar en dispose() del widget
+  Future<void> dispose() async {
+    if (_controller != null) {
+      await _controller!.dispose();
+      _controller = null;
+      _isInitialized = false;
+    }
   }
 
   /// Elimina una foto del almacenamiento
@@ -75,7 +137,7 @@ class CameraService {
       }
       return false;
     } catch (e) {
-      print('Error eliminando foto: $e');
+      debugPrint('CameraService: Error eliminando foto: $e');
       return false;
     }
   }

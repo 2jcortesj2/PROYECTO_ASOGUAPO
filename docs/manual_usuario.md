@@ -8,9 +8,9 @@ AguaLector es una aplicación móvil diseñada para facilitar el registro de lec
 
 ## Requisitos
 
-- Teléfono Android (versión 6.0 o superior)
+- Teléfono Android (versión 5.0 o superior)
+- Permisos de Cámara y Ubicación concedidos (se solicitan al inicio)
 - GPS activado
-- Cámara funcional
 - No requiere internet
 
 ---
@@ -36,11 +36,12 @@ Al abrir la app verás la lista de todos los contadores de tu zona.
 
 **Pasos:**
 
-1. **Toca el botón circular** para abrir la cámara
-2. **Apunta al contador** y toma la foto
-3. **Ingresa la lectura** en el campo numérico grande
-4. **Verifica** que el GPS esté activo (ícono verde con coordenadas)
-5. **Toca "GUARDAR LECTURA"**
+1. **Ver cámara en vivo**: La cámara se activa automáticamente al entrar a la pantalla.
+2. **Apunta al contador**: Mantén el teléfono firme frente al contador de agua.
+3. **Presiona el botón blanco**: Toca el círculo blanco grande para capturar la foto.
+4. **Ingresa la lectura**: Escribe el número actual en el campo blanco grande.
+5. **Verifica el GPS**: Asegúrate de ver las coordenadas en verde bajo la lectura.
+6. **Toca "GUARDAR LECTURA"**: Guarda el registro completo.
 
 > ⚠️ **Importante:** 
 > - Si el GPS muestra error, toca el ícono de reintentar
@@ -81,12 +82,11 @@ Accede desde el botón flotante en la lista principal.
 
 ## Solución de Problemas
 
-| Problema        | Solución                                       |
-| --------------- | ---------------------------------------------- |
-| GPS no funciona | Activa ubicación en ajustes del teléfono       |
-| Foto borrosa    | Limpia la cámara y mantén el teléfono firme    |
-| No guarda       | Verifica que el campo de lectura no esté vacío |
-| App lenta       | Cierra otras aplicaciones                      |
+| App no abre          | Verifica los permisos de Cámara y GPS al inicio |
+| GPS no funciona      | Activa ubicación en ajustes del teléfono        |
+| Foto borrosa         | Limpia la cámara y mantén el teléfono firme     |
+| No guarda            | Verifica que el campo de lectura no esté vacío  |
+| App lenta (Gama baja) | Cierra otras aplicaciones                       |
 
 ---
 
