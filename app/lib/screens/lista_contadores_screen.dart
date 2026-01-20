@@ -271,7 +271,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Usuario ya registrado', style: AppTextStyles.subtitulo),
+            Text('Lectura registrada hoy', style: AppTextStyles.subtitulo),
             IconButton(
               icon: const Icon(Icons.close, color: Colors.grey),
               onPressed: () => Navigator.pop(context),
@@ -284,46 +284,20 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.registrado.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: AppColors.registrado.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: AppColors.registrado),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Lectura registrada para hoy',
-                      style: AppTextStyles.cuerpo.copyWith(
-                        color: AppColors.registrado,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
             _buildDetalleRow(Icons.speed, 'Lectura', lectura.lecturaFormateada),
-            const Divider(height: 16),
+            const SizedBox(height: 12),
             _buildDetalleRow(
               Icons.calendar_today,
               'Fecha',
               '${lectura.fecha.day} ${_obtenerMes(lectura.fecha.month)} ${lectura.fecha.year}',
             ),
-            const Divider(height: 16),
+            const SizedBox(height: 12),
             _buildDetalleRow(
               Icons.access_time,
               'Hora',
               '${lectura.fecha.hour.toString().padLeft(2, '0')}:${lectura.fecha.minute.toString().padLeft(2, '0')}',
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
           ],
         ),
         actions: [
