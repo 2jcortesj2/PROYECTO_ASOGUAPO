@@ -584,37 +584,46 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
           ],
         ),
         actions: [
-          // Botón limpiar/borrar motivo si ya existía
-          if (_comentario != null)
-            OutlinedButton.icon(
-              onPressed: () {
-                setState(() => _comentario = null);
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.delete_outline, size: 18),
-              label: const Text('BORRAR MOTIVO'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.error,
-                side: const BorderSide(color: AppColors.error),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Botón limpiar/borrar motivo (si existe)
+              if (_comentario != null) ...[
+                OutlinedButton.icon(
+                  onPressed: () {
+                    setState(() => _comentario = null);
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.delete_outline, size: 18),
+                  label: const Text('BORRAR MOTIVO'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.error,
+                    side: const BorderSide(color: AppColors.error),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+
+              // Botón Aceptar
+              ElevatedButton(
+                onPressed: () {
+                  if (controller.text.trim().isNotEmpty) {
+                    setState(() {
+                      _comentario = controller.text.trim();
+                      _errorLectura = null;
+                      _lecturaController.clear(); // Limpiar lectura visualmente
+                    });
+                    Navigator.pop(context);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('ACEPTAR'),
               ),
-            ),
-          if (_comentario != null) const SizedBox(width: 12),
-          ElevatedButton(
-            onPressed: () {
-              if (controller.text.trim().isNotEmpty) {
-                setState(() {
-                  _comentario = controller.text.trim();
-                  _errorLectura = null;
-                  _lecturaController.clear(); // Limpiar lectura visualmente
-                });
-                Navigator.pop(context);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('ACEPTAR'),
+            ],
           ),
         ],
       ),
