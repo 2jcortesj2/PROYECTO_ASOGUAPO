@@ -166,28 +166,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
               ),
               child: Row(
                 children: _veredas.map((vereda) {
-                  final seleccionada = _veredaSeleccionada == vereda;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(vereda),
-                      selected: seleccionada,
-                      onSelected: (selected) {
-                        if (selected) {
-                          setState(() => _veredaSeleccionada = vereda);
-                        }
-                      },
-                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
-                      labelStyle: TextStyle(
-                        color: seleccionada
-                            ? AppColors.primary
-                            : AppColors.textSecondary,
-                        fontWeight: seleccionada
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                    ),
-                  );
+                  return _buildVeredaChip(vereda);
                 }).toList(),
               ),
             ),
@@ -256,6 +235,32 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildVeredaChip(String label) {
+    final activo = _veredaSeleccionada == label;
+
+    return GestureDetector(
+      onTap: () => setState(() => _veredaSeleccionada = label),
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: activo ? AppColors.primary : AppColors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: activo ? AppColors.primary : AppColors.border,
+          ),
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.cuerpo.copyWith(
+            color: activo ? Colors.white : AppColors.textPrimary,
+            fontWeight: activo ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
       ),
     );
   }
