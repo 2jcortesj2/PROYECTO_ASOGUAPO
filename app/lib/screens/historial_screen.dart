@@ -9,7 +9,9 @@ import '../widgets/boton_principal.dart';
 
 /// Pantalla de historial y exportación de lecturas
 class HistorialScreen extends StatefulWidget {
-  const HistorialScreen({super.key});
+  final String? filtroInicial;
+
+  const HistorialScreen({super.key, this.filtroInicial});
 
   @override
   State<HistorialScreen> createState() => _HistorialScreenState();
@@ -29,6 +31,8 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
   List<Lectura> _lecturas = [];
   bool _cargando = true;
+  bool _exportando = false;
+  double _progresoExportacion = 0;
 
   @override
   void initState() {
@@ -42,18 +46,25 @@ class _HistorialScreenState extends State<HistorialScreen> {
     if (mounted) {
       setState(() {
         _lecturas = lecturas;
-        // Seleccionar la vereda de la última lectura tomada si existe
-        if (_lecturas.isNotEmpty) {
+
+        // Determinar qué vereda seleccionar
+        if (widget.filtroInicial != null) {
+          // Si nos pasaron un filtro inicial, lo usamos
+          _filtroActivo = _veredas.firstWhere(
+            (v) => v.toUpperCase() == widget.filtroInicial!.toUpperCase(),
+            orElse: () => 'Todas',
+          );
+        } else if (_lecturas.isNotEmpty) {
+          // Si no hay filtro inicial pero hay lecturas, usamos la última
           final ultimaVereda = _lecturas.first.vereda;
-          // Validar que la vereda esté en nuestra lista (ignorar mayúsculas)
-          final veredaEnLista = _veredas.firstWhere(
+          _filtroActivo = _veredas.firstWhere(
             (v) => v.toUpperCase() == ultimaVereda.toUpperCase(),
             orElse: () => 'Todas',
           );
-          _filtroActivo = veredaEnLista;
         } else {
           _filtroActivo = 'Todas';
         }
+
         _cargando = false;
       });
     }
@@ -74,59 +85,120 @@ class _HistorialScreenState extends State<HistorialScreen> {
         title: const Text('Historial de Lecturas'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, _filtroActivo),
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 8),
-          // Subtítulo
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppConstants.paddingMedium,
-            ),
-            child: Text(
-              '${_lecturasFiltradas.length} lecturas registradas',
-              style: AppTextStyles.cuerpoSecundario,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Filtros
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppConstants.paddingMedium,
-            ),
-            child: Row(
-              children: _veredas.map((v) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: _buildFiltroChip(v),
-                );
-              }).toList(),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Lista de lecturas
-          Expanded(
-            child: _cargando
-                ? const Center(child: CircularProgressIndicator())
-                : _lecturasFiltradas.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 100),
-                    itemCount: _lecturasFiltradas.length,
-                    itemBuilder: (context, index) {
-                      return _buildLecturaCard(_lecturasFiltradas[index]);
-                    },
+      body: PopScope(
+        canPop: !_exportando, // Bloquear volver si está exportando
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          if (context.mounted) {
+            Navigator.pop(context, _filtroActivo);
+          }
+        },
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                // Subtítulo
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.paddingMedium,
                   ),
-          ),
-        ],
+                  child: Text(
+                    '${_lecturasFiltradas.length} lecturas registradas',
+                    style: AppTextStyles.cuerpoSecundario,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Filtros
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.paddingMedium,
+                  ),
+                  child: Row(
+                    children: _veredas.map((v) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: _buildFiltroChip(v),
+                      );
+                    }).toList(),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Lista de lecturas
+                Expanded(
+                  child: _cargando
+                      ? const Center(child: CircularProgressIndicator())
+                      : _lecturasFiltradas.isEmpty
+                      ? _buildEmptyState()
+                      : ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 100),
+                          itemCount: _lecturasFiltradas.length,
+                          itemBuilder: (context, index) {
+                            return _buildLecturaCard(_lecturasFiltradas[index]);
+                          },
+                        ),
+                ),
+              ],
+            ),
+
+            // Overlay de progreso
+            if (_exportando)
+              Container(
+                color: Colors.black.withOpacity(0.6),
+                child: Center(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 40),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Empaquetando evidencias...',
+                          style: AppTextStyles.subtitulo,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Preparando archivos para compartir',
+                          style: AppTextStyles.cuerpoSecundario,
+                        ),
+                        const SizedBox(height: 20),
+                        LinearProgressIndicator(
+                          value: _progresoExportacion,
+                          backgroundColor: Colors.grey[200],
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${(_progresoExportacion * 100).toInt()}%',
+                          style: AppTextStyles.cuerpo.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
 
       // Botón exportar fijo abajo
@@ -346,11 +418,21 @@ class _HistorialScreenState extends State<HistorialScreen> {
   Future<void> _ejecutarExportacion(TipoExportacion tipo) async {
     Navigator.pop(context);
 
+    setState(() {
+      _exportando = true;
+      _progresoExportacion = 0;
+    });
+
     try {
       await _exportService.exportarLecturas(
         lecturasFiltradas: _lecturasFiltradas,
         veredaFiltro: _filtroActivo,
         tipo: tipo,
+        onProgress: (progreso) {
+          setState(() {
+            _progresoExportacion = progreso;
+          });
+        },
       );
     } catch (e) {
       if (mounted) {
@@ -360,6 +442,12 @@ class _HistorialScreenState extends State<HistorialScreen> {
             backgroundColor: Colors.red,
           ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _exportando = false;
+        });
       }
     }
   }

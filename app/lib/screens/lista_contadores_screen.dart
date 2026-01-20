@@ -22,7 +22,12 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _veredaSeleccionada = 'El Recreo';
-  final List<String> _veredas = ['El Recreo', 'Pueblo Nuevo', 'El Tendido'];
+  final List<String> _veredas = [
+    'El Recreo',
+    'Pueblo Nuevo',
+    'El Tendido',
+    'Todas',
+  ];
   final DatabaseService _databaseService = DatabaseService();
 
   List<Contador> _contadores = [];
@@ -52,11 +57,14 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   }
 
   List<Contador> get _contadoresFiltrados {
-    final porVereda = _contadores
-        .where(
-          (c) => c.vereda.toUpperCase() == _veredaSeleccionada.toUpperCase(),
-        )
-        .toList();
+    final porVereda = _veredaSeleccionada == 'Todas'
+        ? _contadores
+        : _contadores
+              .where(
+                (c) =>
+                    c.vereda.toUpperCase() == _veredaSeleccionada.toUpperCase(),
+              )
+              .toList();
 
     if (_searchQuery.isEmpty) {
       return _ocultarCompletados
@@ -420,16 +428,24 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     return meses[month];
   }
 
-  void _abrirHistorial() {
-    Navigator.push(
+  Future<void> _abrirHistorial() async {
+    final nuevaVereda = await Navigator.push<String>(
       context,
-      MaterialPageRoute(builder: (context) => const HistorialScreen()),
+      MaterialPageRoute(
+        builder: (context) =>
+            HistorialScreen(filtroInicial: _veredaSeleccionada),
+      ),
     );
+
+    // Si vuelve con una vereda seleccionada que existe en nuestra lista, la actualizamos
+    if (nuevaVereda != null && _veredas.contains(nuevaVereda)) {
+      setState(() {
+        _veredaSeleccionada = nuevaVereda;
+      });
+    }
   }
 
   void _abrirExportar() {
-    // Por ahora redirigimos al historial que tiene la lógica de exportar
-    // o podríamos abrir el modal directamente aquí.
     _abrirHistorial();
   }
 
