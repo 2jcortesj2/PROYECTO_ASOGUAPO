@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.5.6] - 2026-01-20
+
+### Corregido
+- **Precisión de GPS en Fotos:** Se corrigió un bug donde múltiples fotos podían quedar con la misma ubicación. Ahora el sistema prioriza una ubicación fresca y se refresca automáticamente al reintentar una fotografía.
+
 ## [0.5.5] - 2026-01-20
 
 ### Agregado

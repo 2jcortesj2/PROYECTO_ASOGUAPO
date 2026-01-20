@@ -152,7 +152,27 @@ class DatabaseService {
 
   Future<Lectura?> getLecturaActiva(String contadorId) async {
     final db = await database;
-    // Obtener lecturas del contador ordenadas por fecha reciente
+
+    // 1. Obtener la primera lectura tomada en el sistema (la más antigua que aún está activa)
+    // Para simplificar, buscamos la lectura más antigua entre las que tienen estado 'registrado' en su contador
+    final List<Map<String, dynamic>> firstReadingQuery = await db.rawQuery('''
+      SELECT MIN(fecha) as primera_fecha FROM lecturas l
+      JOIN contadores c ON l.contador_id = c.id
+      WHERE c.estado = 'registrado'
+    ''');
+
+    if (firstReadingQuery.first['primera_fecha'] == null) return null;
+
+    final DateTime primeraFecha = DateTime.parse(
+      firstReadingQuery.first['primera_fecha'] as String,
+    );
+    final now = DateTime.now();
+    final diferenciaGlobal = now.difference(primeraFecha).inDays;
+
+    // Si el ciclo global (desde la primera toma) superó los 15 días, nada es editable
+    if (diferenciaGlobal >= 15) return null;
+
+    // 2. Si estamos dentro del ciclo, buscar la lectura específica de este contador
     final List<Map<String, dynamic>> maps = await db.query(
       'lecturas',
       where: 'contador_id = ?',
@@ -162,56 +182,52 @@ class DatabaseService {
     );
 
     if (maps.isEmpty) return null;
-
-    final lectura = Lectura.fromMap(maps.first);
-    final now = DateTime.now();
-    final diferencia = now.difference(lectura.fecha).inDays;
-
-    // Solo es editable/borrable si tiene menos de 15 días
-    if (diferencia < 15) {
-      return lectura;
-    }
-
-    return null;
+    return Lectura.fromMap(maps.first);
   }
 
-  /// Limpia fotos antiguas (>15 días) y prepara contadores para nueva lectura
+  /// Limpia fotos antiguas y realiza el rollover mensual global (>15 días desde la primera toma)
   Future<void> limpiarYActualizarRegistros() async {
     final db = await database;
-    final now = DateTime.now();
-    final builtInLimit = now
-        .subtract(const Duration(days: 15))
-        .toIso8601String();
 
-    // 1. Obtener lecturas que ya pasaron su periodo de gracia (15 días)
-    // y que aún tienen foto o el contador sigue marcado como 'registrado'
-    final List<Map<String, dynamic>> oldLecturas = await db.rawQuery(
-      '''
+    // 1. Encontrar la fecha de la primera lectura del ciclo actual
+    final List<Map<String, dynamic>> firstReadingQuery = await db.rawQuery('''
+      SELECT MIN(fecha) as primera_fecha FROM lecturas l
+      JOIN contadores c ON l.contador_id = c.id
+      WHERE c.estado = 'registrado'
+    ''');
+
+    if (firstReadingQuery.first['primera_fecha'] == null) return;
+
+    final DateTime primeraFecha = DateTime.parse(
+      firstReadingQuery.first['primera_fecha'] as String,
+    );
+    final now = DateTime.now();
+    final diasDesdeInicio = now.difference(primeraFecha).inDays;
+
+    // SOLO si han pasado 15 días o más desde la PRIMERA toma del mes, hacemos el rollover
+    if (diasDesdeInicio < 15) return;
+
+    // 2. Obtener todas las lecturas del ciclo que terminó
+    final List<Map<String, dynamic>> oldLecturas = await db.rawQuery('''
       SELECT l.* FROM lecturas l
       JOIN contadores c ON l.contador_id = c.id
-      WHERE l.fecha < ? AND (l.foto_path != '' OR c.estado = 'registrado')
-    ''',
-      [builtInLimit],
-    );
-
-    if (oldLecturas.isEmpty) return;
+      WHERE c.estado = 'registrado'
+    ''');
 
     for (var row in oldLecturas) {
       final lectura = Lectura.fromMap(row);
 
-      // A. Borrar archivo físico de foto
+      // A. Borrar archivo físico de foto para liberar espacio
       if (lectura.fotoPath.isNotEmpty) {
         final file = File(lectura.fotoPath);
         if (await file.exists()) {
           try {
             await file.delete();
-          } catch (e) {
-            print('Error al borrar foto antigua: $e');
-          }
+          } catch (_) {}
         }
       }
 
-      // B. Actualizar registro de lectura (quitar path de foto)
+      // B. Actualizar registro de lectura (quitar path de foto para integridad)
       await db.update(
         'lecturas',
         {'foto_path': ''},
@@ -219,9 +235,8 @@ class DatabaseService {
         whereArgs: [lectura.id],
       );
 
-      // C. Actualizar contador:
-      // - Nueva 'ultima_lectura' es el valor de esta lectura vieja
-      // - 'estado' vuelve a 'pendiente' para el nuevo mes
+      // C. ROLLOVER: La lectura actual pasa a ser la del 'mes pasado' (ultima_lectura)
+      // y el contador queda libre ('pendiente') para el nuevo mes
       await db.update(
         'contadores',
         {

@@ -94,19 +94,22 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
   }
 
   /// Obtiene la ubicación GPS real
-  /// Prioriza última ubicación conocida para mejor rendimiento
+  /// Prioriza la ubicación actual para asegurar precisión entre medidores
   Future<void> _obtenerGps() async {
     setState(() {
       _obteniendoGps = true;
       _gpsError = null;
     });
 
-    // Primero intentar con última ubicación conocida (más rápido)
-    var result = await _gpsService.getLastKnownLocation();
+    // Intentar obtener ubicación actual (más precisa para este caso)
+    var result = await _gpsService.getCurrentLocation();
 
-    // Si no hay última ubicación, obtener actual
+    // Si falla la obtención actual (ej. timeout), intentar con última conocida como respaldo
     if (!result.success) {
-      result = await _gpsService.getCurrentLocation();
+      final lastKnown = await _gpsService.getLastKnownLocation();
+      if (lastKnown.success) {
+        result = lastKnown;
+      }
     }
 
     if (mounted) {
@@ -362,6 +365,9 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
       });
       // Eliminar el archivo anterior para ahorrar espacio
       _cameraService.deletePhoto(oldPath);
+
+      // Refrescar GPS al intentar una nueva toma para asegurar precisión
+      _obtenerGps();
       return;
     }
 
