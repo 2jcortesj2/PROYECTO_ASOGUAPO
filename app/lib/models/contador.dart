@@ -6,6 +6,7 @@ class Contador {
   final String nombre;
   final String vereda;
   final String? lote;
+
   final double? ultimaLectura;
   final DateTime? fechaUltimaLectura;
   final EstadoContador estado;
@@ -15,6 +16,7 @@ class Contador {
     required this.nombre,
     required this.vereda,
     this.lote,
+
     this.ultimaLectura,
     this.fechaUltimaLectura,
     this.estado = EstadoContador.pendiente,
@@ -27,6 +29,7 @@ class Contador {
       nombre: map['nombre'] as String,
       vereda: map['vereda'] as String,
       lote: map['lote'] as String?,
+
       ultimaLectura: map['ultima_lectura'] as double?,
       fechaUltimaLectura: map['fecha_ultima_lectura'] != null
           ? DateTime.parse(map['fecha_ultima_lectura'] as String)
@@ -45,6 +48,7 @@ class Contador {
       'nombre': nombre,
       'vereda': vereda,
       'lote': lote,
+
       'ultima_lectura': ultimaLectura,
       'fecha_ultima_lectura': fechaUltimaLectura?.toIso8601String(),
       'estado': estado.name,
@@ -71,6 +75,7 @@ class Contador {
     String? nombre,
     String? vereda,
     String? lote,
+
     double? ultimaLectura,
     DateTime? fechaUltimaLectura,
     EstadoContador? estado,
@@ -80,6 +85,7 @@ class Contador {
       nombre: nombre ?? this.nombre,
       vereda: vereda ?? this.vereda,
       lote: lote ?? this.lote,
+
       ultimaLectura: ultimaLectura ?? this.ultimaLectura,
       fechaUltimaLectura: fechaUltimaLectura ?? this.fechaUltimaLectura,
       estado: estado ?? this.estado,

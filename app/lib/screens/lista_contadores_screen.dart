@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
 import '../models/contador.dart';
+import '../models/lectura.dart';
 import '../widgets/contador_card.dart';
+import '../services/database_service.dart';
 import 'registro_lectura_screen.dart';
 import 'historial_screen.dart';
 
@@ -19,62 +21,34 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   String _searchQuery = '';
   String _veredaSeleccionada = 'El Recreo';
   final List<String> _veredas = ['El Recreo', 'Pueblo Nuevo', 'El Tendido'];
+  final DatabaseService _databaseService = DatabaseService();
 
-  // Datos de prueba para el prototipo con Veredas reales
-  final List<Contador> _contadores = [
-    const Contador(
-      id: '1',
-      nombre: 'Juan Pérez García',
-      vereda: 'El Recreo',
-      lote: 'Lote 45',
-      ultimaLectura: 1234,
-      estado: EstadoContador.registrado,
-    ),
-    const Contador(
-      id: '2',
-      nombre: 'María Rodríguez López',
-      vereda: 'El Tendido',
-      lote: 'Lote 12',
-      ultimaLectura: 1120,
-      estado: EstadoContador.pendiente,
-    ),
-    const Contador(
-      id: '3',
-      nombre: 'Carlos Sánchez Ruiz',
-      vereda: 'Pueblo Nuevo',
-      lote: 'Lote 88',
-      ultimaLectura: 1350,
-      estado: EstadoContador.registrado,
-    ),
-    const Contador(
-      id: '4',
-      nombre: 'Ana Martínez Flores',
-      vereda: 'El Recreo',
-      lote: 'Lote 30',
-      ultimaLectura: 1210,
-      estado: EstadoContador.pendiente,
-    ),
-    const Contador(
-      id: '5',
-      nombre: 'Pedro González Díaz',
-      vereda: 'El Tendido',
-      lote: 'Lote 67',
-      ultimaLectura: 980,
-      estado: EstadoContador.conError,
-    ),
-    const Contador(
-      id: '6',
-      nombre: 'Lucía Hernández Castro',
-      vereda: 'Pueblo Nuevo',
-      lote: 'Lote 23',
-      ultimaLectura: 1567,
-      estado: EstadoContador.pendiente,
-    ),
-  ];
+  List<Contador> _contadores = [];
+  bool _cargando = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarContadores();
+  }
+
+  Future<void> _cargarContadores() async {
+    setState(() => _cargando = true);
+    final contadores = await _databaseService.getContadores();
+
+    if (mounted) {
+      setState(() {
+        _contadores = contadores;
+        _cargando = false;
+      });
+    }
+  }
 
   List<Contador> get _contadoresFiltrados {
     final porVereda = _contadores
-        .where((c) => c.vereda == _veredaSeleccionada)
+        .where(
+          (c) => c.vereda.toUpperCase() == _veredaSeleccionada.toUpperCase(),
+        )
         .toList();
 
     if (_searchQuery.isEmpty) return porVereda;
@@ -188,7 +162,9 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
 
             // Lista de contadores
             Expanded(
-              child: _contadoresFiltrados.isEmpty
+              child: _cargando
+                  ? const Center(child: CircularProgressIndicator())
+                  : _contadoresFiltrados.isEmpty
                   ? _buildEmptyState()
                   : ListView.builder(
                       padding: const EdgeInsets.only(bottom: 100),
@@ -265,12 +241,137 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     );
   }
 
-  void _abrirRegistro(Contador contador) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RegistroLecturaScreen(contador: contador),
+  Future<void> _abrirRegistro(Contador contador) async {
+    // Verificar si ya tiene lectura hoy
+    final lecturaExistente = await _databaseService.getLecturaPorContadorHoy(
+      contador.id,
+    );
+
+    if (lecturaExistente != null && mounted) {
+      // Mostrar diálogo de detalle
+      _mostrarDialogoLecturaExistente(contador, lecturaExistente);
+    } else {
+      // Navegar a registro
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RegistroLecturaScreen(contador: contador),
+        ),
+      );
+      // Recargar lista al volver
+      _cargarContadores();
+    }
+  }
+
+  void _mostrarDialogoLecturaExistente(Contador contador, Lectura lectura) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Usuario ya registrado', style: AppTextStyles.subtitulo),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.registrado.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: AppColors.registrado.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: AppColors.registrado),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Lectura registrada para hoy',
+                      style: AppTextStyles.cuerpo.copyWith(
+                        color: AppColors.registrado,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildDetalleRow(Icons.speed, 'Lectura', lectura.lecturaFormateada),
+            const Divider(height: 16),
+            _buildDetalleRow(
+              Icons.calendar_today,
+              'Fecha',
+              '${lectura.fecha.day}/${lectura.fecha.month}/${lectura.fecha.year}',
+            ),
+            const Divider(height: 16),
+            _buildDetalleRow(
+              Icons.access_time,
+              'Hora',
+              '${lectura.fecha.hour.toString().padLeft(2, '0')}:${lectura.fecha.minute.toString().padLeft(2, '0')}',
+            ),
+            const SizedBox(height: 24),
+            Text(
+              '¿Qué deseas hacer?',
+              style: AppTextStyles.cuerpoSecundario.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(foregroundColor: Colors.grey),
+            child: const Text('CERRAR'),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.edit, size: 18),
+            onPressed: () async {
+              Navigator.pop(context); // Cerrar diálogo
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegistroLecturaScreen(
+                    contador: contador,
+                    lecturaExistente: lectura,
+                  ),
+                ),
+              );
+              _cargarContadores();
+            },
+            label: const Text('CORREGIR / EDITAR'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildDetalleRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: AppColors.textSecondary),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            Text(
+              value,
+              style: AppTextStyles.cuerpo.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

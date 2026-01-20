@@ -13,6 +13,33 @@ y este proyecto adhiere a [Versionado Semántico](https://semver.org/lang/es/).
 - Estructura inicial del proyecto
 - Configuración de Git con flujo de trabajo de dos ramas
 
+## [0.4.1] - 2026-01-20
+
+### Corregido
+- **Lógica de Piloto:** Las lecturas importadas del 20 de Dic se toman como "Lectura Anterior". Los usuarios inician en estado **PENDIENTE** para la lectura de Enero.
+- **Validación de Fecha:** Verificación estricta (día/mes/año) para "Lectura Existente" hoy.
+
+### Cambios
+- **UI:** Rediseño del diálogo "Usuario Registrado" con mejor organización visual y colores de estado.
+- **Optimización:** Eliminación de campos no utilizados (`Cedula`, `Celular`) para privacidad y ligereza.
+
+## [0.4.0] - 2026-01-19
+
+### Agregado
+- **Persistencia de Datos:** Implementación de base de datos SQLite (`sqflite`) para almacenar usuarios y lecturas localmente.
+- **Importación de Datos:** Carga automática de `LECTURAS_PILOTO.csv` al iniciar la aplicación.
+- **Gestión de Lecturas Existentes:** Lógica en `ListaContadoresScreen` para detectar usuarios con lecturas del día y ofrecer edición.
+- **Exportación Real:** Generación de archivo CSV con `ExportService` y funcionalidad de compartir.
+- **Modo Edición:** `RegistroLecturaScreen` ahora permite actualizar lecturas existentes.
+
+### Cambios
+- `ListaContadoresScreen`: Ahora consume datos reales de la base de datos en lugar de lista estática.
+- `HistorialScreen`: Conectado a la base de datos para mostrar historial real y permitir exportación.
+- `main.dart`: Inicializa base de datos e importa datos del piloto antes de ejecutar la app.
+- **Optimización de Datos:** Eliminados los campos `Cédula` y `Celular` del modelo y base de datos.
+
+---
+
 ## [0.3.1] - 2026-01-19
 
 ### Agregado

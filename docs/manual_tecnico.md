@@ -106,17 +106,19 @@ class Lectura {
 CREATE TABLE contadores (
   id TEXT PRIMARY KEY,
   nombre TEXT NOT NULL,
-  vereda TEXT,
+  vereda TEXT NOT NULL,
   lote TEXT,
+
   ultima_lectura REAL,
-  fecha_ultima_lectura TEXT
+  fecha_ultima_lectura TEXT,
+  estado TEXT
 );
 
 CREATE TABLE lecturas (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   contador_id TEXT NOT NULL,
   nombre_usuario TEXT NOT NULL,
-  vereda TEXT,
+  vereda TEXT NOT NULL,
   lectura REAL NOT NULL,
   foto_path TEXT NOT NULL,
   latitud REAL,
@@ -169,8 +171,15 @@ class PermissionService {
 
 ```dart
 class ExportService {
-  Future<String> exportToCsv(List<Lectura> lecturas);
-  Future<void> shareFile(String filePath);
+  Future<void> exportarLecturas();
+}
+```
+
+### CsvImportService
+
+```dart
+class CsvImportService {
+  Future<void> importInitialData();
 }
 ```
 

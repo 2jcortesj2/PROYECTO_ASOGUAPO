@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'config/theme.dart';
 import 'screens/lista_contadores_screen.dart';
 import 'services/permission_service.dart';
+import 'services/csv_import_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,13 @@ void main() async {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
+
+  // Inicializar base de datos y cargar datos del piloto
+  debugPrint('Iniciando importación de datos del piloto...');
+  final csvImportService = CsvImportService();
+
+  await csvImportService.importInitialData();
+  debugPrint('Importación completada.');
 
   // Solicitar todos los permisos al inicio de la aplicación
   final permissionService = PermissionService();

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
 import '../models/lectura.dart';
+import '../services/database_service.dart';
+import '../services/export_service.dart';
 import '../widgets/boton_principal.dart';
 
 /// Pantalla de historial y exportación de lecturas
@@ -15,64 +17,28 @@ class HistorialScreen extends StatefulWidget {
 class _HistorialScreenState extends State<HistorialScreen> {
   String _filtroActivo = 'Hoy';
 
-  // Datos de prueba para el prototipo con Veredas reales
-  final List<Lectura> _lecturas = [
-    Lectura(
-      id: 1,
-      contadorId: '1',
-      nombreUsuario: 'María González',
-      vereda: 'El Recreo',
-      lectura: 1567,
-      fotoPath: '/path/foto1.jpg',
-      latitud: 4.5923,
-      longitud: -74.0836,
-      fecha: DateTime.now().subtract(const Duration(hours: 1)),
-    ),
-    Lectura(
-      id: 2,
-      contadorId: '2',
-      nombreUsuario: 'Carlos Pérez',
-      vereda: 'El Tendido',
-      lectura: 1565,
-      fotoPath: '/path/foto2.jpg',
-      latitud: 4.5920,
-      longitud: -74.0840,
-      fecha: DateTime.now().subtract(const Duration(hours: 2)),
-    ),
-    Lectura(
-      id: 3,
-      contadorId: '3',
-      nombreUsuario: 'Ana López',
-      vereda: 'Pueblo Nuevo',
-      lectura: 1564,
-      fotoPath: '/path/foto3.jpg',
-      latitud: 4.5918,
-      longitud: -74.0832,
-      fecha: DateTime.now().subtract(const Duration(hours: 3)),
-    ),
-    Lectura(
-      id: 4,
-      contadorId: '4',
-      nombreUsuario: 'Pedro Martínez',
-      vereda: 'El Recreo',
-      lectura: 1890,
-      fotoPath: '/path/foto4.jpg',
-      latitud: 4.5925,
-      longitud: -74.0838,
-      fecha: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    Lectura(
-      id: 5,
-      contadorId: '5',
-      nombreUsuario: 'Lucía Castro',
-      vereda: 'El Tendido',
-      lectura: 2100,
-      fotoPath: '/path/foto5.jpg',
-      latitud: 4.5930,
-      longitud: -74.0845,
-      fecha: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-  ];
+  final DatabaseService _databaseService = DatabaseService();
+  final ExportService _exportService = ExportService();
+
+  List<Lectura> _lecturas = [];
+  bool _cargando = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarLecturas();
+  }
+
+  Future<void> _cargarLecturas() async {
+    setState(() => _cargando = true);
+    final lecturas = await _databaseService.getLecturas();
+    if (mounted) {
+      setState(() {
+        _lecturas = lecturas;
+        _cargando = false;
+      });
+    }
+  }
 
   List<Lectura> get _lecturasFiltradas {
     final ahora = DateTime.now();
@@ -136,7 +102,9 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
           // Lista de lecturas
           Expanded(
-            child: _lecturasFiltradas.isEmpty
+            child: _cargando
+                ? const Center(child: CircularProgressIndicator())
+                : _lecturasFiltradas.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
                     padding: const EdgeInsets.only(bottom: 100),
@@ -305,7 +273,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
               title: const Text('Exportar como CSV'),
               subtitle: const Text('Compatible con Excel'),
               onTap: () {
-                Navigator.pop(context);
                 _simularExportacion('CSV');
               },
             ),
@@ -323,7 +290,6 @@ class _HistorialScreenState extends State<HistorialScreen> {
               title: const Text('Compartir'),
               subtitle: const Text('Enviar por WhatsApp, Email...'),
               onTap: () {
-                Navigator.pop(context);
                 _simularExportacion('Compartir');
               },
             ),
@@ -334,15 +300,37 @@ class _HistorialScreenState extends State<HistorialScreen> {
     );
   }
 
-  void _simularExportacion(String tipo) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '✅ Exportando ${_lecturasFiltradas.length} lecturas ($tipo)...',
-        ),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+  Future<void> _simularExportacion(String tipo) async {
+    Navigator.pop(context); // Cerrar modal si no se cerró antes
+
+    try {
+      if (tipo == 'CSV') {
+        await _exportService.exportarLecturas();
+      } else {
+        // Reutilizamos la misma lógica
+        await _exportService.exportarLecturas();
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Archivo generado exitosamente'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Error al exportar: $e'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 }

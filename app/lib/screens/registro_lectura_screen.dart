@@ -11,13 +11,19 @@ import '../widgets/lectura_input.dart';
 import '../widgets/gps_indicator.dart';
 import '../widgets/camera_preview_widget.dart';
 import 'confirmacion_screen.dart';
+import '../services/database_service.dart';
 
 /// Pantalla de registro de lectura
 /// Incluye cámara embebida en vivo, input de lectura y GPS real
 class RegistroLecturaScreen extends StatefulWidget {
   final Contador contador;
+  final Lectura? lecturaExistente;
 
-  const RegistroLecturaScreen({super.key, required this.contador});
+  const RegistroLecturaScreen({
+    super.key,
+    required this.contador,
+    this.lecturaExistente,
+  });
 
   @override
   State<RegistroLecturaScreen> createState() => _RegistroLecturaScreenState();
@@ -45,6 +51,16 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // Si hay lectura existente, pre-llenar datos
+    if (widget.lecturaExistente != null) {
+      _lecturaController.text = widget.lecturaExistente!.lectura
+          .toStringAsFixed(0);
+      if (widget.lecturaExistente!.fotoPath.isNotEmpty) {
+        _fotoPath = widget.lecturaExistente!.fotoPath;
+      }
+    }
+
     _initCamera();
     _obtenerGps();
   }
@@ -200,7 +216,9 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
 
                   // Botón guardar
                   BotonPrincipal(
-                    texto: 'GUARDAR LECTURA',
+                    texto: widget.lecturaExistente != null
+                        ? 'ACTUALIZAR LECTURA'
+                        : 'GUARDAR LECTURA',
                     icono: Icons.save,
                     habilitado: _puedeGuardar,
                     cargando: _guardando,
@@ -414,26 +432,43 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
     // Pequeña pausa para feedback visual
     await Future.delayed(const Duration(milliseconds: 300));
 
-    // Crear registro de lectura
-    final registro = Lectura(
+    // Crear o actualizar registro de lectura
+    final nuevaLectura = Lectura(
+      id: widget.lecturaExistente?.id, // Mantener ID si es edición
       contadorId: widget.contador.id,
       nombreUsuario: widget.contador.nombre,
       vereda: widget.contador.vereda,
       lectura: lectura,
-      fotoPath: _fotoPath!,
+      fotoPath: _fotoPath ?? '',
       latitud: _latitud,
       longitud: _longitud,
       fecha: DateTime.now(),
+      sincronizado: false,
     );
 
-    if (mounted) {
-      // Navegar a confirmación
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ConfirmacionScreen(lectura: registro),
-        ),
-      );
+    // Guardar en BD
+    try {
+      final dbService = DatabaseService();
+      if (widget.lecturaExistente != null) {
+        await dbService.updateLectura(nuevaLectura);
+      } else {
+        await dbService.insertLectura(nuevaLectura);
+      }
+
+      if (mounted) {
+        // Navegar a confirmación
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ConfirmacionScreen(lectura: nuevaLectura),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _guardando = false;
+        _errorLectura = 'Error al guardar: $e';
+      });
     }
   }
 }
