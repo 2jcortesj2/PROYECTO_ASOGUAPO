@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [1.0.2] - 2026-01-21
+
+### Bug Fixes
+- **Splash Nativo (Xiaomi/Dark Mode):** Se corrigió un error crítico donde el fondo del splash se veía negro en dispositivos con modo oscuro activo (especialmente Xiaomi/HyperOS). Se implementó un bloqueo de inversión de color y se sincronizó el tamaño del logo (108dp) para una transición 1:1 con la interfaz de Flutter.
+
 ## [1.0.1] - 2026-01-21
 
 ### Mejoras de Producción

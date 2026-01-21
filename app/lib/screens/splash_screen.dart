@@ -115,14 +115,12 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFEFEFE),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Spacer(flex: 3), // Empujar logo hacia arriba
-            // Logo animado
-            AnimatedBuilder(
+      backgroundColor: const Color(0xFFFFFEFE),
+      body: Stack(
+        children: [
+          // Logo centrado (coincidencia 1:1 con splash nativo Android 12)
+          Center(
+            child: AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
                 return FadeTransition(
@@ -130,8 +128,9 @@ class _SplashScreenState extends State<SplashScreen>
                   child: ScaleTransition(
                     scale: _scaleAnimation,
                     child: Container(
-                      width: 140, // Tamaño reducido según pedido
-                      height: 140,
+                      width:
+                          108, // Tamaño estándar Android 12 SplashScreen icon
+                      height: 108,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white.withOpacity(
@@ -158,38 +157,39 @@ class _SplashScreenState extends State<SplashScreen>
                 );
               },
             ),
-            const SizedBox(height: 24),
+          ),
 
-            const Spacer(flex: 2), // Espacio intermedio
-            // Versión y barra de progreso (con retraso)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 40.0),
-              child: FadeTransition(
-                opacity: _decorationOpacityAnimation,
-                child: Column(
-                  children: [
-                    const CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.primary,
-                      ),
+          // Versión y barra de progreso (abajo)
+          Positioned(
+            bottom: 40.0,
+            left: 0,
+            right: 0,
+            child: FadeTransition(
+              opacity: _decorationOpacityAnimation,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primary,
                     ),
-                    const SizedBox(height: 24), // Un poco más de aire
-                    Text(
-                      'v1.0.1',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14,
-                        letterSpacing: 1.2,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'v1.0.1',
+                    style: TextStyle(
+                      color: Colors.grey[400],
+                      fontSize: 14,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
