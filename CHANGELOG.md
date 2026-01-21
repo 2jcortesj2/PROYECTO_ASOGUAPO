@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [0.9.10] - 2026-01-21
+
+### Bug Fixes
+- **Lecturas Nulas - Migración DB v4:** Se corrigió la excepción `SQLITE_CONSTRAINT_NOTNULL` que impedía guardar lecturas sin valor numérico. Se modificó el esquema de la base de datos (versión 4) para permitir valores `NULL` en la columna `lectura`, preservando así la distinción entre "contador en 0" y "no se pudo leer". La migración es automática y preserva todos los datos existentes.
+
 ## [0.9.9] - 2026-01-20
 
 ### Mejoras de UX

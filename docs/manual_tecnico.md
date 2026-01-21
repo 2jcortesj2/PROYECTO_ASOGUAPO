@@ -133,7 +133,7 @@ class Lectura {
   final String contadorId;
   final String nombreUsuario;
   final String vereda;
-  final double lectura;
+  final double? lectura; // Nullable: permite registrar anomalías sin valor
   final String fotoPath;
   final double? latitud;
   final double? longitud;
@@ -166,7 +166,7 @@ CREATE TABLE lecturas (
   contador_id TEXT NOT NULL,
   nombre_usuario TEXT NOT NULL,
   vereda TEXT NOT NULL,
-  lectura REAL NOT NULL,
+  lectura REAL,  -- Permite NULL para anomalías
   foto_path TEXT NOT NULL,
   latitud REAL,
   longitud REAL,

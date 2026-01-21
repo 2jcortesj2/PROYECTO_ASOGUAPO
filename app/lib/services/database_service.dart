@@ -29,7 +29,7 @@ class DatabaseService {
     // Increment version if schema changes
     return await openDatabase(
       path,
-      version: 3,
+      version: 4, // Incrementado para permitir lectura NULL
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -37,11 +37,45 @@ class DatabaseService {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 3) {
-      // Recrear tablas si cambia versión (o hacer alter table si se prefiere conservar datos)
-      // Como estamos en piloto y se reimporta todo, vamos a redrop
-      await db.execute('DROP TABLE IF EXISTS lecturas');
-      await db.execute('DROP TABLE IF EXISTS contadores');
-      await _createDB(db, newVersion);
+      // Agregar columna comentario si viene de versión 2
+      await db.execute('ALTER TABLE lecturas ADD COLUMN comentario TEXT');
+    }
+
+    if (oldVersion < 4) {
+      // Permitir NULL en columna lectura
+      // SQLite no soporta ALTER COLUMN, así que recreamos la tabla
+      await db.execute('''
+        CREATE TABLE lecturas_new (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          contador_id TEXT NOT NULL,
+          nombre_usuario TEXT NOT NULL,
+          vereda TEXT NOT NULL,
+          lectura REAL,
+          foto_path TEXT NOT NULL,
+          latitud REAL,
+          longitud REAL,
+          fecha TEXT NOT NULL,
+          sincronizado INTEGER DEFAULT 0,
+          comentario TEXT,
+          FOREIGN KEY (contador_id) REFERENCES contadores(id)
+        )
+      ''');
+
+      // Copiar datos
+      await db.execute('''
+        INSERT INTO lecturas_new 
+        SELECT * FROM lecturas
+      ''');
+
+      // Eliminar tabla vieja y renombrar
+      await db.execute('DROP TABLE lecturas');
+      await db.execute('ALTER TABLE lecturas_new RENAME TO lecturas');
+
+      // Recrear índices
+      await db.execute('CREATE INDEX idx_lecturas_fecha ON lecturas(fecha)');
+      await db.execute(
+        'CREATE INDEX idx_lecturas_contador ON lecturas(contador_id)',
+      );
     }
   }
 
@@ -66,7 +100,7 @@ class DatabaseService {
         contador_id TEXT NOT NULL,
         nombre_usuario TEXT NOT NULL,
         vereda TEXT NOT NULL,
-        lectura REAL NOT NULL,
+        lectura REAL,
         foto_path TEXT NOT NULL,
         latitud REAL,
         longitud REAL,
@@ -238,10 +272,11 @@ class DatabaseService {
 
       // C. ROLLOVER: La lectura actual pasa a ser la del 'mes pasado' (ultima_lectura)
       // y el contador queda libre ('pendiente') para el nuevo mes
+      // Si la lectura es nula (anomalía), guardamos null para preservar esa información
       await db.update(
         'contadores',
         {
-          'ultima_lectura': lectura.lectura,
+          'ultima_lectura': lectura.lectura, // Puede ser null
           'fecha_ultima_lectura': lectura.fecha.toIso8601String(),
           'estado': EstadoContador.pendiente.name,
         },
