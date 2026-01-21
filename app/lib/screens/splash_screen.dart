@@ -19,12 +19,14 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
   late Animation<double> _scaleAnimation;
+  late Animation<double>
+  _decorationOpacityAnimation; // For shadow and circle background
 
   @override
   void initState() {
     super.initState();
 
-    // Configurar animación (duración visual mínima)
+    // Configurar animación de entrada (logo principal)
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -33,22 +35,22 @@ class _SplashScreenState extends State<SplashScreen>
     _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(
-          0.0,
-          1.0,
-          curve: Curves.easeIn,
-        ), // Suavizado completo
+        curve: const Interval(0.0, 1.0, curve: Curves.easeIn),
       ),
     );
 
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(
-          0.0,
-          1.0,
-          curve: Curves.easeOutBack,
-        ), // Efecto rebote sutil
+        curve: const Interval(0.0, 1.0, curve: Curves.easeOutBack),
+      ),
+    );
+
+    // Animación para la decoración (sombra y círculo) - Comienza después de un pequeño retraso
+    _decorationOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.4, 1.0, curve: Curves.easeIn),
       ),
     );
 
@@ -59,7 +61,9 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _initializeApp() async {
-    // Retirar el splash nativo una vez que la UI de Flutter está lista
+    // Esperar un momento breve para asegurar que el primer frame de Flutter sea idéntico al nativo
+    // antes de quitarlo
+    await Future.delayed(const Duration(milliseconds: 100));
     FlutterNativeSplash.remove();
 
     // Cronómetro para asegurar tiempo mínimo de splash (3 segundos)
@@ -81,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // 3. Esperar tiempo restante para completar 3 segundos de splash
     final elapsed = stopwatch.elapsedMilliseconds;
-    final minSplashDuration = 3000;
+    const minSplashDuration = 3000;
     if (elapsed < minSplashDuration) {
       await Future.delayed(Duration(milliseconds: minSplashDuration - elapsed));
     }
@@ -118,40 +122,50 @@ class _SplashScreenState extends State<SplashScreen>
           children: [
             const Spacer(),
             // Logo animado
-            FadeTransition(
-              opacity: _opacityAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: Container(
-                  width: 180,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.2),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+            AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return FadeTransition(
+                  opacity: _opacityAnimation,
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: Container(
+                      width: 180,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(
+                          _decorationOpacityAnimation.value,
+                        ), // Círculo blanco
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(
+                              0.2 * _decorationOpacityAnimation.value,
+                            ),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/logo_asoguapo.png',
-                      fit: BoxFit.cover,
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/logo_asoguapo.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
             const SizedBox(height: 24),
 
             const Spacer(),
-            // Versión
+            // Versión y barra de progreso (con retraso)
             Padding(
               padding: const EdgeInsets.only(bottom: 40.0),
               child: FadeTransition(
-                opacity: _opacityAnimation,
+                opacity: _decorationOpacityAnimation,
                 child: Column(
                   children: [
                     const CircularProgressIndicator(
