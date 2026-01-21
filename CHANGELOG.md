@@ -2,6 +2,12 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [1.0.1] - 2026-01-21
+
+### Mejoras de Producción
+- **Renombramiento:** La aplicación ahora se llama **GuapoLector**.
+- **Ícono Oficial:** Se ha actualizado el ícono de la aplicación con el logo de Asoguapo.
+
 ## [1.0.0] - 2026-01-21
 
 ### Lanzamiento Oficial

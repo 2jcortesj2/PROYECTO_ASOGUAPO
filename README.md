@@ -1,4 +1,4 @@
-# AguaLector 💧 v1.0.0
+# GuapoLector 💧 v1.0.1
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.x-blue.svg)](https://dart.dev/)

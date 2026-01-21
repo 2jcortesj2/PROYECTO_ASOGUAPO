@@ -1,4 +1,4 @@
-# Manual Técnico - AguaLector
+# Manual Técnico - GuapoLector
 
 ## Arquitectura del Sistema
 
@@ -89,7 +89,7 @@ Para configurar la aplicación con datos reales de una nueva comunidad o periodo
    Al instalar el APK, la aplicación detectará que es la primera ejecución y cargará el nuevo listado automáticamente.
 
 > [!TIP]
-> Si se desea forzar una re-inicialización en un dispositivo que ya tiene datos, se debe ir a *Ajustes > Aplicaciones > AguaLector > Almacenamiento > Borrar Datos*. Esto eliminará la base de datos SQLite y disparará la importación del CSV en el siguiente inicio.
+> Si se desea forzar una re-inicialización en un dispositivo que ya tiene datos, se debe ir a *Ajustes > Aplicaciones > GuapoLector > Almacenamiento > Borrar Datos*. Esto eliminará la base de datos SQLite y disparará la importación del CSV en el siguiente inicio.
 
 ### Actualización de Suscriptores o Información
 Si durante la operación se requiere agregar nuevos usuarios o corregir nombres en la lista maestra, se debe seguir este flujo práctico:
@@ -349,7 +349,7 @@ Para las siguientes fases del proyecto, se contemplan las siguientes mejoras arq
 
 ### 2. Gestión Externa de Usuarios (PC Tool)
 - **Objetivo:** Facilitar la administración de la base de datos sin depender de actualizaciones de APK.
-- **Propuesta:** Desarrollo de una aplicación de escritorio (AguaLector Admin) que, al conectar el dispositivo móvil al PC vía USB:
+- **Propuesta:** Desarrollo de una aplicación de escritorio (GuapoLector Admin) que, al conectar el dispositivo móvil al PC vía USB:
   - Permita leer la base de datos actual.
   - Permita inyectar nuevos suscriptores desde un Excel/CSV de forma masiva.
   - Permita corregir información de usuarios existentes directamente en el dispositivo.

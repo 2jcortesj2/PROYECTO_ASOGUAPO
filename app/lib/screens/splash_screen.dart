@@ -158,7 +158,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'v1.0.0',
+                      'v1.0.1',
                       style: TextStyle(
                         color: Colors.grey[400],
                         fontSize: 14,

@@ -1,8 +1,8 @@
-# Manual de Usuario - AguaLector 💧
+# Manual de Usuario - GuapoLector 💧
 
 ## Introducción
 
-AguaLector es una aplicación móvil diseñada para facilitar el registro de lecturas de contadores de agua potable en comunidades rurales.
+GuapoLector es una aplicación móvil diseñada para facilitar el registro de lecturas de contadores de agua potable en comunidades rurales.
 
 ---
 
@@ -14,7 +14,7 @@ AguaLector es una aplicación móvil diseñada para facilitar el registro de lec
 - No requiere internet
 
 ### Inicio de la Aplicación
-Al abrir AguaLector, verás una **Pantalla de Inicio (Splash Screen)** durante unos segundos con el logo de Asoguapo mientras la aplicación prepara todos los datos. Es normal que esto tome entre 2 y 3 segundos.
+Al abrir GuapoLector, verás una **Pantalla de Inicio (Splash Screen)** durante unos segundos con el logo de Asoguapo mientras la aplicación prepara todos los datos. Es normal que esto tome entre 2 y 3 segundos.
 
 ---
 
