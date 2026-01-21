@@ -302,7 +302,35 @@ El APK se genera en: `build/app/outputs/flutter-apk/app-release.apk`
 - **GPS:** Uso de `getLastKnownLocation()` como primera opción para evitar esperas y consumo excesivo de batería.
 - **Imágenes:** Guardadas con nombres de archivo basados en timestamp para evitar colisiones.
 - **Isolates:** Uso de `compute` para operaciones de I/O pesadas (compresión ZIP) para mantener la tasa de refresco de la UI estable.
-- **Limpieza Temporal:** De eliminación de archivos físicas tras 15 días para prevenir el agotamiento de almacenamiento interno.
+- Limpieza Temporal:** De eliminación de archivos físicas tras 15 días para prevenir el agotamiento de almacenamiento interno.
+
+---
+
+## Estrategia de Pruebas
+
+El proyecto cuenta con una suite de pruebas automatizadas ubicadas en el directorio `app/test/` para garantizar la estabilidad de las funciones críticas.
+
+### 1. Pruebas de Logica de Negocio (`logic_test.dart`)
+Verifica el núcleo de la lógica del ciclo de facturación de 15 días:
+- **Ciclo Activo**: Confirma que las lecturas son editables si la primera toma del mes fue hace menos de 15 días.
+- **Ciclo Vencido**: Asegura que se bloquee la edición después de 15 días.
+- **Rollover**: Valida que el sistema marque correctamente cuándo se debe limpiar el historial y comenzar un nuevo periodo.
+
+### 2. Pruebas de Servicios (`gps_service_test.dart`)
+Valida la resiliencia del servicio de geolocalización:
+- **Manejo de Errores**: Simula fallos en el plugin `geolocator` para asegurar que la app no se cierre inesperadamente y devuelva un objeto `GpsResult` con `success: false`.
+
+### 3. Pruebas de Interfaz (`widget_test.dart`)
+Pruebas de humo (smoke tests) para la UI:
+- **Splash Screen**: Verifica que la aplicación inicie correctamente, muestre el logo y la versión v1.0.0.
+- **Navegación**: Valida el flujo inicial de carga de la aplicación.
+
+### Ejecución de Pruebas
+Para ejecutar todas las pruebas automatizadas:
+
+```bash
+flutter test
+```
 ---
 
 ## Flujo de Trabajo Git

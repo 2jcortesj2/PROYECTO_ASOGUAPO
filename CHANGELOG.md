@@ -2,6 +2,13 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [1.0.0] - 2026-01-21
+
+### Lanzamiento Oficial
+- **Nuevo Logo:** Se integra la imagen corporativa oficial de Asoguapo (gota sonriente).
+- **Pantalla de Carga:** Se añade una pantalla de inicio (Splash Screen) animada y armoniosa.
+- **Estabilidad:** Versión estable para producción.
+
 ## [0.9.10] - 2026-01-21
 
 ### Bug Fixes

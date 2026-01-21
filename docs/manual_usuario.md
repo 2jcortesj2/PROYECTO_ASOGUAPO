@@ -13,6 +13,9 @@ AguaLector es una aplicación móvil diseñada para facilitar el registro de lec
 - GPS activado
 - No requiere internet
 
+### Inicio de la Aplicación
+Al abrir AguaLector, verás una **Pantalla de Inicio (Splash Screen)** durante unos segundos con el logo de Asoguapo mientras la aplicación prepara todos los datos. Es normal que esto tome entre 2 y 3 segundos.
+
 ---
 
 ## Pantallas de la Aplicación

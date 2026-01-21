@@ -9,24 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:agualector/main.dart';
-import 'package:agualector/services/permission_service.dart';
 
 void main() {
-  testWidgets('AguaLector loads and displays list', (
+  testWidgets('AguaLector loads and displays Splash Screen', (
     WidgetTester tester,
   ) async {
-    // Build our app with mocked permission result (all granted)
-    final mockResult = PermissionResult(
-      cameraGranted: true,
-      locationGranted: true,
-    );
-    await tester.pumpWidget(AguaLectorApp(permissionResult: mockResult));
+    // Build our app
+    await tester.pumpWidget(const AguaLectorApp());
 
-    // Verify key elements of the main screen
-    expect(find.text('Lecturas del Día'), findsOneWidget);
-    expect(find.text('Juan Pérez García'), findsOneWidget);
-
-    // Verify FAB functionality
-    expect(find.byIcon(Icons.history), findsOneWidget);
+    // Verify Splash Screen appears initially
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('v1.0.0'), findsOneWidget);
   });
 }
