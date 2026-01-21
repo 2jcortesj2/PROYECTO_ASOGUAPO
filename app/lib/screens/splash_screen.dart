@@ -115,12 +115,12 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFEFEFE),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Spacer(),
+            const Spacer(flex: 3), // Empujar logo hacia arriba
             // Logo animado
             AnimatedBuilder(
               animation: _controller,
@@ -130,8 +130,8 @@ class _SplashScreenState extends State<SplashScreen>
                   child: ScaleTransition(
                     scale: _scaleAnimation,
                     child: Container(
-                      width: 180,
-                      height: 180,
+                      width: 140, // Tamaño reducido según pedido
+                      height: 140,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white.withOpacity(
@@ -160,7 +160,7 @@ class _SplashScreenState extends State<SplashScreen>
             ),
             const SizedBox(height: 24),
 
-            const Spacer(),
+            const Spacer(flex: 2), // Espacio intermedio
             // Versión y barra de progreso (con retraso)
             Padding(
               padding: const EdgeInsets.only(bottom: 40.0),
@@ -174,7 +174,7 @@ class _SplashScreenState extends State<SplashScreen>
                         AppColors.primary,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24), // Un poco más de aire
                     Text(
                       'v1.0.1',
                       style: TextStyle(
