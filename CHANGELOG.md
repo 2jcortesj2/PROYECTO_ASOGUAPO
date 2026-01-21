@@ -7,6 +7,7 @@ Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 ### Mejoras de Producción
 - **Renombramiento:** La aplicación ahora se llama **GuapoLector**.
 - **Ícono Oficial:** Se ha actualizado el ícono de la aplicación con el logo de Asoguapo.
+- **Splash Nativo:** Se integró `flutter_native_splash` para eliminar el parpadeo negro al iniciar la aplicación.
 
 ## [1.0.0] - 2026-01-21
 

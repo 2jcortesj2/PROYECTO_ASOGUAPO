@@ -5,6 +5,7 @@ import 'package:agualector/screens/permission_denied_screen.dart';
 import 'package:agualector/config/theme.dart';
 import 'package:agualector/services/csv_import_service.dart';
 import 'package:agualector/services/permission_service.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -58,6 +59,9 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _initializeApp() async {
+    // Retirar el splash nativo una vez que la UI de Flutter está lista
+    FlutterNativeSplash.remove();
+
     // Cronómetro para asegurar tiempo mínimo de splash (3 segundos)
     final stopwatch = Stopwatch()..start();
 

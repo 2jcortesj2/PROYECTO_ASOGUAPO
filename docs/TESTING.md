@@ -1,6 +1,6 @@
-# Guía de Testing - AguaLector v0.1.0
+# Guía de Testing - GuapoLector v1.0.1
 
-Esta guía está diseñada para que QA testers o agentes de IA configuren, ejecuten y validen el prototipo funcional de la aplicación **AguaLector**.
+Esta guía está diseñada para que QA testers o agentes de IA configuren, ejecuten y validen el prototipo funcional de la aplicación **GuapoLector**.
 
 ---
 
