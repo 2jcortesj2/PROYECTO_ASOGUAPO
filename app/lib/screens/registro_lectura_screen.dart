@@ -104,9 +104,9 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
       _gpsError = null;
     });
 
-    // Iniciar temporizador de timeout (6 segundos)
+    // Iniciar temporizador de timeout (10 segundos)
     bool timeoutOcurrido = false;
-    final timeoutTimer = Timer(const Duration(seconds: 6), () {
+    final timeoutTimer = Timer(const Duration(seconds: 10), () {
       if (_obteniendoGps && mounted) {
         timeoutOcurrido = true;
         setState(() {
