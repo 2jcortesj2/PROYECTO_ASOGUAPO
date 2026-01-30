@@ -2,6 +2,11 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [1.0.3] - 2026-01-30
+
+### Corregido
+- **Exportación CSV:** Se corrigió el comportamiento de la exportación "Solo reporte CSV". Ahora el archivo se comparte directamente en formato `.csv` sin ser comprimido en un archivo ZIP, facilitando su visualización inmediata en dispositivos móviles.
+
 ## [1.0.2] - 2026-01-21
 
 ### Bug Fixes

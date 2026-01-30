@@ -173,8 +173,32 @@ class ExportService {
 
         final csvFileName = 'LECTURAS_${vCode}_$timestamp.csv';
         final csvBytes = utf8.encode(csv);
-        archive.addFile(ArchiveFile(csvFileName, csvBytes.length, csvBytes));
-        hasContent = true;
+
+        // Solo agregar al archive si se va a comprimir (tipo TODO)
+        if (tipo == TipoExportacion.todo) {
+          archive.addFile(ArchiveFile(csvFileName, csvBytes.length, csvBytes));
+          hasContent = true;
+        } else if (tipo == TipoExportacion.csv) {
+          // Para CSV solo, guardar directamente sin comprimir
+          final csvPath = p.join(directory.path, csvFileName);
+          final csvFile = File(csvPath);
+          await csvFile.writeAsBytes(csvBytes, flush: true);
+
+          if (onProgress != null) {
+            onProgress(
+              ExportProgress(
+                porcentaje: 1.0,
+                mensaje: '¡Listo! Preparando para compartir...',
+              ),
+            );
+          }
+
+          await Share.shareXFiles([
+            XFile(csvPath, name: csvFileName, mimeType: 'text/csv'),
+          ], text: 'Reporte CSV Asoguapo - Vereda: $filtro ($vCode)');
+
+          return; // Salir temprano, no necesitamos comprimir
+        }
       }
 
       // 3. AGREGAR FOTOS AL ARCHIVE (Si se solicita)
