@@ -566,240 +566,251 @@ class _MapScreenState extends State<MapScreen> {
                     ? _buildEnConstruccion()
                     : FlutterMap(
                         mapController: _mapController,
-                    options: MapOptions(
-                      initialCenter:
-                          _mapService.lastCenter ??
-                          const LatLng(2.389, -75.525),
-                      initialZoom: _mapService.lastZoom ?? 15,
-                      initialRotation:
-                          _mapService.lastRotation ??
-                          270, // West to East orientation (bearing)
-                      minZoom: 12,
-                      maxZoom: 21,
-                      onPositionChanged: (position, hasGesture) {
-                        setState(() {
-                          final camera = _mapController.camera;
-                          _currentZoom = camera.zoom;
-                          // Persist the state in the service
-                          _mapService.lastZoom = camera.zoom;
-                          _mapService.lastCenter = camera.center;
-                          _mapService.lastRotation = camera.rotation;
-                        });
-                      },
-                      interactionOptions: const InteractionOptions(
-                        flags: InteractiveFlag.all,
-                      ),
-                      cameraConstraint: CameraConstraint.contain(
-                        bounds: _calculateExpandedBounds(_contadores),
-                      ),
-                    ),
-                    children: [
-                      TileLayer(
-                        urlTemplate:
-                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.asoguapo.app',
-                        tileProvider: _cacheStore != null
-                            ? CachedTileProvider(store: _cacheStore!)
-                            : null,
-                      ),
-                      MarkerClusterLayerWidget(
-                        options: MarkerClusterLayerOptions(
-                          maxClusterRadius: 30,
-                          size: const Size(45, 45),
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.all(50),
-                          markers: _contadoresFiltrados.map((contador) {
-                            final isDone =
-                                contador.estado == EstadoContador.registrado;
+                        options: MapOptions(
+                          initialCenter:
+                              _mapService.lastCenter ??
+                              const LatLng(2.389, -75.525),
+                          initialZoom: _mapService.lastZoom ?? 15,
+                          initialRotation:
+                              _mapService.lastRotation ??
+                              270, // West to East orientation (bearing)
+                          minZoom: 12,
+                          maxZoom: 21,
+                          onPositionChanged: (position, hasGesture) {
+                            setState(() {
+                              final camera = _mapController.camera;
+                              _currentZoom = camera.zoom;
+                              // Persist the state in the service
+                              _mapService.lastZoom = camera.zoom;
+                              _mapService.lastCenter = camera.center;
+                              _mapService.lastRotation = camera.rotation;
+                            });
+                          },
+                          interactionOptions: const InteractionOptions(
+                            flags: InteractiveFlag.all,
+                          ),
+                          cameraConstraint: CameraConstraint.contain(
+                            bounds: _calculateExpandedBounds(_contadores),
+                          ),
+                        ),
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.asoguapo.app',
+                            tileProvider: _cacheStore != null
+                                ? CachedTileProvider(store: _cacheStore!)
+                                : null,
+                          ),
+                          MarkerClusterLayerWidget(
+                            options: MarkerClusterLayerOptions(
+                              maxClusterRadius: 30,
+                              size: const Size(45, 45),
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.all(50),
+                              markers: _contadoresFiltrados.map((contador) {
+                                final isDone =
+                                    contador.estado ==
+                                    EstadoContador.registrado;
                                 final double size =
-                                    (30 * (_currentZoom / 15) * (_currentZoom / 15))
+                                    (30 *
+                                            (_currentZoom / 15) *
+                                            (_currentZoom / 15))
                                         .clamp(10.0, 250.0);
 
-                            return Marker(
-                              point: LatLng(
-                                contador.latitud!,
-                                contador.longitud!,
-                              ),
-                              width: size,
-                              height: size,
-                              rotate:
-                                  false, // Keep vertical icons upright relative to the screen
-                              child: GestureDetector(
-                                onTap: () => _showContadorDetails(contador),
-                                child: Stack(
-                                  children: [
-                                    Positioned(
-                                      left: size * 0.05,
-                                      top: size * 0.05,
-                                      child: Icon(
-                                        Icons.water_drop,
-                                        color: Colors.black.withValues(
-                                          alpha: 0.35,
-                                        ),
-                                        size: size,
-                                      ),
-                                    ),
-                                    Center(
-                                      child: isDone
-                                          ? ShaderMask(
-                                              shaderCallback: (bounds) =>
-                                                  const LinearGradient(
-                                                    colors: [
-                                                      AppColors.primary,
-                                                      AppColors.secondary,
-                                                    ],
-                                                    begin: Alignment.topCenter,
-                                                    end: Alignment.bottomCenter,
-                                                  ).createShader(bounds),
-                                              child: Icon(
-                                                Icons.water_drop,
-                                                color: Colors.white,
-                                                size: size,
-                                              ),
-                                            )
-                                          : Icon(
-                                              Icons.water_drop,
-                                              color: Colors.grey[400],
-                                              size: size,
-                                            ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          builder: (context, markers) {
-                            // Check if any marker in the cluster is completed
-                            // This requires accessing the custom data of the markers
-                            // markers is a List<Marker>
-                            // Since we can't easily store the Contador in the Marker object directly without a wrapper
-                            // we'll assume the markers provided here are the ones we created in the markers: ... map()
-                            // However, Marker doesn't have a 'key' or 'data' field by default.
-                            // To solve this correctly, we should look at how we generate markers.
-                            // For now, let's create a logic that checks if the cluster should be 'done'
-                            // based on the presence of any marker that would have been green.
-                            // ACTUALLY, we can filter our _contadores list where it matches the marker points.
-                            // But that's slow. A better way is to pass the state in the Marker Key or use a custom Marker class.
-                            // For simplicity, I will use a heuristic or check the _contadores list.
-
-                            final clusterPoints = markers
-                                .map((m) => m.point)
-                                .toSet();
-                            final clusterContadores = _contadoresFiltrados
-                                .where(
-                                  (c) => clusterPoints.contains(
-                                    LatLng(c.latitud!, c.longitud!),
+                                return Marker(
+                                  point: LatLng(
+                                    contador.latitud!,
+                                    contador.longitud!,
                                   ),
-                                )
-                                .toList();
+                                  width: size,
+                                  height: size,
+                                  rotate:
+                                      false, // Keep vertical icons upright relative to the screen
+                                  child: GestureDetector(
+                                    onTap: () => _showContadorDetails(contador),
+                                    child: Stack(
+                                      children: [
+                                        Positioned(
+                                          left: size * 0.05,
+                                          top: size * 0.05,
+                                          child: Icon(
+                                            Icons.water_drop,
+                                            color: Colors.black.withValues(
+                                              alpha: 0.35,
+                                            ),
+                                            size: size,
+                                          ),
+                                        ),
+                                        Center(
+                                          child: isDone
+                                              ? ShaderMask(
+                                                  shaderCallback: (bounds) =>
+                                                      const LinearGradient(
+                                                        colors: [
+                                                          AppColors.primary,
+                                                          AppColors.secondary,
+                                                        ],
+                                                        begin:
+                                                            Alignment.topCenter,
+                                                        end: Alignment
+                                                            .bottomCenter,
+                                                      ).createShader(bounds),
+                                                  child: Icon(
+                                                    Icons.water_drop,
+                                                    color: Colors.white,
+                                                    size: size,
+                                                  ),
+                                                )
+                                              : Icon(
+                                                  Icons.water_drop,
+                                                  color: Colors.grey[400],
+                                                  size: size,
+                                                ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              builder: (context, markers) {
+                                // Check if any marker in the cluster is completed
+                                // This requires accessing the custom data of the markers
+                                // markers is a List<Marker>
+                                // Since we can't easily store the Contador in the Marker object directly without a wrapper
+                                // we'll assume the markers provided here are the ones we created in the markers: ... map()
+                                // However, Marker doesn't have a 'key' or 'data' field by default.
+                                // To solve this correctly, we should look at how we generate markers.
+                                // For now, let's create a logic that checks if the cluster should be 'done'
+                                // based on the presence of any marker that would have been green.
+                                // ACTUALLY, we can filter our _contadores list where it matches the marker points.
+                                // But that's slow. A better way is to pass the state in the Marker Key or use a custom Marker class.
+                                // For simplicity, I will use a heuristic or check the _contadores list.
 
-                            final bool allDone =
-                                clusterContadores.length > 0 &&
-                                clusterContadores.every(
+                                final clusterPoints = markers
+                                    .map((m) => m.point)
+                                    .toSet();
+                                final clusterContadores = _contadoresFiltrados
+                                    .where(
+                                      (c) => clusterPoints.contains(
+                                        LatLng(c.latitud!, c.longitud!),
+                                      ),
+                                    )
+                                    .toList();
+
+                                final bool allDone =
+                                    clusterContadores.length > 0 &&
+                                    clusterContadores.every(
+                                      (c) =>
+                                          c.estado == EstadoContador.registrado,
+                                    );
+                                final bool anyDone = clusterContadores.any(
                                   (c) => c.estado == EstadoContador.registrado,
                                 );
-                            final bool anyDone = clusterContadores.any(
-                              (c) => c.estado == EstadoContador.registrado,
-                            );
-                            const double clusterSize = 50.0;
+                                const double clusterSize = 50.0;
 
-                            // Counter-rotate to stay upright
-                            final rotation = _mapController.camera.rotation;
+                                // Counter-rotate to stay upright
+                                final rotation = _mapController.camera.rotation;
 
-                            return Transform.rotate(
-                              angle: -rotation * math.pi / 180,
-                              child: SizedBox(
-                                width: clusterSize,
-                                height: clusterSize,
-                                child: Stack(
-                                  children: [
-                                    // Sombra para la Gota Maestra
-                                    Center(
-                                      child: Transform.translate(
-                                        offset: Offset(
-                                          clusterSize * 0.04,
-                                          clusterSize * 0.04,
-                                        ),
-                                        child: Icon(
-                                          Icons.water_drop,
-                                          color: Colors.black.withValues(
-                                            alpha: 0.3,
-                                          ),
-                                          size: clusterSize * 0.8,
-                                        ),
-                                      ),
-                                    ),
-                                    // The main Water Drop icon
-                                    // Colors completely ONLY if all are done.
-                                    Center(
-                                      child: Icon(
-                                        Icons.water_drop,
-                                        color: allDone
-                                            ? AppColors.primary
-                                            : Colors.grey[400],
-                                        size: clusterSize * 0.8,
-                                      ),
-                                    ),
-                                  // The Notification Globito (the badge)
-                                  Positioned(
-                                    right: 0,
-                                    top: 0,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(4),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        gradient: anyDone
-                                            ? const LinearGradient(
-                                                colors: [
-                                                  AppColors.primary,
-                                                  AppColors.secondary,
-                                                ],
-                                              )
-                                            : null,
-                                        color: anyDone
-                                            ? null
-                                            : Colors.grey[500],
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                (anyDone
-                                                        ? AppColors.primary
-                                                        : Colors.black)
-                                                    .withValues(alpha: 0.3),
-                                            blurRadius: 6,
-                                            spreadRadius: 2,
-                                          ),
-                                        ],
-                                      ),
-                                      constraints: const BoxConstraints(
-                                        minWidth: 20,
-                                        minHeight: 20,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          markers.length.toString(),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
+                                return Transform.rotate(
+                                  angle: -rotation * math.pi / 180,
+                                  child: SizedBox(
+                                    width: clusterSize,
+                                    height: clusterSize,
+                                    child: Stack(
+                                      children: [
+                                        // Sombra para la Gota Maestra
+                                        Center(
+                                          child: Transform.translate(
+                                            offset: Offset(
+                                              clusterSize * 0.04,
+                                              clusterSize * 0.04,
+                                            ),
+                                            child: Icon(
+                                              Icons.water_drop,
+                                              color: Colors.black.withValues(
+                                                alpha: 0.3,
+                                              ),
+                                              size: clusterSize * 0.8,
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                        // The main Water Drop icon
+                                        // Colors completely ONLY if all are done.
+                                        Center(
+                                          child: Icon(
+                                            Icons.water_drop,
+                                            color: allDone
+                                                ? AppColors.primary
+                                                : Colors.grey[400],
+                                            size: clusterSize * 0.8,
+                                          ),
+                                        ),
+                                        // The Notification Globito (the badge)
+                                        Positioned(
+                                          right: 0,
+                                          top: 0,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              gradient: anyDone
+                                                  ? const LinearGradient(
+                                                      colors: [
+                                                        AppColors.primary,
+                                                        AppColors.secondary,
+                                                      ],
+                                                    )
+                                                  : null,
+                                              color: anyDone
+                                                  ? null
+                                                  : Colors.grey[500],
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color:
+                                                      (anyDone
+                                                              ? AppColors
+                                                                    .primary
+                                                              : Colors.black)
+                                                          .withValues(
+                                                            alpha: 0.3,
+                                                          ),
+                                                  blurRadius: 6,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
+                                            ),
+                                            constraints: const BoxConstraints(
+                                              minWidth: 20,
+                                              minHeight: 20,
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                markers.length.toString(),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
-                          );
-                        },
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
                 if (_isFirstLoad || _isLoading) _buildLoadingScreen(),
               ],
             ),
           ),
+        ],
+      ),
     );
   }
 
