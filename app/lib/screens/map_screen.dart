@@ -629,46 +629,52 @@ class _MapScreenState extends State<MapScreen> {
                                       false, // Keep vertical icons upright relative to the screen
                                   child: GestureDetector(
                                     onTap: () => _showContadorDetails(contador),
-                                    child: Stack(
-                                      children: [
-                                        Positioned(
-                                          left: size * 0.05,
-                                          top: size * 0.05,
-                                          child: Icon(
-                                            Icons.water_drop,
-                                            color: Colors.black.withValues(
-                                              alpha: 0.35,
+                                    child: Transform.rotate(
+                                      angle:
+                                          -_mapController.camera.rotation *
+                                          math.pi /
+                                          180,
+                                      child: Stack(
+                                        children: [
+                                          Positioned(
+                                            left: size * 0.05,
+                                            top: size * 0.05,
+                                            child: Icon(
+                                              Icons.water_drop,
+                                              color: Colors.black.withValues(
+                                                alpha: 0.35,
+                                              ),
+                                              size: size,
                                             ),
-                                            size: size,
                                           ),
-                                        ),
-                                        Center(
-                                          child: isDone
-                                              ? ShaderMask(
-                                                  shaderCallback: (bounds) =>
-                                                      const LinearGradient(
-                                                        colors: [
-                                                          AppColors.primary,
-                                                          AppColors.secondary,
-                                                        ],
-                                                        begin:
-                                                            Alignment.topCenter,
-                                                        end: Alignment
-                                                            .bottomCenter,
-                                                      ).createShader(bounds),
-                                                  child: Icon(
+                                          Center(
+                                            child: isDone
+                                                ? ShaderMask(
+                                                    shaderCallback: (bounds) =>
+                                                        const LinearGradient(
+                                                          colors: [
+                                                            AppColors.primary,
+                                                            AppColors.secondary,
+                                                          ],
+                                                          begin: Alignment
+                                                              .topCenter,
+                                                          end: Alignment
+                                                              .bottomCenter,
+                                                        ).createShader(bounds),
+                                                    child: Icon(
+                                                      Icons.water_drop,
+                                                      color: Colors.white,
+                                                      size: size,
+                                                    ),
+                                                  )
+                                                : Icon(
                                                     Icons.water_drop,
-                                                    color: Colors.white,
+                                                    color: Colors.grey[400],
                                                     size: size,
                                                   ),
-                                                )
-                                              : Icon(
-                                                  Icons.water_drop,
-                                                  color: Colors.grey[400],
-                                                  size: size,
-                                                ),
-                                        ),
-                                      ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 );
