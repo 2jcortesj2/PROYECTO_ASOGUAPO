@@ -604,16 +604,16 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                       MarkerClusterLayerWidget(
                         options: MarkerClusterLayerOptions(
-                          maxClusterRadius: 45,
+                          maxClusterRadius: 30,
                           size: const Size(45, 45),
                           alignment: Alignment.center,
                           padding: const EdgeInsets.all(50),
                           markers: _contadoresFiltrados.map((contador) {
                             final isDone =
                                 contador.estado == EstadoContador.registrado;
-                            final double size =
-                                (40 * (_currentZoom / 15) * (_currentZoom / 15))
-                                    .clamp(10.0, 250.0);
+                                final double size =
+                                    (30 * (_currentZoom / 15) * (_currentZoom / 15))
+                                        .clamp(10.0, 250.0);
 
                             return Marker(
                               point: LatLng(
@@ -712,18 +712,34 @@ class _MapScreenState extends State<MapScreen> {
                                 width: clusterSize,
                                 height: clusterSize,
                                 child: Stack(
-                                children: [
-                                  // The main Water Drop icon
-                                  // Colors completely ONLY if all are done.
-                                  Center(
-                                    child: Icon(
-                                      Icons.water_drop,
-                                      color: allDone
-                                          ? AppColors.primary
-                                          : Colors.grey[400],
-                                      size: clusterSize * 0.8,
+                                  children: [
+                                    // Sombra para la Gota Maestra
+                                    Center(
+                                      child: Transform.translate(
+                                        offset: Offset(
+                                          clusterSize * 0.04,
+                                          clusterSize * 0.04,
+                                        ),
+                                        child: Icon(
+                                          Icons.water_drop,
+                                          color: Colors.black.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                          size: clusterSize * 0.8,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    // The main Water Drop icon
+                                    // Colors completely ONLY if all are done.
+                                    Center(
+                                      child: Icon(
+                                        Icons.water_drop,
+                                        color: allDone
+                                            ? AppColors.primary
+                                            : Colors.grey[400],
+                                        size: clusterSize * 0.8,
+                                      ),
+                                    ),
                                   // The Notification Globito (the badge)
                                   Positioned(
                                     right: 0,
