@@ -2,6 +2,16 @@
 
 Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
 
+## [1.1.0] - 2026-01-30
+
+### Sistema de Mapa Premium
+- **Clustering Estilizado:** Implementación de grupos de marcadores con forma de gota de agua y badges de progreso dinámicos.
+- **Verticalidad Total:** Se corrigió la orientación de todos los iconos (marcadores y grupos) para que permanezcan siempre verticales sin importar la rotación del mapa.
+- **Persistencia de Cámara:** El mapa ahora recuerda automáticamente la última ubicación, nivel de zoom y rotación del usuario al navegar entre pantallas.
+- **Optimización Estética:** Reducción del radio de agrupación a 30px y ajuste del tamaño de marcadores para una visualización más limpia.
+- **Pantalla de Carga:** Nueva transición fluida con el logo corporativo al cargar los datos del mapa.
+- **Caché de Mapas:** Implementación de caché en memoria para los mosaicos (tiles), reduciendo el parpadeo blanco al navegar.
+
 ## [1.0.3] - 2026-01-30
 
 ### Corregido

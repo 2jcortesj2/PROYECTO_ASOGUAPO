@@ -307,21 +307,24 @@ El APK se genera en: `build/app/outputs/flutter-apk/app-release.apk`
 
 ---
 
-## Sistema de Mapa
+## Sistema de Mapa Premium (v1.1.0)
 
-El módulo de mapas permite visualizar la ubicación de los contadores y su estado de lectura en tiempo real.
+El módulo de mapas ha sido rediseñado para ofrecer una experiencia profesional:
+
+- **Persistencia de Estado:** Singleton en `MapService` que almacena `lastCenter`, `lastZoom` y `lastRotation`.
+- **Verticalidad Total:** Lógica de contra-rotación manual con `Transform.rotate` (`-camera.rotation`).
+- **Clustering:** Radio de `30px`, iconografía de gota corporativa y badges de progreso vinculados al estado de los contadores.
+- **Caché:** Integración de `flutter_map_cache` con `MemCacheStore`.
 
 ### Arquitectura y Flujo de Datos
-- **Manejo de Coordenadas:** Se utilizan las coordenadas almacenadas en la tabla `contadores` (ubicación fija) para renderizar los marcadores.
+- **Manejo de Coordenadas:** Se utilizan las coordenadas almacenadas en la tabla `contadores` (ubicación fija).
 - **Diferenciación de Estados:**
-    - **🟢 Verde**: Contador con lectura registrada en el ciclo actual.
-    - **🔴 Rojo/Gris**: Contador pendiente de lectura.
-- **Capa de Interacción:** 
-    - Al tocar un marcador, se despliega un **Bottom Sheet Expandible** (`DraggableScrollableSheet`).
-    - Este panel consulta dinámicamente si el contador tiene una lectura activa para mostrar el resumen del registro o el botón de acción correspondiente.
+    - **🟢 Verde**: Registro completado en el ciclo actual.
+    - **🔴 Rojo/Gris**: Pendiente de lectura.
+- **Capa de Interacción:** Bottom Sheet Expandible (`DraggableScrollableSheet`) para detalles y acciones rápidas.
 
 ### Importación de Coordenadas
-Para facilitar la transición a un sistema basado en mapas, el `CsvImportService` permite actualizar las coordenadas de los usuarios existentes sin afectar su historial de lecturas. Busca las columnas `LATITUD` y `LONGITUD` en el archivo CSV y realiza un `UPDATE` selectivo en la base de datos.
+El `CsvImportService` permite actualizar `LATITUD` y `LONGITUD` mediante el archivo CSV maestro sin afectar lecturas previas.
 
 ---
 

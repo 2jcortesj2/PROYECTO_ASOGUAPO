@@ -76,7 +76,21 @@ Si el contador está rayado, tapado, es ilegible o no puedes acceder a él:
 
 ---
 
-### 3. Confirmación
+### 3. Mapa Interactivo Premium (Nuevo v1.1.0) 🗺️
+
+El nuevo mapa inteligente te permite navegar con total libertad:
+
+- **Se queda donde lo dejas:** Si te mueves, haces zoom o rotas el mapa, GuapoLector **recordará** esa posición exacta. Cuando vuelvas al mapa, no tendrás que buscar tu zona de nuevo.
+- **Lectura perfecta:** Sin importar cuánto gires el mapa con los dedos para orientarte, todos los iconos (gotas y números) se mantendrán siempre **derechos y verticales** para que sean fáciles de leer.
+- **Agrupamiento Inteligente:** Cuando hay muchos medidores cerca, se agrupan en una gota mayor.
+    - **Gris**: Zona pendiente.
+    - **Gota gris con número a color**: Ya has empezado a leer en esa zona.
+    - **Gota Verde**: ¡Felicidades! Has completado el 100% de los medidores en ese grupo.
+- **Carga Fluida:** Verás una pantalla de carga elegante con el logo de ASOGUAPO mientras el mapa prepara los puntos.
+
+---
+
+### 4. Confirmación
 
 Después de guardar verás:
 - ✅ Mensaje de éxito
