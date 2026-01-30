@@ -84,6 +84,10 @@ class _MapScreenState extends State<MapScreen> {
 
   void _actualizarMapa() {
     if (_contadores.isEmpty) return;
+
+    // Si ya tenemos una posición guardada de esta sesión, no forzamos el re-encuadre
+    if (_mapService.lastCenter != null) return;
+
     if (_veredaSeleccionada != 'El Tendido' && _veredaSeleccionada != 'Todas')
       return;
 
@@ -555,15 +559,23 @@ class _MapScreenState extends State<MapScreen> {
                 : FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(
-                      initialCenter: const LatLng(2.389, -75.525),
-                      initialZoom: 15,
+                      initialCenter:
+                          _mapService.lastCenter ??
+                          const LatLng(2.389, -75.525),
+                      initialZoom: _mapService.lastZoom ?? 15,
                       initialRotation:
+                          _mapService.lastRotation ??
                           270, // West to East orientation (bearing)
                       minZoom: 12,
                       maxZoom: 21,
                       onPositionChanged: (position, hasGesture) {
                         setState(() {
-                          _currentZoom = position.zoom ?? 16.0;
+                          final camera = _mapController.camera;
+                          _currentZoom = camera.zoom;
+                          // Persist the state in the service
+                          _mapService.lastZoom = camera.zoom;
+                          _mapService.lastCenter = camera.center;
+                          _mapService.lastRotation = camera.rotation;
                         });
                       },
                       interactionOptions: const InteractionOptions(
