@@ -603,7 +603,7 @@ class _MapScreenState extends State<MapScreen> {
                               width: size,
                               height: size,
                               rotate:
-                                  true, // Keep vertical icons relative to the SCREEN
+                                  false, // Keep vertical icons upright relative to the screen
                               child: GestureDetector(
                                 onTap: () => _showContadorDetails(contador),
                                 child: Stack(
@@ -673,6 +673,11 @@ class _MapScreenState extends State<MapScreen> {
                                 )
                                 .toList();
 
+                            final bool allDone =
+                                clusterContadores.length > 0 &&
+                                clusterContadores.every(
+                                  (c) => c.estado == EstadoContador.registrado,
+                                );
                             final bool anyDone = clusterContadores.any(
                               (c) => c.estado == EstadoContador.registrado,
                             );
@@ -683,11 +688,12 @@ class _MapScreenState extends State<MapScreen> {
                               height: clusterSize,
                               child: Stack(
                                 children: [
-                                  // The main Water Drop icon (Grey if none done)
+                                  // The main Water Drop icon
+                                  // Colors completely ONLY if all are done.
                                   Center(
                                     child: Icon(
                                       Icons.water_drop,
-                                      color: anyDone
+                                      color: allDone
                                           ? AppColors.primary
                                           : Colors.grey[400],
                                       size: clusterSize * 0.8,
