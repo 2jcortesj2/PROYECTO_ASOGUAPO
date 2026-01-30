@@ -1,4 +1,3 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -20,15 +19,19 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   final MapService _mapService = MapService();
-  final DatabaseService _databaseService =
-      DatabaseService(); // Keep for specific actions like getLecturaActiva
+  final DatabaseService _databaseService = DatabaseService();
+  final TextEditingController _searchController = TextEditingController();
+
   List<Contador> _contadores = [];
   bool _isLoading = true;
   final MapController _mapController = MapController();
   double _currentZoom = 15.0;
 
-  // Custom visual assets
-  // You might want to use custom icons here, but we'll build them with Flutter widgets first
+  String _searchQuery = '';
+  String _veredaSeleccionada = 'El Tendido';
+  bool _ocultarCompletados = false;
+
+  final List<String> _veredas = ['El Recreo', 'Pueblo Nuevo', 'El Tendido'];
 
   @override
   void initState() {
@@ -48,18 +51,46 @@ class _MapScreenState extends State<MapScreen> {
     });
 
     if (_contadores.isNotEmpty) {
-      // Calculate bounds and fit map
-      final points = _contadores
-          .map((c) => LatLng(c.latitud!, c.longitud!))
-          .toList();
-      final bounds = LatLngBounds.fromPoints(points);
-
-      Future.delayed(const Duration(milliseconds: 500), () {
-        _mapController.fitCamera(
-          CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)),
-        );
-      });
+      _actualizarMapa();
     }
+  }
+
+  void _actualizarMapa() {
+    if (_veredaSeleccionada != 'El Tendido' || _contadores.isEmpty) return;
+
+    final points = _contadoresFiltrados
+        .map((c) => LatLng(c.latitud!, c.longitud!))
+        .toList();
+
+    if (points.isEmpty) return;
+
+    final bounds = LatLngBounds.fromPoints(points);
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _mapController.fitCamera(
+        CameraFit.bounds(
+          bounds: bounds,
+          padding: const EdgeInsets.symmetric(horizontal: 400, vertical: 300),
+        ),
+      );
+    });
+  }
+
+  List<Contador> get _contadoresFiltrados {
+    final filtrados = _contadores.where((c) {
+      if (c.vereda.toUpperCase() != _veredaSeleccionada.toUpperCase())
+        return false;
+      if (_ocultarCompletados && c.estado == EstadoContador.registrado)
+        return false;
+
+      if (_searchQuery.isEmpty) return true;
+
+      final query = _searchQuery.toLowerCase();
+      return c.nombre.toLowerCase().contains(query) ||
+          c.id.toLowerCase().contains(query);
+    }).toList();
+
+    return filtrados;
   }
 
   void _showContadorDetails(Contador contador) async {
@@ -303,182 +334,297 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  LatLngBounds _calculateExpandedBounds(List<Contador> contadores) {
+    if (contadores.isEmpty) {
+      return LatLngBounds(
+        const LatLng(2.30, -75.60),
+        const LatLng(2.45, -75.40),
+      );
+    }
+
+    double minLat = contadores.first.latitud!;
+    double maxLat = contadores.first.latitud!;
+    double minLng = contadores.first.longitud!;
+    double maxLng = contadores.first.longitud!;
+
+    for (final c in contadores) {
+      if (c.latitud! < minLat) minLat = c.latitud!;
+      if (c.latitud! > maxLat) maxLat = c.latitud!;
+      if (c.longitud! < minLng) minLng = c.longitud!;
+      if (c.longitud! > maxLng) maxLng = c.longitud!;
+    }
+
+    // Add much larger margin (50%) to the bounding box for easier navigation
+    final double latDelta = (maxLat - minLat).abs();
+    final double lngDelta = (maxLng - minLng).abs();
+
+    // Ensure a generous margin
+    final double latMargin = (latDelta * 0.5).clamp(0.01, 1.0);
+    final double lngMargin = (lngDelta * 0.5).clamp(0.01, 1.0);
+
+    return LatLngBounds(
+      LatLng(minLat - latMargin, minLng - lngMargin),
+      LatLng(maxLat + latMargin, maxLng + lngMargin),
+    );
+  }
+
+  Widget _buildVeredaChip(String vereda) {
+    final selected = _veredaSeleccionada == vereda;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _veredaSeleccionada = vereda;
+        });
+        if (vereda == 'El Tendido') {
+          _actualizarMapa();
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected ? AppColors.primary : Colors.grey[300]!,
+          ),
+        ),
+        child: Text(
+          vereda,
+          style: TextStyle(
+            color: selected ? Colors.white : Colors.black87,
+            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Mapa de Contadores')),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                initialCenter: const LatLng(2.389, -75.525), // Huila coverage
-                initialZoom: 15,
-                minZoom: 13,
-                maxZoom: 18,
-                onPositionChanged: (position, hasGesture) {
-                  setState(() {
-                    _currentZoom = position.zoom ?? 15.0;
-                  });
-                },
-                cameraConstraint: CameraConstraint.contain(
-                  bounds: _contadores.isNotEmpty
-                      ? LatLngBounds.fromPoints(
-                          _contadores
-                              .map((c) => LatLng(c.latitud!, c.longitud!))
-                              .toList(),
-                        )
-                      : LatLngBounds(
-                          const LatLng(4.0, -75.0),
-                          const LatLng(5.0, -73.0),
-                        ),
-                ),
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.asoguapo.app',
-                ),
-                MarkerLayer(
-                  markers: _contadores.map((contador) {
-                    final isDone = contador.estado == EstadoContador.registrado;
-                    // Dynamic size based on zoom
-                    // Scale from base 40 at zoom 15
-                    final double size = (40 * (_currentZoom / 15)).clamp(
-                      20.0,
-                      80.0,
-                    );
+    final now = DateTime.now();
+    final meses = [
+      '',
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
+    ];
+    final fechaHoy = '${now.day} ${meses[now.month]} ${now.year}';
 
-                    return Marker(
-                      point: LatLng(contador.latitud!, contador.longitud!),
-                      width: size,
-                      height: size,
-                      child: GestureDetector(
-                        onTap: () => _showContadorDetails(contador),
-                        child: _StylizedDropMarker(isDone: isDone, size: size),
+    return Scaffold(
+      appBar: AppBar(
+        title: Column(
+          children: [
+            Text('Lecturas del Día', style: AppTextStyles.titulo),
+            Text(
+              fechaHoy,
+              style: AppTextStyles.cuerpoSecundario.copyWith(fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 8),
+          // Barra de búsqueda
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppConstants.paddingMedium,
+            ),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Buscar medidores...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      )
+                    : null,
+              ),
+              onChanged: (value) => setState(() => _searchQuery = value),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Selector de Vereda
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppConstants.paddingMedium,
+            ),
+            child: Row(
+              children: _veredas.map((v) => _buildVeredaChip(v)).toList(),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Contador y Toggle
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppConstants.paddingMedium,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${_contadoresFiltrados.length} contadores',
+                  style: AppTextStyles.cuerpoSecundario,
+                ),
+                Row(
+                  children: [
+                    Text(
+                      'Ocultar completados',
+                      style: AppTextStyles.cuerpoSecundario.copyWith(
+                        fontSize: 12,
                       ),
-                    );
-                  }).toList(),
+                    ),
+                    const SizedBox(width: 8),
+                    Switch(
+                      value: _ocultarCompletados,
+                      onChanged: (value) =>
+                          setState(() => _ocultarCompletados = value),
+                      activeTrackColor: AppColors.primary.withOpacity(0.5),
+                      activeThumbColor: AppColors.primary,
+                    ),
+                  ],
                 ),
               ],
             ),
-    );
-  }
-}
+          ),
 
-class _StylizedDropMarker extends StatelessWidget {
-  final bool isDone;
-  final double size;
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _veredaSeleccionada != 'El Tendido'
+                ? _buildEnConstruccion()
+                : FlutterMap(
+                    mapController: _mapController,
+                    options: MapOptions(
+                      initialCenter: const LatLng(2.389, -75.525),
+                      initialZoom: 15,
+                      initialRotation: 90, // East to West orientation (bearing)
+                      minZoom: 12,
+                      maxZoom: 21,
+                      onPositionChanged: (position, hasGesture) {
+                        setState(() {
+                          _currentZoom = position.zoom ?? 16.0;
+                        });
+                      },
+                      interactionOptions: const InteractionOptions(
+                        flags: InteractiveFlag.all,
+                      ),
+                      cameraConstraint: CameraConstraint.contain(
+                        bounds: _calculateExpandedBounds(_contadores),
+                      ),
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.asoguapo.app',
+                      ),
+                      MarkerLayer(
+                        markers: _contadoresFiltrados.map((contador) {
+                          final isDone =
+                              contador.estado == EstadoContador.registrado;
+                          final double size =
+                              (40 * (_currentZoom / 15) * (_currentZoom / 15))
+                                  .clamp(10.0, 250.0);
 
-  const _StylizedDropMarker({required this.isDone, required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        boxShadow: [
-          BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
+                          return Marker(
+                            point: LatLng(
+                              contador.latitud!,
+                              contador.longitud!,
+                            ),
+                            width: size,
+                            height: size,
+                            rotate: false, // Keep vertical icons
+                            child: GestureDetector(
+                              onTap: () => _showContadorDetails(contador),
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                    left: size * 0.05,
+                                    top: size * 0.05,
+                                    child: Icon(
+                                      Icons.water_drop,
+                                      color: Colors.black.withOpacity(0.35),
+                                      size: size,
+                                    ),
+                                  ),
+                                  Center(
+                                    child: isDone
+                                        ? ShaderMask(
+                                            shaderCallback: (bounds) =>
+                                                const LinearGradient(
+                                                  colors: [
+                                                    AppColors.primary,
+                                                    AppColors.secondary,
+                                                  ],
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                ).createShader(bounds),
+                                            child: Icon(
+                                              Icons.water_drop,
+                                              color: Colors.white,
+                                              size: size,
+                                            ),
+                                          )
+                                        : Icon(
+                                            Icons.water_drop,
+                                            color: Colors.grey[400],
+                                            size: size,
+                                          ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+          ),
         ],
       ),
-      child: CustomPaint(painter: _DropShapePainter(isDone: isDone)),
-    );
-  }
-}
-
-class _DropShapePainter extends CustomPainter {
-  final bool isDone;
-
-  _DropShapePainter({required this.isDone});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final ui.Paint paint = ui.Paint()
-      ..shader = ui.Gradient.linear(
-        ui.Offset(size.width / 2, 0),
-        ui.Offset(size.width / 2, size.height),
-        isDone
-            ? [const Color(0xFF4CAF50), const Color(0xFF2E7D32)]
-            : [const Color(0xFF42A5F5), const Color(0xFF1565C0)],
-      )
-      ..style = ui.PaintingStyle.fill;
-
-    final ui.Paint borderPaint = ui.Paint()
-      ..color = Colors.white
-      ..style = ui.PaintingStyle.stroke
-      ..strokeWidth = 2.5;
-
-    final ui.Path path = ui.Path();
-    // Drop shape: top point + rounded bottom
-    path.moveTo(size.width / 2, 0);
-    path.quadraticBezierTo(
-      size.width * 0.9,
-      size.height * 0.4,
-      size.width * 0.9,
-      size.height * 0.65,
-    );
-    path.arcToPoint(
-      ui.Offset(size.width * 0.1, size.height * 0.65),
-      radius: ui.Radius.circular(size.width * 0.4),
-      clockwise: true,
-    );
-    path.quadraticBezierTo(
-      size.width * 0.1,
-      size.height * 0.4,
-      size.width / 2,
-      0,
-    );
-    path.close();
-
-    canvas.drawPath(path, paint);
-    canvas.drawPath(path, borderPaint);
-
-    // Reflection/Shine
-    final ui.Paint shinePaint = ui.Paint()
-      ..shader = ui.Gradient.linear(
-        ui.Offset(size.width * 0.2, size.height * 0.3),
-        ui.Offset(size.width * 0.5, size.height * 0.6),
-        [Colors.white.withOpacity(0.5), Colors.white.withOpacity(0.0)],
-      )
-      ..style = ui.PaintingStyle.fill;
-
-    canvas.drawCircle(
-      ui.Offset(size.width * 0.35, size.height * 0.45),
-      size.width * 0.12,
-      shinePaint,
-    );
-
-    // Inner icon indicator
-    final iconPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-      text: TextSpan(
-        text: String.fromCharCode(
-          isDone ? Icons.check.codePoint : Icons.water_drop.codePoint,
-        ),
-        style: TextStyle(
-          fontSize: size.width * 0.35,
-          fontFamily: isDone
-              ? Icons.check.fontFamily
-              : Icons.water_drop.fontFamily,
-          package: isDone
-              ? Icons.check.fontPackage
-              : Icons.water_drop.fontPackage,
-          color: Colors.white.withOpacity(0.9),
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-    iconPainter.layout();
-    iconPainter.paint(
-      canvas,
-      ui.Offset(
-        (size.width - iconPainter.width) / 2,
-        (size.height * 0.65 - iconPainter.height / 2),
-      ),
     );
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  Widget _buildEnConstruccion() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.construction, size: 80, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            'En Construcción',
+            style: AppTextStyles.titulo.copyWith(color: Colors.grey[600]),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'El mapa para esta vereda estará disponible pronto.',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.cuerpoSecundario,
+          ),
+        ],
+      ),
+    );
+  }
 }
