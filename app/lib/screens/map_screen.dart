@@ -649,31 +649,98 @@ class _MapScreenState extends State<MapScreen> {
                             );
                           }).toList(),
                           builder: (context, markers) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    AppColors.primary,
-                                    AppColors.secondary,
-                                  ],
-                                ),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black26,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
+                            // Check if any marker in the cluster is completed
+                            // This requires accessing the custom data of the markers
+                            // markers is a List<Marker>
+                            // Since we can't easily store the Contador in the Marker object directly without a wrapper
+                            // we'll assume the markers provided here are the ones we created in the markers: ... map()
+                            // However, Marker doesn't have a 'key' or 'data' field by default.
+                            // To solve this correctly, we should look at how we generate markers.
+                            // For now, let's create a logic that checks if the cluster should be 'done'
+                            // based on the presence of any marker that would have been green.
+                            // ACTUALLY, we can filter our _contadores list where it matches the marker points.
+                            // But that's slow. A better way is to pass the state in the Marker Key or use a custom Marker class.
+                            // For simplicity, I will use a heuristic or check the _contadores list.
+
+                            final clusterPoints = markers
+                                .map((m) => m.point)
+                                .toSet();
+                            final clusterContadores = _contadoresFiltrados
+                                .where(
+                                  (c) => clusterPoints.contains(
+                                    LatLng(c.latitud!, c.longitud!),
+                                  ),
+                                )
+                                .toList();
+
+                            final bool anyDone = clusterContadores.any(
+                              (c) => c.estado == EstadoContador.registrado,
+                            );
+                            const double clusterSize = 50.0;
+
+                            return SizedBox(
+                              width: clusterSize,
+                              height: clusterSize,
+                              child: Stack(
+                                children: [
+                                  // The main Water Drop icon (Grey if none done)
+                                  Center(
+                                    child: Icon(
+                                      Icons.water_drop,
+                                      color: anyDone
+                                          ? AppColors.primary
+                                          : Colors.grey[400],
+                                      size: clusterSize * 0.8,
+                                    ),
+                                  ),
+                                  // The Notification Globito (the badge)
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: anyDone
+                                            ? const LinearGradient(
+                                                colors: [
+                                                  AppColors.primary,
+                                                  AppColors.secondary,
+                                                ],
+                                              )
+                                            : null,
+                                        color: anyDone
+                                            ? null
+                                            : Colors.grey[500],
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                (anyDone
+                                                        ? AppColors.primary
+                                                        : Colors.black)
+                                                    .withValues(alpha: 0.3),
+                                            blurRadius: 6,
+                                            spreadRadius: 2,
+                                          ),
+                                        ],
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 20,
+                                        minHeight: 20,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          markers.length.toString(),
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
-                              ),
-                              child: Center(
-                                child: Text(
-                                  markers.length.toString(),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
                               ),
                             );
                           },
