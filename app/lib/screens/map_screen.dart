@@ -613,7 +613,9 @@ class _MapScreenState extends State<MapScreen> {
                                       top: size * 0.05,
                                       child: Icon(
                                         Icons.water_drop,
-                                        color: Colors.black.withOpacity(0.35),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.35,
+                                        ),
                                         size: size,
                                       ),
                                     ),
