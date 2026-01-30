@@ -518,7 +518,8 @@ class _MapScreenState extends State<MapScreen> {
                     options: MapOptions(
                       initialCenter: const LatLng(2.389, -75.525),
                       initialZoom: 15,
-                      initialRotation: 90, // East to West orientation (bearing)
+                      initialRotation:
+                          270, // West to East orientation (bearing)
                       minZoom: 12,
                       maxZoom: 21,
                       onPositionChanged: (position, hasGesture) {
@@ -554,7 +555,8 @@ class _MapScreenState extends State<MapScreen> {
                             ),
                             width: size,
                             height: size,
-                            rotate: false, // Keep vertical icons
+                            rotate:
+                                true, // Keep vertical icons relative to the SCREEN
                             child: GestureDetector(
                               onTap: () => _showContadorDetails(contador),
                               child: Stack(
