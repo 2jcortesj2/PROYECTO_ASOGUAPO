@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_cache/flutter_map_cache.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import '../models/contador.dart';
 import '../models/lectura.dart';
 import '../services/database_service.dart';
@@ -27,6 +30,7 @@ class _MapScreenState extends State<MapScreen> {
   bool _isLoading = true;
   final MapController _mapController = MapController();
   double _currentZoom = 15.0;
+  CacheStore? _cacheStore;
 
   String _searchQuery = '';
   String _veredaSeleccionada = 'El Tendido';
@@ -42,10 +46,24 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
+    _initCache();
     if (widget.initialVereda != null) {
       _veredaSeleccionada = widget.initialVereda!;
     }
     _loadContadores();
+  }
+
+  Future<void> _initCache() async {
+    setState(() {
+      _cacheStore = MemCacheStore();
+    });
+  }
+
+  @override
+  void dispose() {
+    _cacheStore?.close();
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadContadores() async {
@@ -560,66 +578,104 @@ class _MapScreenState extends State<MapScreen> {
                         urlTemplate:
                             'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                         userAgentPackageName: 'com.asoguapo.app',
+                        tileProvider: _cacheStore != null
+                            ? CachedTileProvider(store: _cacheStore!)
+                            : null,
                       ),
-                      MarkerLayer(
-                        markers: _contadoresFiltrados.map((contador) {
-                          final isDone =
-                              contador.estado == EstadoContador.registrado;
-                          final double size =
-                              (40 * (_currentZoom / 15) * (_currentZoom / 15))
-                                  .clamp(10.0, 250.0);
+                      MarkerClusterLayerWidget(
+                        options: MarkerClusterLayerOptions(
+                          maxClusterRadius: 45,
+                          size: const Size(45, 45),
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.all(50),
+                          markers: _contadoresFiltrados.map((contador) {
+                            final isDone =
+                                contador.estado == EstadoContador.registrado;
+                            final double size =
+                                (40 * (_currentZoom / 15) * (_currentZoom / 15))
+                                    .clamp(10.0, 250.0);
 
-                          return Marker(
-                            point: LatLng(
-                              contador.latitud!,
-                              contador.longitud!,
-                            ),
-                            width: size,
-                            height: size,
-                            rotate:
-                                true, // Keep vertical icons relative to the SCREEN
-                            child: GestureDetector(
-                              onTap: () => _showContadorDetails(contador),
-                              child: Stack(
-                                children: [
-                                  Positioned(
-                                    left: size * 0.05,
-                                    top: size * 0.05,
-                                    child: Icon(
-                                      Icons.water_drop,
-                                      color: Colors.black.withOpacity(0.35),
-                                      size: size,
+                            return Marker(
+                              point: LatLng(
+                                contador.latitud!,
+                                contador.longitud!,
+                              ),
+                              width: size,
+                              height: size,
+                              rotate:
+                                  true, // Keep vertical icons relative to the SCREEN
+                              child: GestureDetector(
+                                onTap: () => _showContadorDetails(contador),
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      left: size * 0.05,
+                                      top: size * 0.05,
+                                      child: Icon(
+                                        Icons.water_drop,
+                                        color: Colors.black.withOpacity(0.35),
+                                        size: size,
+                                      ),
                                     ),
-                                  ),
-                                  Center(
-                                    child: isDone
-                                        ? ShaderMask(
-                                            shaderCallback: (bounds) =>
-                                                const LinearGradient(
-                                                  colors: [
-                                                    AppColors.primary,
-                                                    AppColors.secondary,
-                                                  ],
-                                                  begin: Alignment.topCenter,
-                                                  end: Alignment.bottomCenter,
-                                                ).createShader(bounds),
-                                            child: Icon(
+                                    Center(
+                                      child: isDone
+                                          ? ShaderMask(
+                                              shaderCallback: (bounds) =>
+                                                  const LinearGradient(
+                                                    colors: [
+                                                      AppColors.primary,
+                                                      AppColors.secondary,
+                                                    ],
+                                                    begin: Alignment.topCenter,
+                                                    end: Alignment.bottomCenter,
+                                                  ).createShader(bounds),
+                                              child: Icon(
+                                                Icons.water_drop,
+                                                color: Colors.white,
+                                                size: size,
+                                              ),
+                                            )
+                                          : Icon(
                                               Icons.water_drop,
-                                              color: Colors.white,
+                                              color: Colors.grey[400],
                                               size: size,
                                             ),
-                                          )
-                                        : Icon(
-                                            Icons.water_drop,
-                                            color: Colors.grey[400],
-                                            size: size,
-                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          builder: (context, markers) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    AppColors.primary,
+                                    AppColors.secondary,
+                                  ],
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
                                   ),
                                 ],
                               ),
-                            ),
-                          );
-                        }).toList(),
+                              child: Center(
+                                child: Text(
+                                  markers.length.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
