@@ -29,7 +29,7 @@ class DatabaseService {
     // Increment version if schema changes
     return await openDatabase(
       path,
-      version: 4, // Incrementado para permitir lectura NULL
+      version: 5, // Incrementado para incluir coordenadas en contadores
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -77,6 +77,12 @@ class DatabaseService {
         'CREATE INDEX idx_lecturas_contador ON lecturas(contador_id)',
       );
     }
+
+    if (oldVersion < 5) {
+      // Agregar latitud y longitud a contadores
+      await db.execute('ALTER TABLE contadores ADD COLUMN latitud REAL');
+      await db.execute('ALTER TABLE contadores ADD COLUMN longitud REAL');
+    }
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -89,7 +95,9 @@ class DatabaseService {
         lote TEXT,
         ultima_lectura REAL,
         fecha_ultima_lectura TEXT,
-        estado TEXT
+        estado TEXT,
+        latitud REAL,
+        longitud REAL
       )
     ''');
 
@@ -157,6 +165,21 @@ class DatabaseService {
     await db.update(
       'contadores',
       {'estado': estado.name},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // Actualizar solo coordenadas (para preservar estado y lecturas al importar CSV nuevo)
+  Future<void> updateContadorUbicacion(
+    String id,
+    double lat,
+    double lng,
+  ) async {
+    final db = await database;
+    await db.update(
+      'contadores',
+      {'latitud': lat, 'longitud': lng},
       where: 'id = ?',
       whereArgs: [id],
     );

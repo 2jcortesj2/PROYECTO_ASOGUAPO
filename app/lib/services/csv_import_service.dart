@@ -2,24 +2,37 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/foundation.dart'; // For debugPrint
 import 'package:csv/csv.dart';
 import 'database_service.dart';
+import 'map_service.dart';
 import '../models/contador.dart';
-
 import '../config/constants.dart';
 
 class CsvImportService {
   final DatabaseService _databaseService = DatabaseService();
+  final MapService _mapService = MapService();
 
   Future<void> importInitialData() async {
-    // Check if we already have data to avoid duplicate imports
-    final existingContadores = await _databaseService.getContadores();
-    if (existingContadores.isNotEmpty) {
+    // Check if we already have data WITH location
+    final contadoresConUbicacion = await _mapService
+        .getContadoresConUbicacion();
+    if (contadoresConUbicacion.isNotEmpty) {
       return;
     }
 
     try {
-      String csvString = await rootBundle.loadString(
-        'assets/LECTURAS_PILOTO.csv',
-      );
+      String csvName = 'LECTURAS_TEN_20260126_1622.csv';
+      String csvString;
+      try {
+        csvString = await rootBundle.loadString('assets/$csvName');
+      } catch (e) {
+        debugPrint('Archivo Real CSV no encontrado, intentando piloto...');
+        csvName = 'LECTURAS_PILOTO.csv';
+        try {
+          csvString = await rootBundle.loadString('assets/$csvName');
+        } catch (_) {
+          debugPrint('Ningun CSV encontrado.');
+          return;
+        }
+      }
 
       // Eliminar BOM si existe
       if (csvString.startsWith('\uFEFF')) {
@@ -52,6 +65,9 @@ class CsvImportService {
       int idxHora = headers.indexOf('HORA_LECTURA');
       if (idxHora == -1) idxHora = headers.indexOf('HORA_HISTORICO_DIC');
 
+      int idxLat = headers.indexOf('LATITUD');
+      int idxLng = headers.indexOf('LONGITUD');
+
       if (idxId == -1 || idxNombre == -1) {
         debugPrint(
           'Error: Columnas requeridas no encontradas en el CSV. Headers: $headers',
@@ -67,50 +83,68 @@ class CsvImportService {
         // Skip empty rows
         if (id.isEmpty) continue;
 
-        final String nombre = _toTitleCase(row[idxNombre].toString());
-        final String vereda = _toTitleCase(row[idxVereda].toString());
-
-        double? lecturaActual;
-        if (idxLecturaAct != -1 &&
-            row[idxLecturaAct] != null &&
-            row[idxLecturaAct].toString().isNotEmpty) {
-          lecturaActual = double.tryParse(row[idxLecturaAct].toString());
+        double? latitud;
+        if (idxLat != -1 && row[idxLat] != null) {
+          latitud = double.tryParse(row[idxLat].toString());
+        }
+        double? longitud;
+        if (idxLng != -1 && row[idxLng] != null) {
+          longitud = double.tryParse(row[idxLng].toString());
         }
 
-        DateTime? fechaLectura;
-        if (idxFecha != -1 &&
-            row[idxFecha] != null &&
-            row[idxFecha].toString().isNotEmpty) {
-          String fechaStr = row[idxFecha].toString();
-          String horaStr = (idxHora != -1 && row[idxHora] != null)
-              ? row[idxHora].toString()
-              : '00:00:00';
-          try {
-            fechaLectura = DateTime.parse('$fechaStr $horaStr');
-          } catch (e) {
-            fechaLectura = DateTime.now(); // Fallback
+        // Check availability
+        final existing = await _databaseService.getContadorById(id);
+
+        if (existing != null) {
+          // Si ya existe, SOLO actualizamos coordenadas si las tenemos en el CSV
+          // Esto preserva el estado actual y lecturas realizadas
+          if (latitud != null && longitud != null) {
+            await _databaseService.updateContadorUbicacion(
+              id,
+              latitud,
+              longitud,
+            );
           }
+        } else {
+          // Si no existe, creamos uno nuevo
+          final String nombre = _toTitleCase(row[idxNombre].toString());
+          final String vereda = _toTitleCase(row[idxVereda].toString());
+
+          double? lecturaActual;
+          if (idxLecturaAct != -1 &&
+              row[idxLecturaAct] != null &&
+              row[idxLecturaAct].toString().isNotEmpty) {
+            lecturaActual = double.tryParse(row[idxLecturaAct].toString());
+          }
+
+          DateTime? fechaLectura;
+          if (idxFecha != -1 &&
+              row[idxFecha] != null &&
+              row[idxFecha].toString().isNotEmpty) {
+            String fechaStr = row[idxFecha].toString();
+            String horaStr = (idxHora != -1 && row[idxHora] != null)
+                ? row[idxHora].toString()
+                : '00:00:00';
+            try {
+              fechaLectura = DateTime.parse('$fechaStr $horaStr');
+            } catch (e) {
+              fechaLectura = DateTime.now(); // Fallback
+            }
+          }
+
+          final contador = Contador(
+            id: id,
+            nombre: nombre,
+            vereda: vereda,
+            ultimaLectura: lecturaActual,
+            fechaUltimaLectura: fechaLectura,
+            estado: EstadoContador.pendiente, // Nuevo siempre pendiente
+            latitud: latitud,
+            longitud: longitud,
+          );
+
+          await _databaseService.insertContador(contador);
         }
-
-        // El requerimiento es: La lectura del CSV (Dec 20) es la "ANTERIOR" para el nuevo periodo.
-        // Por lo tanto, el usuario debe aparecer como PENDIENTE para tomar la nueva lectura de Enero.
-        EstadoContador estado = EstadoContador.pendiente;
-
-        final contador = Contador(
-          id: id,
-          nombre: nombre,
-          vereda: vereda,
-          // La LECTURA_ACTUAL del CSV pasa a ser la ultimaLectura para referencia en la app
-          ultimaLectura: lecturaActual,
-          fechaUltimaLectura: fechaLectura,
-          estado: estado,
-        );
-
-        await _databaseService.insertContador(contador);
-
-        // NO insertamos la lectura histórica en la tabla 'lecturas'
-        // Solo la usamos como referencia en 'ultimaLectura' del contador
-        // Esto deja la app completamente vacía para registrar las lecturas de Enero
       }
     } catch (e, stackTrace) {
       debugPrint('Error importando CSV: $e');

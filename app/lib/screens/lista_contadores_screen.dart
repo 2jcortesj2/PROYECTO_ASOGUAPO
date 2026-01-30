@@ -8,6 +8,7 @@ import '../widgets/info_lectura_widget.dart';
 import '../services/database_service.dart';
 import 'registro_lectura_screen.dart';
 import 'historial_screen.dart';
+import 'map_screen.dart';
 
 /// Pantalla principal - Lista de contadores
 class ListaContadoresScreen extends StatefulWidget {
@@ -152,6 +153,18 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.map_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MapScreen()),
+              );
+            },
+            tooltip: 'Ver Mapa',
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(

@@ -11,6 +11,9 @@ class Contador {
   final DateTime? fechaUltimaLectura;
   final EstadoContador estado;
 
+  final double? latitud;
+  final double? longitud;
+
   const Contador({
     required this.id,
     required this.nombre,
@@ -20,6 +23,8 @@ class Contador {
     this.ultimaLectura,
     this.fechaUltimaLectura,
     this.estado = EstadoContador.pendiente,
+    this.latitud,
+    this.longitud,
   });
 
   /// Crea un Contador desde un Map (base de datos)
@@ -38,6 +43,8 @@ class Contador {
         (e) => e.name == (map['estado'] ?? 'pendiente'),
         orElse: () => EstadoContador.pendiente,
       ),
+      latitud: map['latitud'] as double?,
+      longitud: map['longitud'] as double?,
     );
   }
 
@@ -52,6 +59,8 @@ class Contador {
       'ultima_lectura': ultimaLectura,
       'fecha_ultima_lectura': fechaUltimaLectura?.toIso8601String(),
       'estado': estado.name,
+      'latitud': latitud,
+      'longitud': longitud,
     };
   }
 
@@ -79,6 +88,8 @@ class Contador {
     double? ultimaLectura,
     DateTime? fechaUltimaLectura,
     EstadoContador? estado,
+    double? latitud,
+    double? longitud,
   }) {
     return Contador(
       id: id ?? this.id,
@@ -89,11 +100,13 @@ class Contador {
       ultimaLectura: ultimaLectura ?? this.ultimaLectura,
       fechaUltimaLectura: fechaUltimaLectura ?? this.fechaUltimaLectura,
       estado: estado ?? this.estado,
+      latitud: latitud ?? this.latitud,
+      longitud: longitud ?? this.longitud,
     );
   }
 
   @override
   String toString() {
-    return 'Contador(id: $id, nombre: $nombre, vereda: $vereda)';
+    return 'Contador(id: $id, nombre: $nombre, vereda: $vereda, lat: $latitud, lng: $longitud)';
   }
 }

@@ -64,6 +64,14 @@ dependencies:
   # Archive (ZIP)
   archive: ^3.6.1
 
+  # Maps
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+
+  # Splash Screen
+  flutter_native_splash: ^2.4.0
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -75,7 +83,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.13.1
-  flutter_native_splash: ^2.4.0
+
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -108,8 +116,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/LECTURAS_PILOTO.csv
-    - assets/logo_asoguapo.png
+    - assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

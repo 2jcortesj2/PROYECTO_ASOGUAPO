@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolución ASOGUAPO - Próxima Fase</title>
+    <style>
+        :root {
+            --primary-color: #00897B;
+            --secondary-color: #E0F2F1;
+            --text-color: #333;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            box-sizing: border-box;
+            background-color: var(--white);
+            border-bottom: 5px solid var(--secondary-color);
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            text-align: center;
+        }
+
+        p,
+        li {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .slide-content {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .text-block {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .image-block {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            justify-content: center;
+        }
+
+        img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        img:hover {
+            transform: scale(1.02);
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 1rem 0;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .grid-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .principles-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .principles-list li {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .principles-list li::before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .intro-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4DB6AC 100%);
+            color: white;
+        }
+
+        .intro-section h1,
+        .intro-section h2 {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Intro Slide -->
+    <section class="intro-section">
+        <div class="container text-center">
+            <img src="logo_asoguapo.png" alt="Logo ASOGUAPO"
+                style="max-width: 250px; margin-bottom: 2rem; background: white; padding: 1.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <h1>PROYECTO ASOGUAPO</h1>
+            <h2>Hacia un Ecosistema Digital Integral</h2>
+            <p>De un simple lector a un sistema de gestión comunitaria completo.</p>
+        </div>
+    </section>
+
+    <!-- Vision General -->
+    <section id="vision">
+        <div class="container">
+            <h2>🧭 Visión General del Sistema</h2>
+            <div class="slide-content">
+                <div class="text-block">
+                    <p>El sistema evoluciona hacia una arquitectura robusta donde el <strong>Servidor Central</strong>
+                        es el corazón.</p>
+                    <div class="card">
+                        <h3>Componentes Principales:</h3>
+                        <ul>
+                            <li><strong>App Lectores:</strong> Android (Flutter) - Campo / Offline</li>
+                            <li><strong>Servidor Central:</strong> Supabase - Base de Datos & Reglas</li>
+                            <li><strong>App Administrador:</strong> Flutter Desktop / Web - Gestión & Facturación</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="image-block">
+                    <img src="diagrama_ecosistema_sistema.png" alt="Diagrama de Arquitectura">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Principios -->
+    <section>
+        <div class="container">
+            <h2>🧠 Principios Inquebrantables</h2>
+            <div class="slide-content">
+                <div class="text-block">
+                    <ul class="principles-list">
+                        <li><strong>Offline-first siempre:</strong> El lector nunca depende del internet para trabajar.
+                        </li>
+                        <li><strong>El servidor decide:</strong> Centraliza la validación de lecturas y contadores para
+                            evitar errores.</li>
+                        <li><strong>Un contador = una lectura por período:</strong> Evita duplicados y garantiza la
+                            integridad de los datos.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fase 1 -->
+    <section>
+        <div class="container">
+            <h2>🟢 FASE 1 — Consolidación (Lograda)</h2>
+            <p>Captura confiable y saneamiento de datos base.</p>
+            <div class="grid-gallery">
+                <div class="card">
+                    <h3>Logros</h3>
+                    <ul>
+                        <li>✅ Contadores ubicados</li>
+                        <li>✅ Casas sin contador identificadas</li>
+                        <li>✅ Datos corregidos manualmente</li>
+                    </ul>
+                </div>
+                <!-- Uploaded images from Phase 1 -->
+                <img src="app_splash_actual.jpg" alt="Splash Screen Actual">
+                <img src="app_lista_lecturas_actual.jpg" alt="Lista de Lecturas Actual">
+            </div>
+
+            <h3 style="margin-top: 3rem; text-align: center;">Mapa Real de Contadores Geolocalizados</h3>
+            <p style="text-align: center;">Este es el resultado tangible de la Fase 1: más de 100 contadores ubicados
+                con precisión GPS.</p>
+            <div style="display: flex; justify-content: center; margin-top: 2rem;">
+                <img src="mapa_real_contadores.jpg" alt="Mapa Real con Contadores Ubicados" style="max-width: 90%;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Fase 2 & 3 -->
+    <section>
+        <div class="container">
+            <h2>🟡 FASE 2 y 3 — Servidor & Lector v2</h2>
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>Fase 3: App Lectores con Mapa Interactivo</h3>
+                    <p>Objetivo: Reducir errores humanos y acelerar la lectura mediante geolocalización visual.</p>
+                    <ul>
+                        <li>🔴 Rojo: No leído</li>
+                        <li>🟢 Verde: Leído</li>
+                    </ul>
+                    <p>Validación por proximidad GPS para garantizar que el lector esté cerca del contador.</p>
+                </div>
+                <div class="image-block">
+                    <img src="mockup_fase_3_mapa_lectores.png" alt="Mockup Mapa Lectores">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fase 4 -->
+    <section>
+        <div class="container">
+            <h2>🟣 FASE 4 — App Administrador PC</h2>
+            <p style="text-align: center;"><strong>GuapoAdministrador</strong> (Flutter Desktop)</p>
+            <p style="text-align: center;">Centraliza la gestión y facturación sin depender de bancos.</p>
+
+            <div class="slide-content" style="margin-top: 2rem;">
+                <div class="text-block">
+                    <div class="card">
+                        <h3>Funcionalidades Principales</h3>
+                        <ul class="principles-list">
+                            <li>Reutilización de código (mismo backend que app móvil)</li>
+                            <li>Ver lecturas y consumo histórico</li>
+                            <li>Generación automática de facturas PDF</li>
+                            <li>Exportación a Excel</li>
+                            <li>Gestión de deudas por usuario</li>
+                            <li>Estadísticas comunitarias e individuales</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="image-block">
+                    <img src="mockup_fase_4_admin_desktop.png" alt="Mockup Admin Desktop - Vista General">
+                </div>
+            </div>
+
+            <h3 style="margin-top: 3rem; text-align: center;">Control de Deudas Individual</h3>
+            <div class="slide-content" style="margin-top: 2rem;">
+                <div class="text-block">
+                    <div class="card">
+                        <h4>Seguimiento de Pagos</h4>
+                        <p>Visualización clara del historial de pagos de cada usuario:</p>
+                        <ul>
+                            <li>Meses pagados vs. pendientes</li>
+                            <li>Cálculo automático de deuda total</li>
+                            <li>Identificación rápida de usuarios en mora</li>
+                            <li>Historial completo de consumo y facturación</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="image-block">
+                    <img src="mockup_admin_deudas.png" alt="Mockup Control de Deudas">
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 3rem;">
+                <h3>📊 Estadísticas de la Comunidad</h3>
+                <p>Panel de métricas clave para la toma de decisiones:</p>
+                <div class="slide-content">
+                    <div class="text-block">
+                        <h4>Indicadores Generales</h4>
+                        <ul>
+                            <li>Total de usuarios activos</li>
+                            <li>Lecturas completadas del mes</li>
+                            <li>Tasa de recaudo (%)</li>
+                            <li>Consumo promedio comunitario</li>
+                        </ul>
+                    </div>
+                    <div class="text-block">
+                        <h4>Análisis por Sector</h4>
+                        <ul>
+                            <li>Consumo mensual por vereda</li>
+                            <li>Distribución de estados de pago</li>
+                            <li>Top consumidores</li>
+                            <li>Reportes exportables</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 1rem; font-style: italic; color: #666;">Nota: El mockup visual de estadísticas se
+                    agregará en una actualización futura debido a limitaciones temporales de generación de imágenes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fase 5 -->
+    <section>
+        <div class="container">
+            <h2>🟤 FASE 5 — Fontanero / Técnico</h2>
+            <div class="slide-content">
+                <div class="text-block">
+                    <p>Mantenimiento del catastro vivo para la sostenibilidad a largo plazo.</p>
+                    <div class="card">
+                        <h3>Funciones Clave</h3>
+                        <ul>
+                            <li>Crear nuevos usuarios y contadores en sitio</li>
+                            <li>Geolocalizar daños</li>
+                            <li>Registrar reparaciones con evidencia fotográfica</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="image-block">
+                    <img src="mockup_fase_5_fontanero_app.png" alt="Mockup App Fontanero">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fase 6 - Facturación Digital -->
+    <section>
+        <div class="container">
+            <h2>💳 FASE 6 — Facturación Digital y Pagos en Línea</h2>
+            <p style="text-align: center;"><em>Futuro (varios meses) - Modernización del proceso de cobro</em></p>
+
+            <div class="slide-content" style="margin-top: 2rem;">
+                <div class="text-block">
+                    <h3>Proceso Actual vs. Futuro</h3>
+                    <div class="card">
+                        <h4>📄 Proceso Actual</h4>
+                        <p>Facturas físicas impresas, cobro en efectivo o transferencia manual con confirmación por
+                            Confíe.</p>
+                        <img src="factura_antigua.png" alt="Factura Actual"
+                            style="margin-top: 1rem; max-height: 400px;">
+                    </div>
+                </div>
+
+                <div class="text-block">
+                    <div class="card" style="background-color: var(--secondary-color);">
+                        <h4>🚀 Proceso Futuro</h4>
+                        <ul class="principles-list">
+                            <li>Envío automático de facturas por WhatsApp</li>
+                            <li>Pago directo con PSE (sin intermediarios)</li>
+                            <li>Conciliación automática con extractos bancarios</li>
+                            <li>Reducción de costos operativos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 3rem; text-align: center;">Implementación Propuesta</h3>
+
+            <div class="slide-content" style="margin-top: 2rem;">
+                <div class="text-block">
+                    <div class="card">
+                        <h4>📱 1. Envío por WhatsApp</h4>
+                        <p>Factura PDF enviada automáticamente al usuario con botones de acción directa.</p>
+                    </div>
+                    <img src="mockup_factura_whatsapp.png" alt="Mockup Factura WhatsApp" style="margin-top: 1rem;">
+                </div>
+
+                <div class="text-block">
+                    <div class="card">
+                        <h4>💰 2. Pago con PSE</h4>
+                        <p>Integración con Pagos Seguros en Línea para recibir pagos directamente desde el banco del
+                            usuario.</p>
+                    </div>
+                    <img src="mockup_pse_payment.png" alt="Mockup Pago PSE" style="margin-top: 1rem;">
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 3rem;">
+                <h4>📊 3. Conciliación Automática</h4>
+                <p>Conexión con extractos bancarios para automatizar la contabilidad y reducir errores humanos.</p>
+                <ul>
+                    <li>Importación automática de movimientos bancarios</li>
+                    <li>Matching inteligente: pago ↔ factura</li>
+                    <li>Reportes de recaudo en tiempo real</li>
+                    <li>Identificación automática de pagos pendientes</li>
+                </ul>
+                <p style="margin-top: 1rem;"><strong>Nota:</strong> Esta funcionalidad se implementará con un mockup
+                    visual debido a limitaciones temporales de generación de imágenes.</p>
+            </div>
+
+            <div class="card" style="margin-top: 2rem; background-color: #FFF3CD; border-left-color: #FFC107;">
+                <h4>⚠️ Consideraciones Importantes</h4>
+                <ul>
+                    <li><strong>Costos PSE:</strong> Comisión por transacción (~$900 COP + IVA por pago)</li>
+                    <li><strong>Integración:</strong> Requiere contrato con proveedor PSE (ej: PayU, ePayco, Wompi)</li>
+                    <li><strong>Tiempo de implementación:</strong> 2-3 meses</li>
+                    <li><strong>Beneficio:</strong> Elimina dependencia de Confíe y agiliza recaudo</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resumen -->
+    <section>
+        <div class="container">
+            <h2>🧠 Resumen Estratégico & Costos</h2>
+            <div class="slide-content">
+                <div class="text-block">
+                    <h3>Roadmap</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fase</th>
+                                <th>Objetivo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Captura confiable (✔)</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Servidor central (Supabase)</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Lectura guiada por mapa</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Administración PC</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>Mantenimiento (Fontanero)</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>Facturación digital y pagos PSE</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-block">
+                    <h3>Escalabilidad Real</h3>
+                    <p>Con esta arquitectura (Supabase + Flutter), el sistema puede crecer de 500 a 10,000 usuarios
+                        simplemente ajustando el plan del servidor, sin reescribir código.</p>
+                    <div class="card" style="background-color: var(--secondary-color);">
+                        <p><strong>Costo Operativo:</strong> Mínimo (Supabase capa gratuita cubre la demanda actual).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 2rem; background: var(--primary-color); color: white;">
+        <p>ASOGUAPO - Sistema de Gestión de Agua Potable Comunitario</p>
+    </footer>
+
+</body>
+
+</html>

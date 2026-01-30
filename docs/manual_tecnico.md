@@ -121,7 +121,9 @@ class Contador {
   final String? lote;
   final double? ultimaLectura;
   final DateTime? fechaUltimaLectura;
-  final bool tieneRegistroHoy;
+  final EstadoContador estado;
+  final double? latitud;  // Coordenada GPS estática
+  final double? longitud; // Coordenada GPS estática
 }
 ```
 
@@ -130,13 +132,13 @@ class Contador {
 ```dart
 class Lectura {
   final int id;
-  final String contadorId;
-  final String nombreUsuario;
+  final String contador_id;
+  final String nombre_usuario;
   final String vereda;
-  final double? lectura; // Nullable: permite registrar anomalías sin valor
-  final String fotoPath;
-  final double? latitud;
-  final double? longitud;
+  final double? lectura; // Nullable para anomalías
+  final String foto_path;
+  final double? latitud;  // Ubicación al momento de la toma
+  final double? longitud; // Ubicación al momento de la toma
   final DateTime fecha;
   final bool sincronizado;
   final String? comentario;
@@ -155,10 +157,11 @@ CREATE TABLE contadores (
   nombre TEXT NOT NULL,
   vereda TEXT NOT NULL,
   lote TEXT,
-
   ultima_lectura REAL,
   fecha_ultima_lectura TEXT,
-  estado TEXT
+  estado TEXT,
+  latitud REAL,
+  longitud REAL
 );
 
 CREATE TABLE lecturas (
@@ -166,7 +169,7 @@ CREATE TABLE lecturas (
   contador_id TEXT NOT NULL,
   nombre_usuario TEXT NOT NULL,
   vereda TEXT NOT NULL,
-  lectura REAL,  -- Permite NULL para anomalías
+  lectura REAL,
   foto_path TEXT NOT NULL,
   latitud REAL,
   longitud REAL,
@@ -190,12 +193,18 @@ CREATE INDEX idx_lecturas_contador ON lecturas(contador_id);
 class DatabaseService {
   Future<Database> get database;
   Future<List<Contador>> getContadores();
+  Future<void> updateContadorUbicacion(String id, double lat, double lng);
   Future<void> insertLectura(Lectura lectura);
-  Future<void> updateLectura(Lectura lectura);
-  Future<void> deleteLectura(int id);
-  Future<Lectura?> getLecturaActiva(String contadorId); // Ventana 15 días
-  Future<void> limpiarYActualizarRegistros(); // Mantenimiento auto
-  Future<void> resetEstadoContadores();
+  Future<Lectura?> getLecturaActiva(String contadorId);
+  Future<void> limpiarYActualizarRegistros();
+}
+```
+
+### MapService
+
+```dart
+class MapService {
+  Future<List<Contador>> getContadoresConUbicacion();
 }
 ```
 
@@ -261,7 +270,9 @@ dependencies:
   camera: ^0.11.0+2
   permission_handler: ^11.3.0
   geolocator: ^10.1.0
-  csv: ^5.1.0
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.0
+  csv: ^6.0.0
   share_plus: ^10.0.0
   archive: ^3.6.1
   intl: ^0.19.0
@@ -291,6 +302,26 @@ flutter build apk --release
 ```
 
 El APK se genera en: `build/app/outputs/flutter-apk/app-release.apk`
+
+---
+
+---
+
+## Sistema de Mapa
+
+El módulo de mapas permite visualizar la ubicación de los contadores y su estado de lectura en tiempo real.
+
+### Arquitectura y Flujo de Datos
+- **Manejo de Coordenadas:** Se utilizan las coordenadas almacenadas en la tabla `contadores` (ubicación fija) para renderizar los marcadores.
+- **Diferenciación de Estados:**
+    - **🟢 Verde**: Contador con lectura registrada en el ciclo actual.
+    - **🔴 Rojo/Gris**: Contador pendiente de lectura.
+- **Capa de Interacción:** 
+    - Al tocar un marcador, se despliega un **Bottom Sheet Expandible** (`DraggableScrollableSheet`).
+    - Este panel consulta dinámicamente si el contador tiene una lectura activa para mostrar el resumen del registro o el botón de acción correspondiente.
+
+### Importación de Coordenadas
+Para facilitar la transición a un sistema basado en mapas, el `CsvImportService` permite actualizar las coordenadas de los usuarios existentes sin afectar su historial de lecturas. Busca las columnas `LATITUD` y `LONGITUD` en el archivo CSV y realiza un `UPDATE` selectivo en la base de datos.
 
 ---
 
