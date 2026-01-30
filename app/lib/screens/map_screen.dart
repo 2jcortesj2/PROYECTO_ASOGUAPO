@@ -4,6 +4,7 @@ import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'dart:math' as math;
 import '../models/contador.dart';
 import '../models/lectura.dart';
 import '../services/database_service.dart';
@@ -35,6 +36,7 @@ class _MapScreenState extends State<MapScreen> {
   String _searchQuery = '';
   String _veredaSeleccionada = 'El Tendido';
   bool _ocultarCompletados = false;
+  bool _isFirstLoad = true;
 
   final List<String> _veredas = [
     'El Recreo',
@@ -75,6 +77,12 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {
       _contadores = contadoresWithLocation;
       _isLoading = false;
+      // After first load, we can set _isFirstLoad to false after a short delay for the animation
+      if (_isFirstLoad) {
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted) setState(() => _isFirstLoad = false);
+        });
+      }
     });
 
     if (_contadores.isNotEmpty) {
@@ -552,12 +560,12 @@ class _MapScreenState extends State<MapScreen> {
           ),
 
           Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _veredaSeleccionada != 'El Tendido'
-                ? _buildEnConstruccion()
-                : FlutterMap(
-                    mapController: _mapController,
+            child: Stack(
+              children: [
+                _veredaSeleccionada != 'El Tendido'
+                    ? _buildEnConstruccion()
+                    : FlutterMap(
+                        mapController: _mapController,
                     options: MapOptions(
                       initialCenter:
                           _mapService.lastCenter ??
@@ -695,10 +703,15 @@ class _MapScreenState extends State<MapScreen> {
                             );
                             const double clusterSize = 50.0;
 
-                            return SizedBox(
-                              width: clusterSize,
-                              height: clusterSize,
-                              child: Stack(
+                            // Counter-rotate to stay upright
+                            final rotation = _mapController.camera.rotation;
+
+                            return Transform.rotate(
+                              angle: -rotation * math.pi / 180,
+                              child: SizedBox(
+                                width: clusterSize,
+                                height: clusterSize,
+                                child: Stack(
                                 children: [
                                   // The main Water Drop icon
                                   // Colors completely ONLY if all are done.
@@ -760,14 +773,46 @@ class _MapScreenState extends State<MapScreen> {
                                   ),
                                 ],
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
+                if (_isFirstLoad || _isLoading) _buildLoadingScreen(),
+              ],
+            ),
           ),
-        ],
+    );
+  }
+
+  Widget _buildLoadingScreen() {
+    return AnimatedOpacity(
+      opacity: _isFirstLoad || _isLoading ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 500),
+      child: Container(
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/logo_asoguapo.png', width: 120, height: 120),
+              const SizedBox(height: 24),
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Cargando mapa...',
+                style: AppTextStyles.cuerpo.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
