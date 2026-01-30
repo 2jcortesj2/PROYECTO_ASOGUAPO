@@ -156,11 +156,19 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.map_outlined),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final result = await Navigator.push<String>(
                 context,
-                MaterialPageRoute(builder: (context) => const MapScreen()),
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      MapScreen(initialVereda: _veredaSeleccionada),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
               );
+              if (result != null) {
+                setState(() => _veredaSeleccionada = result);
+              }
             },
             tooltip: 'Ver Mapa',
           ),

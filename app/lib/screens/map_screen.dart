@@ -11,7 +11,8 @@ import 'registro_lectura_screen.dart';
 import '../widgets/info_lectura_widget.dart'; // Ensure this widget exists or is created
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  final String? initialVereda;
+  const MapScreen({super.key, this.initialVereda});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -31,11 +32,19 @@ class _MapScreenState extends State<MapScreen> {
   String _veredaSeleccionada = 'El Tendido';
   bool _ocultarCompletados = false;
 
-  final List<String> _veredas = ['El Recreo', 'Pueblo Nuevo', 'El Tendido'];
+  final List<String> _veredas = [
+    'El Recreo',
+    'Pueblo Nuevo',
+    'El Tendido',
+    'Todas',
+  ];
 
   @override
   void initState() {
     super.initState();
+    if (widget.initialVereda != null) {
+      _veredaSeleccionada = widget.initialVereda!;
+    }
     _loadContadores();
   }
 
@@ -56,7 +65,9 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _actualizarMapa() {
-    if (_veredaSeleccionada != 'El Tendido' || _contadores.isEmpty) return;
+    if (_contadores.isEmpty) return;
+    if (_veredaSeleccionada != 'El Tendido' && _veredaSeleccionada != 'Todas')
+      return;
 
     final points = _contadoresFiltrados
         .map((c) => LatLng(c.latitud!, c.longitud!))
@@ -78,8 +89,10 @@ class _MapScreenState extends State<MapScreen> {
 
   List<Contador> get _contadoresFiltrados {
     final filtrados = _contadores.where((c) {
-      if (c.vereda.toUpperCase() != _veredaSeleccionada.toUpperCase())
+      if (_veredaSeleccionada != 'Todas' &&
+          c.vereda.toUpperCase() != _veredaSeleccionada.toUpperCase()) {
         return false;
+      }
       if (_ocultarCompletados && c.estado == EstadoContador.registrado)
         return false;
 
@@ -383,16 +396,16 @@ class _MapScreenState extends State<MapScreen> {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.white,
+          color: selected ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? AppColors.primary : Colors.grey[300]!,
+            color: selected ? AppColors.primary : AppColors.border,
           ),
         ),
         child: Text(
           vereda,
-          style: TextStyle(
-            color: selected ? Colors.white : Colors.black87,
+          style: AppTextStyles.cuerpo.copyWith(
+            color: selected ? Colors.white : AppColors.textPrimary,
             fontWeight: selected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -422,6 +435,7 @@ class _MapScreenState extends State<MapScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Column(
           children: [
             Text('Lecturas del Día', style: AppTextStyles.titulo),
@@ -431,6 +445,13 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.list_alt),
+            onPressed: () => Navigator.pop(context, _veredaSeleccionada),
+            tooltip: 'Ver Lista',
+          ),
+        ],
       ),
       body: Column(
         children: [
