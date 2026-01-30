@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -24,6 +25,7 @@ class _MapScreenState extends State<MapScreen> {
   List<Contador> _contadores = [];
   bool _isLoading = true;
   final MapController _mapController = MapController();
+  double _currentZoom = 15.0;
 
   // Custom visual assets
   // You might want to use custom icons here, but we'll build them with Flutter widgets first
@@ -46,11 +48,15 @@ class _MapScreenState extends State<MapScreen> {
     });
 
     if (_contadores.isNotEmpty) {
-      // Center map on the first point or average
+      // Calculate bounds and fit map
+      final points = _contadores
+          .map((c) => LatLng(c.latitud!, c.longitud!))
+          .toList();
+      final bounds = LatLngBounds.fromPoints(points);
+
       Future.delayed(const Duration(milliseconds: 500), () {
-        _mapController.move(
-          LatLng(_contadores.first.latitud!, _contadores.first.longitud!),
-          15,
+        _mapController.fitCamera(
+          CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)),
         );
       });
     }
@@ -305,9 +311,28 @@ class _MapScreenState extends State<MapScreen> {
           ? const Center(child: CircularProgressIndicator())
           : FlutterMap(
               mapController: _mapController,
-              options: const MapOptions(
-                initialCenter: LatLng(4.6097, -74.0817), // Default if no data
-                initialZoom: 14,
+              options: MapOptions(
+                initialCenter: const LatLng(2.389, -75.525), // Huila coverage
+                initialZoom: 15,
+                minZoom: 13,
+                maxZoom: 18,
+                onPositionChanged: (position, hasGesture) {
+                  setState(() {
+                    _currentZoom = position.zoom ?? 15.0;
+                  });
+                },
+                cameraConstraint: CameraConstraint.contain(
+                  bounds: _contadores.isNotEmpty
+                      ? LatLngBounds.fromPoints(
+                          _contadores
+                              .map((c) => LatLng(c.latitud!, c.longitud!))
+                              .toList(),
+                        )
+                      : LatLngBounds(
+                          const LatLng(4.0, -75.0),
+                          const LatLng(5.0, -73.0),
+                        ),
+                ),
               ),
               children: [
                 TileLayer(
@@ -317,30 +342,20 @@ class _MapScreenState extends State<MapScreen> {
                 MarkerLayer(
                   markers: _contadores.map((contador) {
                     final isDone = contador.estado == EstadoContador.registrado;
+                    // Dynamic size based on zoom
+                    // Scale from base 40 at zoom 15
+                    final double size = (40 * (_currentZoom / 15)).clamp(
+                      20.0,
+                      80.0,
+                    );
+
                     return Marker(
                       point: LatLng(contador.latitud!, contador.longitud!),
-                      width: 50,
-                      height: 50,
+                      width: size,
+                      height: size,
                       child: GestureDetector(
                         onTap: () => _showContadorDetails(contador),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isDone ? Colors.green : Colors.grey[200],
-                            border: Border.all(
-                              color: isDone ? Colors.white : Colors.red,
-                              width: 2,
-                            ),
-                            boxShadow: const [
-                              BoxShadow(blurRadius: 4, color: Colors.black26),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.water_drop,
-                            color: isDone ? Colors.white : Colors.grey[600],
-                            size: 28,
-                          ),
-                        ),
+                        child: _StylizedDropMarker(isDone: isDone, size: size),
                       ),
                     );
                   }).toList(),
@@ -349,4 +364,121 @@ class _MapScreenState extends State<MapScreen> {
             ),
     );
   }
+}
+
+class _StylizedDropMarker extends StatelessWidget {
+  final bool isDone;
+  final double size;
+
+  const _StylizedDropMarker({required this.isDone, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: const BoxDecoration(
+        boxShadow: [
+          BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4)),
+        ],
+      ),
+      child: CustomPaint(painter: _DropShapePainter(isDone: isDone)),
+    );
+  }
+}
+
+class _DropShapePainter extends CustomPainter {
+  final bool isDone;
+
+  _DropShapePainter({required this.isDone});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final ui.Paint paint = ui.Paint()
+      ..shader = ui.Gradient.linear(
+        ui.Offset(size.width / 2, 0),
+        ui.Offset(size.width / 2, size.height),
+        isDone
+            ? [const Color(0xFF4CAF50), const Color(0xFF2E7D32)]
+            : [const Color(0xFF42A5F5), const Color(0xFF1565C0)],
+      )
+      ..style = ui.PaintingStyle.fill;
+
+    final ui.Paint borderPaint = ui.Paint()
+      ..color = Colors.white
+      ..style = ui.PaintingStyle.stroke
+      ..strokeWidth = 2.5;
+
+    final ui.Path path = ui.Path();
+    // Drop shape: top point + rounded bottom
+    path.moveTo(size.width / 2, 0);
+    path.quadraticBezierTo(
+      size.width * 0.9,
+      size.height * 0.4,
+      size.width * 0.9,
+      size.height * 0.65,
+    );
+    path.arcToPoint(
+      ui.Offset(size.width * 0.1, size.height * 0.65),
+      radius: ui.Radius.circular(size.width * 0.4),
+      clockwise: true,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.1,
+      size.height * 0.4,
+      size.width / 2,
+      0,
+    );
+    path.close();
+
+    canvas.drawPath(path, paint);
+    canvas.drawPath(path, borderPaint);
+
+    // Reflection/Shine
+    final ui.Paint shinePaint = ui.Paint()
+      ..shader = ui.Gradient.linear(
+        ui.Offset(size.width * 0.2, size.height * 0.3),
+        ui.Offset(size.width * 0.5, size.height * 0.6),
+        [Colors.white.withOpacity(0.5), Colors.white.withOpacity(0.0)],
+      )
+      ..style = ui.PaintingStyle.fill;
+
+    canvas.drawCircle(
+      ui.Offset(size.width * 0.35, size.height * 0.45),
+      size.width * 0.12,
+      shinePaint,
+    );
+
+    // Inner icon indicator
+    final iconPainter = TextPainter(
+      textDirection: TextDirection.ltr,
+      text: TextSpan(
+        text: String.fromCharCode(
+          isDone ? Icons.check.codePoint : Icons.water_drop.codePoint,
+        ),
+        style: TextStyle(
+          fontSize: size.width * 0.35,
+          fontFamily: isDone
+              ? Icons.check.fontFamily
+              : Icons.water_drop.fontFamily,
+          package: isDone
+              ? Icons.check.fontPackage
+              : Icons.water_drop.fontPackage,
+          color: Colors.white.withOpacity(0.9),
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+    iconPainter.layout();
+    iconPainter.paint(
+      canvas,
+      ui.Offset(
+        (size.width - iconPainter.width) / 2,
+        (size.height * 0.65 - iconPainter.height / 2),
+      ),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
