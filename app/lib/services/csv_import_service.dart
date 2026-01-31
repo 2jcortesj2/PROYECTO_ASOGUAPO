@@ -11,13 +11,8 @@ class CsvImportService {
   final MapService _mapService = MapService();
 
   Future<void> importInitialData() async {
-    // Check if we already have data WITH location
-    final contadoresConUbicacion = await _mapService
-        .getContadoresConUbicacion();
-    if (contadoresConUbicacion.isNotEmpty) {
-      return;
-    }
-
+    // We remove the early return to ensure all data (including those without coordinates)
+    // is loaded correctly on new devices.
     try {
       String csvName = 'LECTURAS_TEN_20260126_1622.csv';
       String csvString;

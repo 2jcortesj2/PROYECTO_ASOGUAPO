@@ -1,3 +1,8 @@
+## [1.2.6] - 2026-01-30
+
+### Corregido
+- **Base de Datos**: Se optimizó la carga inicial de datos para asegurar que todos los contadores (incluyendo Pueblo Nuevo y Recreo) se muestren en la lista, permitiendo trabajar en veredas que aún no cuentan con coordenadas GPS.
+
 ## [1.2.5] - 2026-01-30
 
 ### Corregido
