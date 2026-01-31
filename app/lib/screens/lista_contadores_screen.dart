@@ -36,10 +36,12 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   List<Contador> _contadores = [];
   bool _cargando = true;
   bool _ocultarCompletados = false;
+  bool _isScrolled = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     // Usar vereda inicial si se proporciona
     if (widget.veredaInicial != null) {
       _veredaSeleccionada = widget.veredaInicial!;
@@ -60,6 +62,14 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
         _contadores = contadores;
         _cargando = false;
       });
+    }
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final isScrolled = _scrollController.offset > 0;
+    if (isScrolled != _isScrolled) {
+      setState(() => _isScrolled = isScrolled);
     }
   }
 
@@ -144,7 +154,9 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+        backgroundColor: _isScrolled
+            ? AppColors.primary.withValues(alpha: 0.08)
+            : Colors.white,
         surfaceTintColor: Colors.transparent,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
