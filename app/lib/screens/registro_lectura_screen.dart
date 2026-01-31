@@ -238,7 +238,7 @@ class _RegistroLecturaScreenState extends State<RegistroLecturaScreen>
                       ),
                       child: Text(
                         _comentario != null
-                            ? 'Motivo: ${_comentario!.length > 15 ? _comentario!.substring(0, 15) + '...' : _comentario}'
+                            ? 'Motivo: ${_comentario!.length > 15 ? '${_comentario!.substring(0, 15)}...' : _comentario}'
                             : '¿No se puede leer el contador?',
                         style: const TextStyle(
                           fontSize: 12,

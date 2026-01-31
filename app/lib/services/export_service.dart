@@ -263,8 +263,9 @@ class ExportService {
       // Ejecución pesada en Isolate
       final zipData = await compute(_encodeZip, archive);
 
-      if (zipData == null)
+      if (zipData == null) {
         throw Exception('Error al generar el archivo comprimido');
+      }
 
       final zipFile = File(zipPath);
       await zipFile.writeAsBytes(zipData, flush: true);
@@ -298,7 +299,7 @@ class ExportService {
     if (bytes <= 0) return '0 B';
     const suffixes = ['B', 'KB', 'MB', 'GB'];
     var i = (log(bytes) / log(1024)).floor();
-    return ((bytes / pow(1024, i)).toStringAsFixed(1)) + ' ' + suffixes[i];
+    return '${(bytes / pow(1024, i)).toStringAsFixed(1)} ${suffixes[i]}';
   }
 
   String _formatTime(int seconds) {

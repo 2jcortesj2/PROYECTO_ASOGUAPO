@@ -60,6 +60,7 @@ void main() {
         DateTime? primeraFechaEnBD;
 
         bool dispararRollover = false;
+        // ignore: unnecessary_null_comparison
         if (primeraFechaEnBD != null) {
           final ahora = DateTime.now();
           dispararRollover = ahora.difference(primeraFechaEnBD).inDays >= 15;

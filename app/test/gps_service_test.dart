@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/foundation.dart';
 import 'package:agualector/services/gps_service.dart';
 
 // Mock simple de Geolocator Platform
@@ -40,7 +41,7 @@ void main() {
         reason: 'Debería fallar en entorno de test sin mock',
       );
       expect(result.errorMessage, isNotNull);
-      print('Mensaje de error capturado: ${result.errorMessage}');
+      debugPrint('Mensaje de error capturado: ${result.errorMessage}');
     });
   });
 }
