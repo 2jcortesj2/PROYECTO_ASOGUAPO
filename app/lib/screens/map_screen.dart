@@ -291,66 +291,109 @@ class _MapScreenState extends State<MapScreen> {
     if (_selectedContador == null) return const SizedBox.shrink();
 
     final contador = _selectedContador!;
-    final isDone = contador.estado == EstadoContador.registrado;
-
     return Positioned(
       bottom: 0,
       left: 0,
       right: 0,
-      child: GestureDetector(
-        onTap: () => _handleInfoBoxTap(contador),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              // Pending Status Icon updated to gray circle
-              Icon(
-                isDone
-                    ? Icons.check_circle
-                    : Icons.radio_button_unchecked, // Updated icon
-                color: isDone ? Colors.green : Colors.grey, // Updated color
-                size: 32,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      contador.nombre,
-                      style: AppTextStyles.subtitulo.copyWith(fontSize: 16),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      '${contador.vereda} • ${contador.id}',
-                      style: AppTextStyles.cuerpoSecundario,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+      child: Material(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+        elevation: 8,
+        shadowColor: Colors.black.withOpacity(0.2),
+        child: InkWell(
+          onTap: () => _handleInfoBoxTap(contador),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+          child: Padding(
+            padding: const EdgeInsets.all(AppConstants.paddingMedium),
+            child: Row(
+              children: [
+                // Indicador de estado (Copiado de ContadorCard)
+                _buildEstadoIndicador(contador.estado),
+                const SizedBox(width: 16),
+
+                // Información del contador
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        contador.nombre,
+                        style: AppTextStyles.cardTitulo,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Sector: ${contador.ubicacionCompleta}',
+                        style: AppTextStyles.cardSubtitulo,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Lectura mes anterior: ${contador.ultimaLecturaFormateada}',
+                            style: AppTextStyles.cardSubtitulo.copyWith(
+                              fontSize: 12,
+                            ),
+                          ),
+                          // Código de contador "oculto a simple vista"
+                          Text(
+                            contador.id,
+                            style: AppTextStyles.cardSubtitulo.copyWith(
+                              fontSize: 10,
+                              color: AppColors.textSecondary.withOpacity(0.3),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.grey),
-                onPressed: () {
-                  setState(() => _selectedContador = null);
-                },
-              ),
-            ],
+
+                // Flecha de navegación
+                const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textSecondary,
+                  size: 28,
+                ),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  // Helper widget to match ContadorCard's exact icon logic
+  Widget _buildEstadoIndicador(EstadoContador estado) {
+    IconData icono;
+    Color color;
+
+    switch (estado) {
+      case EstadoContador.pendiente:
+        icono = Icons.radio_button_unchecked;
+        color = AppColors.pendiente;
+        break;
+      case EstadoContador.registrado:
+        icono = Icons.check_circle;
+        color = AppColors.primary;
+        break;
+      case EstadoContador.conError:
+        icono = Icons.warning_rounded;
+        color = AppColors.conError;
+        break;
+    }
+
+    return Container(
+      width: 40,
+      height: 40,
+      alignment: Alignment.center,
+      child: Icon(icono, color: color, size: 32),
     );
   }
 
@@ -359,7 +402,7 @@ class _MapScreenState extends State<MapScreen> {
     if (!mounted) return;
 
     if (lecturaActiva != null) {
-      _abrirDialogoEdicion(contador, lecturaActiva);
+      _mostrarDialogoLecturaExistente(contador, lecturaActiva);
     } else {
       await Navigator.push(
         context,
@@ -374,8 +417,7 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  void _abrirDialogoEdicion(Contador contador, Lectura lectura) {
-    // Reusing the logic from the user request, simplified since valid checks are done
+  void _mostrarDialogoLecturaExistente(Contador contador, Lectura lectura) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -383,6 +425,7 @@ class _MapScreenState extends State<MapScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Header con color secundario (Azul) - Igual que en lista
             Container(
               padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
@@ -393,13 +436,11 @@ class _MapScreenState extends State<MapScreen> {
                 children: [
                   const Icon(Icons.info_outline, color: Colors.white, size: 28),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Lectura Registrada',
-                      style: TextStyle(
+                      style: AppTextStyles.subtitulo.copyWith(
                         color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -410,21 +451,26 @@ class _MapScreenState extends State<MapScreen> {
                 ],
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Text(
+                    'Este medidor ya tiene una lectura en el periodo activo.',
+                    style: AppTextStyles.cuerpoSecundario,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Caja unificada de detalles (Con foto y GPS)
                   InfoLecturaWidget(lectura: lectura),
-                  const SizedBox(height: 20),
+
+                  const SizedBox(height: 32),
+
+                  // Botones de acción
                   ElevatedButton.icon(
-                    icon: const Icon(Icons.edit),
-                    label: const Text('EDITAR REGISTRO'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
+                    icon: const Icon(Icons.edit, size: 18),
                     onPressed: () async {
                       Navigator.pop(context);
                       await Navigator.push(
@@ -439,6 +485,22 @@ class _MapScreenState extends State<MapScreen> {
                       );
                       _loadContadores();
                     },
+                    label: const Text('EDITAR REGISTRO'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    icon: const Icon(Icons.delete_outline, size: 18),
+                    onPressed: () => _confirmarEliminarLectura(lectura),
+                    label: const Text('ELIMINAR LECTURA'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.red[700],
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
                   ),
                 ],
               ),
@@ -447,6 +509,43 @@ class _MapScreenState extends State<MapScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _confirmarEliminarLectura(Lectura lectura) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Eliminar esta lectura?'),
+        content: const Text(
+          'Esta acción no se puede deshacer. Se borrará la lectura y la foto asociada.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('CANCELAR'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('ELIMINAR'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar == true && mounted) {
+      // Cerrar el diálogo de detalles (si estuviera abierto, pero aquí ya lo cerramos antes o lo gestionamos)
+      Navigator.pop(context); // Cierra el diálogo principal si sigue abierto
+
+      await _databaseService.deleteLectura(lectura.id!);
+      _loadContadores();
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Lectura eliminada')));
+      }
+    }
   }
 
   LatLngBounds _calculateExpandedBounds(List<Contador> contadores) {
@@ -541,7 +640,7 @@ class _MapScreenState extends State<MapScreen> {
         automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: _isInteracting
-            ? AppColors.primary.withValues(alpha: 0.1)
+            ? AppColors.primary.withOpacity(0.1)
             : Colors.white,
         surfaceTintColor: Colors.transparent,
         // Animate color transition
@@ -645,9 +744,7 @@ class _MapScreenState extends State<MapScreen> {
                           _generarMarcadores();
                         });
                       },
-                      activeTrackColor: AppColors.primary.withValues(
-                        alpha: 0.5,
-                      ),
+                      activeTrackColor: AppColors.primary.withOpacity(0.5),
                       activeThumbColor: AppColors.primary,
                     ),
                   ],
@@ -664,6 +761,9 @@ class _MapScreenState extends State<MapScreen> {
                     : FlutterMap(
                         mapController: _mapController,
                         options: MapOptions(
+                          onTap: (_, __) => setState(() {
+                            _selectedContador = null;
+                          }),
                           initialCenter:
                               _mapService.lastCenter ??
                               const LatLng(2.389, -75.525),
