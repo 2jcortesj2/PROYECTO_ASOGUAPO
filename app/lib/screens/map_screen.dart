@@ -602,9 +602,9 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        elevation: _isMapMoved ? 4.0 : 0,
-        shadowColor: _isMapMoved ? Colors.black.withValues(alpha: 0.5) : null,
-        surfaceTintColor: AppColors.primary,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         title: Column(
           children: [
             Text('Lecturas del Día', style: AppTextStyles.titulo),

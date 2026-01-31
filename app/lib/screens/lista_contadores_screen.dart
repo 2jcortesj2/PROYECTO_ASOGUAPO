@@ -143,6 +143,9 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

@@ -1,3 +1,8 @@
+## [1.2.4] - 2026-01-30
+
+### Mejorado
+- **Diseño Flat**: Se eliminaron las sombras y elevaciones de los encabezados en toda la aplicación para una estética más limpia y minimalista.
+
 ## [1.2.3] - 2026-01-30
 
 ### Mejorado
