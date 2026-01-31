@@ -228,7 +228,7 @@ class DatabaseService {
     final diferenciaGlobal = now.difference(primeraFecha).inDays;
 
     // Si el ciclo global (desde la primera toma) superó los 15 días, nada es editable
-    if (diferenciaGlobal >= 15) return null;
+    if (diferenciaGlobal >= AppConstants.diasCicloLectura) return null;
 
     // 2. Si estamos dentro del ciclo, buscar la lectura específica de este contador
     final List<Map<String, dynamic>> maps = await db.query(
@@ -263,7 +263,7 @@ class DatabaseService {
     final diasDesdeInicio = now.difference(primeraFecha).inDays;
 
     // SOLO si han pasado 15 días o más desde la PRIMERA toma del mes, hacemos el rollover
-    if (diasDesdeInicio < 15) return;
+    if (diasDesdeInicio < AppConstants.diasCicloLectura) return;
 
     // 2. Obtener todas las lecturas del ciclo que terminó
     final List<Map<String, dynamic>> oldLecturas = await db.rawQuery('''

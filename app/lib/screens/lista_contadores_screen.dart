@@ -50,7 +50,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   Future<void> _cargarContadores() async {
     setState(() => _cargando = true);
 
-    // Ejecutar mantenimiento de registros antiguos (>15 días)
+    // Ejecutar mantenimiento de registros antiguos (>AppConstants.diasCicloLectura días)
     await _databaseService.limpiarYActualizarRegistros();
 
     final contadores = await _databaseService.getContadores();
@@ -355,7 +355,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   }
 
   Future<void> _abrirRegistro(Contador contador) async {
-    // Verificar si ya tiene lectura en el periodo activo (últimos 15 días)
+    // Verificar si ya tiene lectura en el periodo activo (últimos AppConstants.diasCicloLectura días)
     final lecturaExistente = await _databaseService.getLecturaActiva(
       contador.id,
     );

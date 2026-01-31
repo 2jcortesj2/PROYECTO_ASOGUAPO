@@ -1,12 +1,15 @@
 /// Constantes globales de la aplicación AguaLector
 class AppConstants {
   // Nombre de la app
-  static const String appName = 'AguaLector';
-  static const String appVersion = '0.1.0';
+  static const String appName = 'GuapoLector';
+  static const String appVersion = '1.3.0';
 
   // Base de datos
   static const String dbName = 'agualector.db';
-  static const int dbVersion = 1;
+  static const int dbVersion = 5;
+
+  // Lógica de Negocio
+  static const int diasCicloLectura = 15;
 
   // GPS
   static const int gpsTimeoutSeconds = 10;
@@ -31,7 +34,7 @@ class AppConstants {
 
   // Exportación
   static const String csvDelimiter = ';';
-  static const String csvFileName = 'lecturas_agualector';
+  static const String csvFileName = 'reporte_asoguapo';
 }
 
 /// Estados posibles de un contador
