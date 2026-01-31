@@ -1,3 +1,20 @@
+## [1.2.3] - 2026-01-30
+
+### Mejorado
+- **Coherencia Visual**: El encabezado del mapa ahora se sombrea dinámicamente al color verde institucional al interactuar, manteniendo la consistencia con la pantalla de lista.
+- **Ajuste de Clustering**: Se refinó la curva exponencial a 0.79 para un balance óptimo entre agrupación y separación.
+
+## [1.2.2] - 2026-01-30
+
+### Mejorado
+- **Curva de Clustering**: Implementación de un radio de agrupación agresivo mediante una función de decaimiento exponencial, mejorando la separación de marcadores en niveles de zoom altos.
+
+## [1.2.1] - 2026-01-30
+
+### Corregido
+- **Map Clustering**: Se corrigió un error de tipo en el radio dinámico de agrupación y se sincronizó el escalado del badge de notificación con el icono de gota para mantener la alineación perfecta al hacer zoom.
+- **Versión**: Actualización de etiquetas a v1.2.1.
+
 ## [1.2.0] - 2026-01-30
 
 ### Optimización de Alto Rendimiento

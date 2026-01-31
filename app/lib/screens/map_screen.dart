@@ -76,6 +76,7 @@ class _MapScreenState extends State<MapScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   List<Contador> _contadores = [];
+  bool _isMapMoved = false;
   bool _isLoading = true;
   final MapController _mapController = MapController();
   CacheStore? _cacheStore;
@@ -601,6 +602,9 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        elevation: _isMapMoved ? 4.0 : 0,
+        shadowColor: _isMapMoved ? Colors.black.withValues(alpha: 0.5) : null,
+        surfaceTintColor: AppColors.primary,
         title: Column(
           children: [
             Text('Lecturas del Día', style: AppTextStyles.titulo),
@@ -721,6 +725,9 @@ class _MapScreenState extends State<MapScreen> {
                           minZoom: 12,
                           maxZoom: 21,
                           onPositionChanged: (position, hasGesture) {
+                            if (hasGesture && !_isMapMoved) {
+                              setState(() => _isMapMoved = true);
+                            }
                             final camera = _mapController.camera;
                             _zoomNotifier.value = camera.zoom;
                             _rotationNotifier.value = camera.rotation;
@@ -748,16 +755,23 @@ class _MapScreenState extends State<MapScreen> {
                           ValueListenableBuilder<double>(
                             valueListenable: _zoomNotifier,
                             builder: (context, zoom, _) {
-                              // Dynamic radius: inversely proportional to zoom
-                              // High zoom (e.g. 18+) -> Near 0 radius
-                              // Low zoom (e.g. 12) -> High radius (e.g. 80)
-                              final dynamicRadius = (150.0 - (zoom * 7.5))
-                                  .clamp(5.0, 100.0);
+                              // Dynamic radius: aggressive exponential decay
+                              final dynamicRadius =
+                                  (150.0 * math.pow(0.80, zoom - 12)).clamp(
+                                    5.0,
+                                    100.0,
+                                  );
+
+                              // Calculate base drop size for the cluster (1.6x individual marker)
+                              final clusterSize = _getMarkerSize(zoom) * 1.6;
 
                               return MarkerClusterLayerWidget(
                                 options: MarkerClusterLayerOptions(
-                                  maxClusterRadius: dynamicRadius,
-                                  size: const Size(120, 120),
+                                  maxClusterRadius: dynamicRadius.toInt(),
+                                  size: Size(
+                                    clusterSize,
+                                    clusterSize,
+                                  ), // Dynamic size synchronizes with content
                                   alignment: Alignment.center,
                                   padding: const EdgeInsets.all(50),
                                   markers: _memoizedMarkers,
@@ -771,106 +785,119 @@ class _MapScreenState extends State<MapScreen> {
                                       (m) => m.isDone,
                                     );
 
-                                    return ValueListenableBuilder2<
-                                      double,
-                                      double
-                                    >(
-                                      first: _zoomNotifier,
-                                      second: _rotationNotifier,
-                                      builder: (context, z, rotation, _) {
-                                        final clusterSize =
-                                            _getMarkerSize(z) *
-                                            1.6; // Slightly larger than individual drops
+                                    return ValueListenableBuilder<double>(
+                                      valueListenable: _rotationNotifier,
+                                      builder: (context, rotation, _) {
+                                        final iconSize = clusterSize * 0.8;
+                                        final badgeSize = clusterSize * 0.35;
+                                        final badgeFontSize =
+                                            (clusterSize * 0.15).clamp(
+                                              8.0,
+                                              32.0,
+                                            );
+                                        final badgePadding = clusterSize * 0.04;
 
                                         return Transform.rotate(
                                           angle: -rotation * math.pi / 180,
-                                          child: SizedBox(
-                                            width: clusterSize,
-                                            height: clusterSize,
-                                            child: Stack(
-                                              children: [
-                                                Center(
-                                                  child: Transform.translate(
-                                                    offset: Offset(
-                                                      clusterSize * 0.04,
-                                                      clusterSize * 0.04,
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.water_drop,
-                                                      color: Colors.black
-                                                          .withValues(
-                                                            alpha: 0.3,
-                                                          ),
-                                                      size: clusterSize * 0.8,
+                                          child: Center(
+                                            child: SizedBox(
+                                              width: iconSize,
+                                              height: iconSize,
+                                              child: Stack(
+                                                clipBehavior: Clip.none,
+                                                children: [
+                                                  // Shadow
+                                                  Positioned.fill(
+                                                    child: Transform.translate(
+                                                      offset: Offset(
+                                                        iconSize * 0.05,
+                                                        iconSize * 0.05,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.water_drop,
+                                                        color: Colors.black
+                                                            .withValues(
+                                                              alpha: 0.3,
+                                                            ),
+                                                        size: iconSize,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                Center(
-                                                  child: Icon(
+                                                  // Main Icon
+                                                  Icon(
                                                     Icons.water_drop,
                                                     color: allDone
                                                         ? AppColors.primary
                                                         : Colors.grey[400],
-                                                    size: clusterSize * 0.8,
+                                                    size: iconSize,
                                                   ),
-                                                ),
-                                                Positioned(
-                                                  right: 0,
-                                                  top: 0,
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(4),
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      gradient: anyDone
-                                                          ? const LinearGradient(
-                                                              colors: [
-                                                                AppColors
-                                                                    .primary,
-                                                                AppColors
-                                                                    .secondary,
-                                                              ],
-                                                            )
-                                                          : null,
-                                                      color: anyDone
-                                                          ? null
-                                                          : Colors.grey[500],
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color:
-                                                              (anyDone
-                                                                      ? AppColors
-                                                                            .primary
-                                                                      : Colors
-                                                                            .black)
-                                                                  .withValues(
-                                                                    alpha: 0.3,
-                                                                  ),
-                                                          blurRadius: 6,
-                                                          spreadRadius: 2,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    constraints:
-                                                        const BoxConstraints(
-                                                          minWidth: 20,
-                                                          minHeight: 20,
-                                                        ),
-                                                    child: Center(
-                                                      child: Text(
-                                                        markers.length
-                                                            .toString(),
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 10,
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                                  // Badge
+                                                  Positioned(
+                                                    right: -badgeSize * 0.2,
+                                                    top: -badgeSize * 0.2,
+                                                    child: Container(
+                                                      padding: EdgeInsets.all(
+                                                        badgePadding,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        gradient: anyDone
+                                                            ? const LinearGradient(
+                                                                colors: [
+                                                                  AppColors
+                                                                      .primary,
+                                                                  AppColors
+                                                                      .secondary,
+                                                                ],
+                                                              )
+                                                            : null,
+                                                        color: anyDone
+                                                            ? null
+                                                            : Colors.grey[600],
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color:
+                                                                (anyDone
+                                                                        ? AppColors
+                                                                              .primary
+                                                                        : Colors
+                                                                              .black)
+                                                                    .withValues(
+                                                                      alpha:
+                                                                          0.3,
+                                                                    ),
+                                                            blurRadius:
+                                                                clusterSize *
+                                                                0.1,
+                                                            spreadRadius:
+                                                                clusterSize *
+                                                                0.03,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      constraints:
+                                                          BoxConstraints(
+                                                            minWidth: badgeSize,
+                                                            minHeight:
+                                                                badgeSize,
+                                                          ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          markers.length
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize:
+                                                                badgeFontSize,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         );
