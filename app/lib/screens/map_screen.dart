@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'dart:math' as math;
 import '../models/contador.dart';
 import '../models/lectura.dart';
@@ -20,7 +18,7 @@ class ContadorMarker extends Marker {
   final Contador contador;
   final bool isDone;
 
-  ContadorMarker({
+  const ContadorMarker({
     required super.point,
     required super.child,
     required super.width,
@@ -79,7 +77,6 @@ class _MapScreenState extends State<MapScreen> {
   bool _isMapMoved = false;
   bool _isLoading = true;
   final MapController _mapController = MapController();
-  CacheStore? _cacheStore;
 
   String _searchQuery = '';
   String _veredaSeleccionada = 'El Tendido';
@@ -103,7 +100,6 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    _initCache();
     if (widget.initialVereda != null) {
       _veredaSeleccionada = widget.initialVereda!;
     }
@@ -112,13 +108,8 @@ class _MapScreenState extends State<MapScreen> {
     _loadContadores();
   }
 
-  Future<void> _initCache() async {
-    _cacheStore = MemCacheStore();
-  }
-
   @override
   void dispose() {
-    _cacheStore?.close();
     _searchController.dispose();
     _zoomNotifier.dispose();
     _rotationNotifier.dispose();
@@ -155,8 +146,9 @@ class _MapScreenState extends State<MapScreen> {
           c.vereda.toUpperCase() != _veredaSeleccionada.toUpperCase()) {
         return false;
       }
-      if (_ocultarCompletados && c.estado == EstadoContador.registrado)
+      if (_ocultarCompletados && c.estado == EstadoContador.registrado) {
         return false;
+      }
 
       if (_searchQuery.isEmpty) return true;
 
@@ -172,8 +164,9 @@ class _MapScreenState extends State<MapScreen> {
     // Si ya tenemos una posición guardada de esta sesión, no forzamos el re-encuadre
     if (_mapService.lastCenter != null) return;
 
-    if (_veredaSeleccionada != 'El Tendido' && _veredaSeleccionada != 'Todas')
+    if (_veredaSeleccionada != 'El Tendido' && _veredaSeleccionada != 'Todas') {
       return;
+    }
 
     final points = _contadoresFiltrados
         .map((c) => LatLng(c.latitud!, c.longitud!))
@@ -698,7 +691,9 @@ class _MapScreenState extends State<MapScreen> {
                           _generarMarcadores();
                         });
                       },
-                      activeTrackColor: AppColors.primary.withOpacity(0.5),
+                      activeTrackColor: AppColors.primary.withValues(
+                        alpha: 0.5,
+                      ),
                       activeThumbColor: AppColors.primary,
                     ),
                   ],
@@ -754,7 +749,7 @@ class _MapScreenState extends State<MapScreen> {
                             builder: (context, zoom, _) {
                               // Dynamic radius: aggressive exponential decay
                               final dynamicRadius =
-                                  (150.0 * math.pow(0.80, zoom - 12)).clamp(
+                                  (150.0 * math.pow(0.76, zoom - 12)).clamp(
                                     5.0,
                                     100.0,
                                   );

@@ -2,13 +2,11 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/foundation.dart'; // For debugPrint
 import 'package:csv/csv.dart';
 import 'database_service.dart';
-import 'map_service.dart';
 import '../models/contador.dart';
 import '../config/constants.dart';
 
 class CsvImportService {
   final DatabaseService _databaseService = DatabaseService();
-  final MapService _mapService = MapService();
 
   Future<void> importInitialData() async {
     // We remove the early return to ensure all data (including those without coordinates)
