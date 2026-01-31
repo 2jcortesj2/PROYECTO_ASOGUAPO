@@ -1,4 +1,4 @@
-# GuapoLector 💧 v1.2.0
+# GuapoLector 💧 v1.3.0
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.x-blue.svg)](https://dart.dev/)
@@ -12,9 +12,9 @@ Digitalize the field reading process, ensuring traceability through photographic
 
 ---
 
-## 🎯 Current Status: Production Release (v1.2.0)
+## 🎯 Current Status: Production Maintenance Release (v1.3.0)
 
-Esta versión consolida la madurez de la aplicación tras múltiples ciclos de retroalimentación, habilitando el despliegue para la totalidad de suscriptores y añadiendo flexibilidad para casos excepcionales de lectura.
+Esta versión consolida la madurez de la aplicación tras múltiples ciclos de retroalimentación, incluyendo un mantenimiento general del código para asegurar su estabilidad y legibilidad a largo plazo.
 
 ### ✨ Características Principales
 
@@ -83,6 +83,8 @@ Para una comprensión profunda del sistema, consulta los siguientes manuales en 
 - **v0.7.x:** Refinamiento visual, scrollbars personalizados y unificación de colores (Verde ASOGUAPO).
 - **v0.8.0:** Despliegue total del padrón de usuarios.
 - **v0.9.0:** Introducción de registro de comentarios para lecturas fallidas.
+- **v1.2.0:** Motor de mapas de alto rendimiento con clustering y persistencia de estado.
+- **v1.3.0:** Mantenimiento general, limpieza de dependencias y centralización de constantes.
 
 ---
 

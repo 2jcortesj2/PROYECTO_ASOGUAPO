@@ -1,3 +1,12 @@
+## [1.3.0] - 2026-01-31
+
+### Mantenimiento General
+- **Código Limpio**: Se resolvieron más de 15 advertencias de linting (linter issues) para cumplir con las últimas recomendaciones de Flutter 3.x.
+- **Refactorización**: Eliminación de dependencias no utilizadas (`flutter_map_cache`, `dio_cache_interceptor`) reduciendo el tamaño del binario y simplificando el árbol de dependencias.
+- **Centralización**: Se movieron valores mágicos (como la duración del ciclo de 15 días) a constantes globales en `AppConstants` para facilitar cambios futuros.
+- **Legibilidad**: Mejoras en la interpolación de strings y simplificación de estructuras de control en archivos críticos como `map_screen.dart` y `export_service.dart`.
+- **Documentación**: Actualización general de manuales y README para reflejar el estado actual del proyecto v1.3.0.
+
 ## [1.2.7] - 2026-01-30
 
 ### Mejorado

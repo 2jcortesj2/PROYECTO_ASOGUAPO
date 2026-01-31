@@ -1,4 +1,4 @@
-# Manual de Usuario - GuapoLector 💧
+# Manual de Usuario - GuapoLector 💧 v1.3.0
 
 ## Introducción
 
@@ -76,11 +76,11 @@ Si el contador está rayado, tapado, es ilegible o no puedes acceder a él:
 
 ---
 
-### 3. Mapa Interactivo de Alto Rendimiento (Nuevo v1.2.0) 🗺️
+### 3. Mapa Interactivo de Alto Rendimiento (v1.3.0) 🗺️
 
-El nuevo mapa inteligente ha sido optimizado para una fluidez total:
+El mapa inteligente ha sido optimizado para una estabilidad total:
 
-- **Motor de Ultra-Velocidad:** El mapa ahora responde instantáneamente incluso con cientos de medidores, gracias a un nuevo sistema de procesamiento de datos.
+- **Motor de Ultra-Velocidad:** El mapa responde instantáneamente incluso con cientos de medidores.
 - **Navegación Fluida:** El movimiento, zoom y rotación del mapa son ahora mucho más suaves (60fps), permitiendo una experiencia de uso profesional.
 - **Se queda donde lo dejas:** Si te mueves, haces zoom o rotas el mapa, GuapoLector **recordará** esa posición exacta.
 - **Lectura perfecta:** Sin importar cuánto gires el mapa, todos los iconos se mantendrán siempre **derechos**.
