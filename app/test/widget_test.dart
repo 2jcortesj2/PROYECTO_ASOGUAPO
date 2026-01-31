@@ -19,6 +19,9 @@ void main() {
 
     // Verify Splash Screen appears initially
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    expect(find.text('v1.0.0'), findsOneWidget);
+    expect(find.text('v1.3.0'), findsOneWidget);
+
+    // Permitir que los timers y animaciones del Splash se procesen para evitar errores de limpieza
+    await tester.pump(const Duration(seconds: 4));
   });
 }

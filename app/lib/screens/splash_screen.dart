@@ -94,11 +94,12 @@ class _SplashScreenState extends State<SplashScreen>
       // 4. Navegar según estado de permisos
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => permissionResult.allGranted
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              permissionResult.allGranted
               ? const ListaContadoresScreen()
               : PermissionDeniedScreen(permissionResult: permissionResult),
           transitionDuration: const Duration(milliseconds: 800),
-          transitionsBuilder: (_, animation, __, child) {
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
         ),
@@ -133,13 +134,13 @@ class _SplashScreenState extends State<SplashScreen>
                       height: 108,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(
-                          _decorationOpacityAnimation.value,
+                        color: Colors.white.withValues(
+                          alpha: _decorationOpacityAnimation.value,
                         ), // Círculo blanco
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(
-                              0.2 * _decorationOpacityAnimation.value,
+                            color: AppColors.primary.withValues(
+                              alpha: 0.2 * _decorationOpacityAnimation.value,
                             ),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
@@ -177,7 +178,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'v1.2.7',
+                    'v1.3.0',
                     style: TextStyle(
                       color: Colors.grey[400],
                       fontSize: 14,
