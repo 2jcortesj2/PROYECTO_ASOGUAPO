@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:math' as math;
+import 'dart:async';
 import '../models/contador.dart';
 import '../models/lectura.dart';
 import '../services/database_service.dart';
@@ -74,7 +75,6 @@ class _MapScreenState extends State<MapScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   List<Contador> _contadores = [];
-  bool _isMapMoved = false;
   bool _isLoading = true;
   final MapController _mapController = MapController();
 
@@ -96,6 +96,11 @@ class _MapScreenState extends State<MapScreen> {
     'El Tendido',
     'Todas',
   ];
+
+  // Interaction state
+  bool _isInteracting = false;
+  Timer? _inactivityTimer;
+  Contador? _selectedContador;
 
   @override
   void initState() {
@@ -212,8 +217,13 @@ class _MapScreenState extends State<MapScreen> {
       second: _rotationNotifier,
       builder: (context, zoom, rotation, child) {
         final double size = _getMarkerSize(zoom);
+        final bool isSelected = contador == _selectedContador;
         return GestureDetector(
-          onTap: () => _showContadorDetails(contador),
+          onTap: () {
+            setState(() {
+              _selectedContador = contador;
+            });
+          },
           child: Transform.rotate(
             angle: -rotation * math.pi / 180,
             child: Stack(
@@ -231,6 +241,19 @@ class _MapScreenState extends State<MapScreen> {
                           size: size,
                         ),
                       ),
+                      // Selection Ring (Highlight)
+                      if (isSelected)
+                        Container(
+                          width: size,
+                          height: size,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.primary,
+                              width: 3.0,
+                            ),
+                          ),
+                        ),
                       // Icono Principal
                       isDone
                           ? ShaderMask(
@@ -264,170 +287,91 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _showContadorDetails(Contador contador) async {
-    // Check current reading status
-    final lecturaActiva = await _databaseService.getLecturaActiva(contador.id);
+  Widget _buildPersistentInfoBox() {
+    if (_selectedContador == null) return const SizedBox.shrink();
 
+    final contador = _selectedContador!;
+    final isDone = contador.estado == EstadoContador.registrado;
+
+    return Positioned(
+      bottom: 20,
+      left: 20,
+      right: 20,
+      child: GestureDetector(
+        onTap: () => _handleInfoBoxTap(contador),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Pending Status Icon updated to gray circle
+              Icon(
+                isDone
+                    ? Icons.check_circle
+                    : Icons.radio_button_unchecked, // Updated icon
+                color: isDone ? Colors.green : Colors.grey, // Updated color
+                size: 32,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      contador.nombre,
+                      style: AppTextStyles.subtitulo.copyWith(fontSize: 16),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      '${contador.vereda} • ${contador.id}',
+                      style: AppTextStyles.cuerpoSecundario,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.grey),
+                onPressed: () {
+                  setState(() => _selectedContador = null);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleInfoBoxTap(Contador contador) async {
+    final lecturaActiva = await _databaseService.getLecturaActiva(contador.id);
     if (!mounted) return;
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.4,
-          minChildSize: 0.25,
-          maxChildSize: 0.75,
-          builder: (context, scrollController) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Column(
-                children: [
-                  // Handle bar
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 12),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-
-                  // Header
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(color: Colors.grey[200]!),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          contador.estado == EstadoContador.registrado
-                              ? Icons.check_circle
-                              : Icons.pending,
-                          color: contador.estado == EstadoContador.registrado
-                              ? Colors.green
-                              : Colors.orange,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                contador.nombre,
-                                style: AppTextStyles.subtitulo,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                '${contador.vereda} • ${contador.id}',
-                                style: AppTextStyles.cuerpoSecundario,
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Content
-                  Expanded(
-                    child: ListView(
-                      controller: scrollController,
-                      padding: const EdgeInsets.all(24),
-                      children: [
-                        if (lecturaActiva != null) ...[
-                          Text(
-                            'Lectura Registrada',
-                            style: AppTextStyles.titulo.copyWith(fontSize: 18),
-                          ),
-                          const SizedBox(height: 16),
-                          InfoLecturaWidget(lectura: lecturaActiva),
-                          const SizedBox(height: 24),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              icon: const Icon(Icons.edit),
-                              label: const Text('VER / EDITAR'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.pop(context); // Close sheet
-                                // Open dialog logic or navigate
-                                _abrirDialogoEdicion(contador, lecturaActiva);
-                              },
-                            ),
-                          ),
-                        ] else ...[
-                          Text(
-                            'Lectura Pendiente',
-                            style: AppTextStyles.titulo.copyWith(fontSize: 18),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Última lectura: ${contador.ultimaLecturaFormateada}',
-                            style: AppTextStyles.cuerpoSecundario,
-                          ),
-                          const SizedBox(height: 24),
-                          // Action Button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              icon: const Icon(Icons.add_a_photo),
-                              label: const Text('REGISTRAR LECTURA'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green, // Primary action
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
-                              ),
-                              onPressed: () async {
-                                Navigator.pop(context);
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => RegistroLecturaScreen(
-                                      contador: contador,
-                                      veredaOrigen: contador.vereda,
-                                    ),
-                                  ),
-                                );
-                                _loadContadores(); // Refresh map
-                              },
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
+    if (lecturaActiva != null) {
+      _abrirDialogoEdicion(contador, lecturaActiva);
+    } else {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RegistroLecturaScreen(
+            contador: contador,
+            veredaOrigen: contador.vereda,
+          ),
+        ),
+      );
+      _loadContadores();
+    }
   }
 
   void _abrirDialogoEdicion(Contador contador, Lectura lectura) {
@@ -596,11 +540,20 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: _isInteracting ? AppColors.primary : Colors.white,
         surfaceTintColor: Colors.transparent,
+        // Animate color transition
+        iconTheme: IconThemeData(
+          color: _isInteracting ? Colors.white : Colors.black87,
+        ),
         title: Column(
           children: [
-            Text('Lecturas del Día', style: AppTextStyles.titulo),
+            Text(
+              'Lectura en Mapa',
+              style: AppTextStyles.titulo.copyWith(
+                color: _isInteracting ? Colors.white : AppColors.textPrimary,
+              ),
+            ),
             Text(
               fechaHoy,
               style: AppTextStyles.cuerpoSecundario.copyWith(fontSize: 12),
@@ -612,6 +565,7 @@ class _MapScreenState extends State<MapScreen> {
             icon: const Icon(Icons.list_alt),
             onPressed: () => Navigator.pop(context, _veredaSeleccionada),
             tooltip: 'Ver Lista',
+            color: _isInteracting ? Colors.white : AppColors.textPrimary,
           ),
         ],
       ),
@@ -720,8 +674,19 @@ class _MapScreenState extends State<MapScreen> {
                           minZoom: 12,
                           maxZoom: 21,
                           onPositionChanged: (position, hasGesture) {
-                            if (hasGesture && !_isMapMoved) {
-                              setState(() => _isMapMoved = true);
+                            if (hasGesture) {
+                              if (!_isInteracting) {
+                                setState(() => _isInteracting = true);
+                              }
+                              _inactivityTimer?.cancel();
+                              _inactivityTimer = Timer(
+                                const Duration(seconds: 5),
+                                () {
+                                  if (mounted) {
+                                    setState(() => _isInteracting = false);
+                                  }
+                                },
+                              );
                             }
                             final camera = _mapController.camera;
                             _zoomNotifier.value = camera.zoom;
@@ -777,9 +742,13 @@ class _MapScreenState extends State<MapScreen> {
                                       (m) => m.isDone,
                                     );
 
-                                    return ValueListenableBuilder<double>(
-                                      valueListenable: _rotationNotifier,
-                                      builder: (context, rotation, _) {
+                                    return ValueListenableBuilder2<
+                                      double,
+                                      double
+                                    >(
+                                      first: _zoomNotifier,
+                                      second: _rotationNotifier,
+                                      builder: (context, z, rotation, _) {
                                         final iconSize = clusterSize * 0.8;
                                         final badgeSize = clusterSize * 0.35;
                                         final badgeFontSize =
@@ -900,6 +869,7 @@ class _MapScreenState extends State<MapScreen> {
                               );
                             },
                           ),
+                          _buildPersistentInfoBox(),
                         ],
                       ),
                 if (_isFirstLoad || _isLoading) _buildLoadingScreen(),

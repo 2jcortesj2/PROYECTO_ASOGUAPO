@@ -76,18 +76,18 @@ Si el contador está rayado, tapado, es ilegible o no puedes acceder a él:
 
 ---
 
-### 3. Mapa Interactivo de Alto Rendimiento (v1.3.0) 🗺️
+### 3. Mapa Interactivo (v1.3.1) 🗺️
 
-El mapa inteligente ha sido optimizado para una estabilidad total:
+El mapa inteligente ha sido optimizado para una interacción superior:
 
-- **Motor de Ultra-Velocidad:** El mapa responde instantáneamente incluso con cientos de medidores.
-- **Navegación Fluida:** El movimiento, zoom y rotación del mapa son ahora mucho más suaves (60fps), permitiendo una experiencia de uso profesional.
-- **Se queda donde lo dejas:** Si te mueves, haces zoom o rotas el mapa, GuapoLector **recordará** esa posición exacta.
-- **Lectura perfecta:** Sin importar cuánto gires el mapa, todos los iconos se mantendrán siempre **derechos**.
-- **Agrupamiento Inteligente:** Las gotas de agua ahora calculan su estado al instante.
-    - **Gris**: Zona pendiente.
-    - **Gota gris con número a color**: Ya has empezado a leer en esa zona.
-- **Carga Fluida:** Verás una pantalla de carga elegante con el logo de ASOGUAPO mientras el mapa prepara los puntos.
+- **Navegación Fluida**: Desplácese y haga zoom libremente. **La barra superior se pondrá verde** automáticamente mientras interactúa para indicarle que el mapa está activo.
+- **Info Box No Intrusivo**: Toque un marcador para ver su información en una **tarjeta flotante** en la parte inferior, sin bloquear la vista completa del mapa.
+    - El marcador seleccionado se resaltará con un **anillo verde**.
+    - La tarjeta muestra el nombre y código. Toque la tarjeta para ir al registro.
+- **Estados Claros**:
+    - ⚪ **Círculo Gris**: Pendiente por lectura (unificado con la lista).
+    - 💧 **Verde/Azul**: Lectura completada.
+- **Recordatorio de Posición**: Si sale del mapa, al volver lo encontrará exactamente donde lo dejó (zoom y rotación).
 
 ---
 

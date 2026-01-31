@@ -1,3 +1,14 @@
+## [1.3.1] - 2026-01-31
+### UI/UX Improvements
+- **Lista de Contadores**:
+    - Implementado scrollbar con gradiente dinámico (Verde -> Azul) para mejor feedback visual de progreso.
+- **Mapa Interactivo**:
+    - **Header Reactivo**: La barra superior cambia a color verde al interactuar con el mapa y vuelve a blanco tras 5 segundos de inactividad.
+    - **Info Box Persistente**: Se eliminó el popup modal bloqueante. Ahora la información del contador seleccionado aparece en una tarjeta flotante no intrusiva en la parte inferior.
+    - **Visuales Mejorados**:
+        - Icono de estado "Pendiente" unificado con la lista (Círculo gris vacío).
+        - Anillo de selección alrededor del marcador activo.
+
 ## [1.3.0] - 2026-01-31
 
 ### Mantenimiento General
