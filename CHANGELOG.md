@@ -1,3 +1,8 @@
+## [1.2.5] - 2026-01-30
+
+### Corregido
+- **Carga de Mapas**: Se desactivó temporalmente el sistema de caché de baldosas (tiles) y se reforzaron los permisos de Internet para solucionar problemas de carga en nuevos dispositivos.
+
 ## [1.2.4] - 2026-01-30
 
 ### Mejorado

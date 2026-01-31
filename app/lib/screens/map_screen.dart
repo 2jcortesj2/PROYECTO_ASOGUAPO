@@ -748,9 +748,6 @@ class _MapScreenState extends State<MapScreen> {
                             urlTemplate:
                                 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                             userAgentPackageName: 'com.asoguapo.app',
-                            tileProvider: _cacheStore != null
-                                ? CachedTileProvider(store: _cacheStore!)
-                                : null,
                           ),
                           ValueListenableBuilder<double>(
                             valueListenable: _zoomNotifier,
