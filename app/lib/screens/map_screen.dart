@@ -208,15 +208,16 @@ class _MapScreenState extends State<MapScreen> {
     }).toList();
   }
 
+  double _getMarkerSize(double zoom) {
+    return (30.0 * (zoom / 15.0) * (zoom / 15.0)).clamp(10.0, 250.0);
+  }
+
   Widget _buildMarkerWidget(Contador contador, bool isDone) {
     return ValueListenableBuilder2<double, double>(
       first: _zoomNotifier,
       second: _rotationNotifier,
       builder: (context, zoom, rotation, child) {
-        final double size = (30.0 * (zoom / 15.0) * (zoom / 15.0)).clamp(
-          10.0,
-          250.0,
-        );
+        final double size = _getMarkerSize(zoom);
         return GestureDetector(
           onTap: () => _showContadorDetails(contador),
           child: Transform.rotate(
@@ -744,119 +745,141 @@ class _MapScreenState extends State<MapScreen> {
                                 ? CachedTileProvider(store: _cacheStore!)
                                 : null,
                           ),
-                          MarkerClusterLayerWidget(
-                            options: MarkerClusterLayerOptions(
-                              maxClusterRadius: 30,
-                              size: const Size(45, 45),
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.all(50),
-                              markers: _memoizedMarkers,
-                              builder: (context, markers) {
-                                final contadorMarkers = markers
-                                    .whereType<ContadorMarker>();
-                                final bool allDone =
-                                    contadorMarkers.isNotEmpty &&
-                                    contadorMarkers.every((m) => m.isDone);
-                                final bool anyDone = contadorMarkers.any(
-                                  (m) => m.isDone,
-                                );
-                                const double clusterSize = 50.0;
+                          ValueListenableBuilder<double>(
+                            valueListenable: _zoomNotifier,
+                            builder: (context, zoom, _) {
+                              // Dynamic radius: inversely proportional to zoom
+                              // High zoom (e.g. 18+) -> Near 0 radius
+                              // Low zoom (e.g. 12) -> High radius (e.g. 80)
+                              final dynamicRadius = (150.0 - (zoom * 7.5))
+                                  .clamp(5.0, 100.0);
 
-                                return ValueListenableBuilder<double>(
-                                  valueListenable: _rotationNotifier,
-                                  builder: (context, rotation, _) {
-                                    return Transform.rotate(
-                                      angle: -rotation * math.pi / 180,
-                                      child: SizedBox(
-                                        width: clusterSize,
-                                        height: clusterSize,
-                                        child: Stack(
-                                          children: [
-                                            Center(
-                                              child: Transform.translate(
-                                                offset: Offset(
-                                                  clusterSize * 0.04,
-                                                  clusterSize * 0.04,
-                                                ),
-                                                child: Icon(
-                                                  Icons.water_drop,
-                                                  color: Colors.black
-                                                      .withValues(alpha: 0.3),
-                                                  size: clusterSize * 0.8,
-                                                ),
-                                              ),
-                                            ),
-                                            Center(
-                                              child: Icon(
-                                                Icons.water_drop,
-                                                color: allDone
-                                                    ? AppColors.primary
-                                                    : Colors.grey[400],
-                                                size: clusterSize * 0.8,
-                                              ),
-                                            ),
-                                            Positioned(
-                                              right: 0,
-                                              top: 0,
-                                              child: Container(
-                                                padding: const EdgeInsets.all(
-                                                  4,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  gradient: anyDone
-                                                      ? const LinearGradient(
-                                                          colors: [
-                                                            AppColors.primary,
-                                                            AppColors.secondary,
-                                                          ],
-                                                        )
-                                                      : null,
-                                                  color: anyDone
-                                                      ? null
-                                                      : Colors.grey[500],
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color:
-                                                          (anyDone
-                                                                  ? AppColors
-                                                                        .primary
-                                                                  : Colors
-                                                                        .black)
-                                                              .withValues(
-                                                                alpha: 0.3,
-                                                              ),
-                                                      blurRadius: 6,
-                                                      spreadRadius: 2,
+                              return MarkerClusterLayerWidget(
+                                options: MarkerClusterLayerOptions(
+                                  maxClusterRadius: dynamicRadius,
+                                  size: const Size(120, 120),
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.all(50),
+                                  markers: _memoizedMarkers,
+                                  builder: (context, markers) {
+                                    final contadorMarkers = markers
+                                        .whereType<ContadorMarker>();
+                                    final bool allDone =
+                                        contadorMarkers.isNotEmpty &&
+                                        contadorMarkers.every((m) => m.isDone);
+                                    final bool anyDone = contadorMarkers.any(
+                                      (m) => m.isDone,
+                                    );
+
+                                    return ValueListenableBuilder2<
+                                      double,
+                                      double
+                                    >(
+                                      first: _zoomNotifier,
+                                      second: _rotationNotifier,
+                                      builder: (context, z, rotation, _) {
+                                        final clusterSize =
+                                            _getMarkerSize(z) *
+                                            1.6; // Slightly larger than individual drops
+
+                                        return Transform.rotate(
+                                          angle: -rotation * math.pi / 180,
+                                          child: SizedBox(
+                                            width: clusterSize,
+                                            height: clusterSize,
+                                            child: Stack(
+                                              children: [
+                                                Center(
+                                                  child: Transform.translate(
+                                                    offset: Offset(
+                                                      clusterSize * 0.04,
+                                                      clusterSize * 0.04,
                                                     ),
-                                                  ],
-                                                ),
-                                                constraints:
-                                                    const BoxConstraints(
-                                                      minWidth: 20,
-                                                      minHeight: 20,
-                                                    ),
-                                                child: Center(
-                                                  child: Text(
-                                                    markers.length.toString(),
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                                                    child: Icon(
+                                                      Icons.water_drop,
+                                                      color: Colors.black
+                                                          .withValues(
+                                                            alpha: 0.3,
+                                                          ),
+                                                      size: clusterSize * 0.8,
                                                     ),
                                                   ),
                                                 ),
-                                              ),
+                                                Center(
+                                                  child: Icon(
+                                                    Icons.water_drop,
+                                                    color: allDone
+                                                        ? AppColors.primary
+                                                        : Colors.grey[400],
+                                                    size: clusterSize * 0.8,
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  right: 0,
+                                                  top: 0,
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(4),
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      gradient: anyDone
+                                                          ? const LinearGradient(
+                                                              colors: [
+                                                                AppColors
+                                                                    .primary,
+                                                                AppColors
+                                                                    .secondary,
+                                                              ],
+                                                            )
+                                                          : null,
+                                                      color: anyDone
+                                                          ? null
+                                                          : Colors.grey[500],
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color:
+                                                              (anyDone
+                                                                      ? AppColors
+                                                                            .primary
+                                                                      : Colors
+                                                                            .black)
+                                                                  .withValues(
+                                                                    alpha: 0.3,
+                                                                  ),
+                                                          blurRadius: 6,
+                                                          spreadRadius: 2,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                          minWidth: 20,
+                                                          minHeight: 20,
+                                                        ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        markers.length
+                                                            .toString(),
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      ),
+                                          ),
+                                        );
+                                      },
                                     );
                                   },
-                                );
-                              },
-                            ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
