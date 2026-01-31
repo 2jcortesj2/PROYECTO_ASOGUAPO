@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
@@ -12,7 +13,54 @@ import '../services/map_service.dart';
 import '../config/theme.dart';
 import '../config/constants.dart';
 import 'registro_lectura_screen.dart';
-import '../widgets/info_lectura_widget.dart'; // Ensure this widget exists or is created
+import '../widgets/info_lectura_widget.dart';
+
+/// Custom Marker to hold Contador data for O(1) access in clusters
+class ContadorMarker extends Marker {
+  final Contador contador;
+  final bool isDone;
+
+  ContadorMarker({
+    required super.point,
+    required super.child,
+    required super.width,
+    required super.height,
+    super.rotate,
+    required this.contador,
+    required this.isDone,
+  });
+}
+
+/// Helper for listening to two ValueListenables
+class ValueListenableBuilder2<A, B> extends StatelessWidget {
+  final ValueListenable<A> first;
+  final ValueListenable<B> second;
+  final Widget Function(BuildContext context, A a, B b, Widget? child) builder;
+  final Widget? child;
+
+  const ValueListenableBuilder2({
+    super.key,
+    required this.first,
+    required this.second,
+    required this.builder,
+    this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<A>(
+      valueListenable: first,
+      builder: (context, a, _) {
+        return ValueListenableBuilder<B>(
+          valueListenable: second,
+          builder: (context, b, _) {
+            return builder(context, a, b, child);
+          },
+        );
+      },
+    );
+  }
+}
 
 class MapScreen extends StatefulWidget {
   final String? initialVereda;
@@ -30,14 +78,19 @@ class _MapScreenState extends State<MapScreen> {
   List<Contador> _contadores = [];
   bool _isLoading = true;
   final MapController _mapController = MapController();
-  double _currentZoom = 15.0;
-  double _currentRotation = 270.0;
   CacheStore? _cacheStore;
 
   String _searchQuery = '';
   String _veredaSeleccionada = 'El Tendido';
   bool _ocultarCompletados = false;
   bool _isFirstLoad = true;
+
+  // Granular state for heavy map updates
+  final ValueNotifier<double> _zoomNotifier = ValueNotifier(15.0);
+  final ValueNotifier<double> _rotationNotifier = ValueNotifier(270.0);
+
+  // Memoized markers
+  List<ContadorMarker> _memoizedMarkers = [];
 
   final List<String> _veredas = [
     'El Recreo',
@@ -53,21 +106,21 @@ class _MapScreenState extends State<MapScreen> {
     if (widget.initialVereda != null) {
       _veredaSeleccionada = widget.initialVereda!;
     }
-    _currentZoom = _mapService.lastZoom ?? 15.0;
-    _currentRotation = _mapService.lastRotation ?? 270.0;
+    _zoomNotifier.value = _mapService.lastZoom ?? 15.0;
+    _rotationNotifier.value = _mapService.lastRotation ?? 270.0;
     _loadContadores();
   }
 
   Future<void> _initCache() async {
-    setState(() {
-      _cacheStore = MemCacheStore();
-    });
+    _cacheStore = MemCacheStore();
   }
 
   @override
   void dispose() {
     _cacheStore?.close();
     _searchController.dispose();
+    _zoomNotifier.dispose();
+    _rotationNotifier.dispose();
     super.dispose();
   }
 
@@ -80,6 +133,7 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {
       _contadores = contadoresWithLocation;
       _isLoading = false;
+      _generarMarcadores(); // Build markers once
       // After first load, we can set _isFirstLoad to false after a short delay for the animation
       if (_isFirstLoad) {
         Future.delayed(const Duration(milliseconds: 1500), () {
@@ -89,8 +143,26 @@ class _MapScreenState extends State<MapScreen> {
     });
 
     if (_contadores.isNotEmpty) {
+      // Re-center on first load if needed
       _actualizarMapa();
     }
+  }
+
+  List<Contador> get _contadoresFiltrados {
+    return _contadores.where((c) {
+      if (_veredaSeleccionada != 'Todas' &&
+          c.vereda.toUpperCase() != _veredaSeleccionada.toUpperCase()) {
+        return false;
+      }
+      if (_ocultarCompletados && c.estado == EstadoContador.registrado)
+        return false;
+
+      if (_searchQuery.isEmpty) return true;
+
+      final query = _searchQuery.toLowerCase();
+      return c.nombre.toLowerCase().contains(query) ||
+          c.id.toLowerCase().contains(query);
+    }).toList();
   }
 
   void _actualizarMapa() {
@@ -111,32 +183,90 @@ class _MapScreenState extends State<MapScreen> {
     final bounds = LatLngBounds.fromPoints(points);
 
     Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
       _mapController.fitCamera(
-        CameraFit.bounds(
-          bounds: bounds,
-          padding: const EdgeInsets.symmetric(horizontal: 400, vertical: 300),
-        ),
+        CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)),
       );
     });
   }
 
-  List<Contador> get _contadoresFiltrados {
-    final filtrados = _contadores.where((c) {
-      if (_veredaSeleccionada != 'Todas' &&
-          c.vereda.toUpperCase() != _veredaSeleccionada.toUpperCase()) {
-        return false;
-      }
-      if (_ocultarCompletados && c.estado == EstadoContador.registrado)
-        return false;
+  void _generarMarcadores() {
+    final filtrados = _contadoresFiltrados;
 
-      if (_searchQuery.isEmpty) return true;
+    _memoizedMarkers = filtrados.map((contador) {
+      final isDone = contador.estado == EstadoContador.registrado;
 
-      final query = _searchQuery.toLowerCase();
-      return c.nombre.toLowerCase().contains(query) ||
-          c.id.toLowerCase().contains(query);
+      return ContadorMarker(
+        point: LatLng(contador.latitud!, contador.longitud!),
+        width: 250, // Large enough to prevent clipping at high zoom
+        height: 250,
+        rotate: false,
+        contador: contador,
+        isDone: isDone,
+        child: _buildMarkerWidget(contador, isDone),
+      );
     }).toList();
+  }
 
-    return filtrados;
+  Widget _buildMarkerWidget(Contador contador, bool isDone) {
+    return ValueListenableBuilder2<double, double>(
+      first: _zoomNotifier,
+      second: _rotationNotifier,
+      builder: (context, zoom, rotation, child) {
+        final double size = (30.0 * (zoom / 15.0) * (zoom / 15.0)).clamp(
+          10.0,
+          250.0,
+        );
+        return GestureDetector(
+          onTap: () => _showContadorDetails(contador),
+          child: Transform.rotate(
+            angle: -rotation * math.pi / 180,
+            child: Stack(
+              children: [
+                Center(
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      // Sombra (Shadow)
+                      Transform.translate(
+                        offset: Offset(size * 0.05, size * 0.05),
+                        child: Icon(
+                          Icons.water_drop,
+                          color: Colors.black.withValues(alpha: 0.35),
+                          size: size,
+                        ),
+                      ),
+                      // Icono Principal
+                      isDone
+                          ? ShaderMask(
+                              shaderCallback: (bounds) => const LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.secondary,
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ).createShader(bounds),
+                              child: Icon(
+                                Icons.water_drop,
+                                color: Colors.white,
+                                size: size,
+                              ),
+                            )
+                          : Icon(
+                              Icons.water_drop,
+                              color: Colors.grey[400],
+                              size: size,
+                            ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _showContadorDetails(Contador contador) async {
@@ -420,6 +550,7 @@ class _MapScreenState extends State<MapScreen> {
       onTap: () {
         setState(() {
           _veredaSeleccionada = vereda;
+          _generarMarcadores(); // Re-generate markers when filter changes
         });
         if (vereda == 'El Tendido') {
           _actualizarMapa();
@@ -509,7 +640,12 @@ class _MapScreenState extends State<MapScreen> {
                       )
                     : null,
               ),
-              onChanged: (value) => setState(() => _searchQuery = value),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                  _generarMarcadores();
+                });
+              },
             ),
           ),
 
@@ -537,7 +673,7 @@ class _MapScreenState extends State<MapScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${_contadoresFiltrados.length} contadores',
+                  '${_memoizedMarkers.length} contadores',
                   style: AppTextStyles.cuerpoSecundario,
                 ),
                 Row(
@@ -551,8 +687,12 @@ class _MapScreenState extends State<MapScreen> {
                     const SizedBox(width: 8),
                     Switch(
                       value: _ocultarCompletados,
-                      onChanged: (value) =>
-                          setState(() => _ocultarCompletados = value),
+                      onChanged: (value) {
+                        setState(() {
+                          _ocultarCompletados = value;
+                          _generarMarcadores();
+                        });
+                      },
                       activeTrackColor: AppColors.primary.withOpacity(0.5),
                       activeThumbColor: AppColors.primary,
                     ),
@@ -580,15 +720,13 @@ class _MapScreenState extends State<MapScreen> {
                           minZoom: 12,
                           maxZoom: 21,
                           onPositionChanged: (position, hasGesture) {
-                            setState(() {
-                              final camera = _mapController.camera;
-                              _currentZoom = camera.zoom;
-                              _currentRotation = camera.rotation;
-                              // Persist the state in the service
-                              _mapService.lastZoom = camera.zoom;
-                              _mapService.lastCenter = camera.center;
-                              _mapService.lastRotation = camera.rotation;
-                            });
+                            final camera = _mapController.camera;
+                            _zoomNotifier.value = camera.zoom;
+                            _rotationNotifier.value = camera.rotation;
+                            // Persist the state in the service
+                            _mapService.lastZoom = camera.zoom;
+                            _mapService.lastCenter = camera.center;
+                            _mapService.lastRotation = camera.rotation;
                           },
                           interactionOptions: const InteractionOptions(
                             flags: InteractiveFlag.all,
@@ -612,197 +750,110 @@ class _MapScreenState extends State<MapScreen> {
                               size: const Size(45, 45),
                               alignment: Alignment.center,
                               padding: const EdgeInsets.all(50),
-                              markers: _contadoresFiltrados.map((contador) {
-                                final isDone =
-                                    contador.estado ==
-                                    EstadoContador.registrado;
-                                final double size =
-                                    (30 *
-                                            (_currentZoom / 15) *
-                                            (_currentZoom / 15))
-                                        .clamp(10.0, 250.0);
+                              markers: _memoizedMarkers,
+                              builder: (context, markers) {
+                                final contadorMarkers = markers
+                                    .whereType<ContadorMarker>();
+                                final bool allDone =
+                                    contadorMarkers.isNotEmpty &&
+                                    contadorMarkers.every((m) => m.isDone);
+                                final bool anyDone = contadorMarkers.any(
+                                  (m) => m.isDone,
+                                );
+                                const double clusterSize = 50.0;
 
-                                return Marker(
-                                  point: LatLng(
-                                    contador.latitud!,
-                                    contador.longitud!,
-                                  ),
-                                  width: size,
-                                  height: size,
-                                  rotate:
-                                      false, // Keep vertical icons upright relative to the screen
-                                  child: GestureDetector(
-                                    onTap: () => _showContadorDetails(contador),
-                                    child: Transform.rotate(
-                                      angle: -_currentRotation * math.pi / 180,
-                                      child: Stack(
-                                        children: [
-                                          Positioned(
-                                            left: size * 0.05,
-                                            top: size * 0.05,
-                                            child: Icon(
-                                              Icons.water_drop,
-                                              color: Colors.black.withValues(
-                                                alpha: 0.35,
+                                return ValueListenableBuilder<double>(
+                                  valueListenable: _rotationNotifier,
+                                  builder: (context, rotation, _) {
+                                    return Transform.rotate(
+                                      angle: -rotation * math.pi / 180,
+                                      child: SizedBox(
+                                        width: clusterSize,
+                                        height: clusterSize,
+                                        child: Stack(
+                                          children: [
+                                            Center(
+                                              child: Transform.translate(
+                                                offset: Offset(
+                                                  clusterSize * 0.04,
+                                                  clusterSize * 0.04,
+                                                ),
+                                                child: Icon(
+                                                  Icons.water_drop,
+                                                  color: Colors.black
+                                                      .withValues(alpha: 0.3),
+                                                  size: clusterSize * 0.8,
+                                                ),
                                               ),
-                                              size: size,
                                             ),
-                                          ),
-                                          Center(
-                                            child: isDone
-                                                ? ShaderMask(
-                                                    shaderCallback: (bounds) =>
-                                                        const LinearGradient(
+                                            Center(
+                                              child: Icon(
+                                                Icons.water_drop,
+                                                color: allDone
+                                                    ? AppColors.primary
+                                                    : Colors.grey[400],
+                                                size: clusterSize * 0.8,
+                                              ),
+                                            ),
+                                            Positioned(
+                                              right: 0,
+                                              top: 0,
+                                              child: Container(
+                                                padding: const EdgeInsets.all(
+                                                  4,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  gradient: anyDone
+                                                      ? const LinearGradient(
                                                           colors: [
                                                             AppColors.primary,
                                                             AppColors.secondary,
                                                           ],
-                                                          begin: Alignment
-                                                              .topCenter,
-                                                          end: Alignment
-                                                              .bottomCenter,
-                                                        ).createShader(bounds),
-                                                    child: Icon(
-                                                      Icons.water_drop,
-                                                      color: Colors.white,
-                                                      size: size,
+                                                        )
+                                                      : null,
+                                                  color: anyDone
+                                                      ? null
+                                                      : Colors.grey[500],
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color:
+                                                          (anyDone
+                                                                  ? AppColors
+                                                                        .primary
+                                                                  : Colors
+                                                                        .black)
+                                                              .withValues(
+                                                                alpha: 0.3,
+                                                              ),
+                                                      blurRadius: 6,
+                                                      spreadRadius: 2,
                                                     ),
-                                                  )
-                                                : Icon(
-                                                    Icons.water_drop,
-                                                    color: Colors.grey[400],
-                                                    size: size,
+                                                  ],
+                                                ),
+                                                constraints:
+                                                    const BoxConstraints(
+                                                      minWidth: 20,
+                                                      minHeight: 20,
+                                                    ),
+                                                child: Center(
+                                                  child: Text(
+                                                    markers.length.toString(),
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
                                                   ),
-                                          ),
-                                        ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              builder: (context, markers) {
-                                // Check if any marker in the cluster is completed
-                                // This requires accessing the custom data of the markers
-                                // markers is a List<Marker>
-                                // Since we can't easily store the Contador in the Marker object directly without a wrapper
-                                // we'll assume the markers provided here are the ones we created in the markers: ... map()
-                                // However, Marker doesn't have a 'key' or 'data' field by default.
-                                // To solve this correctly, we should look at how we generate markers.
-                                // For now, let's create a logic that checks if the cluster should be 'done'
-                                // based on the presence of any marker that would have been green.
-                                // ACTUALLY, we can filter our _contadores list where it matches the marker points.
-                                // But that's slow. A better way is to pass the state in the Marker Key or use a custom Marker class.
-                                // For simplicity, I will use a heuristic or check the _contadores list.
-
-                                final clusterPoints = markers
-                                    .map((m) => m.point)
-                                    .toSet();
-                                final clusterContadores = _contadoresFiltrados
-                                    .where(
-                                      (c) => clusterPoints.contains(
-                                        LatLng(c.latitud!, c.longitud!),
-                                      ),
-                                    )
-                                    .toList();
-
-                                final bool allDone =
-                                    clusterContadores.length > 0 &&
-                                    clusterContadores.every(
-                                      (c) =>
-                                          c.estado == EstadoContador.registrado,
                                     );
-                                final bool anyDone = clusterContadores.any(
-                                  (c) => c.estado == EstadoContador.registrado,
-                                );
-                                const double clusterSize = 50.0;
-
-                                return Transform.rotate(
-                                  angle: -_currentRotation * math.pi / 180,
-                                  child: SizedBox(
-                                    width: clusterSize,
-                                    height: clusterSize,
-                                    child: Stack(
-                                      children: [
-                                        // Sombra para la Gota Maestra
-                                        Center(
-                                          child: Transform.translate(
-                                            offset: Offset(
-                                              clusterSize * 0.04,
-                                              clusterSize * 0.04,
-                                            ),
-                                            child: Icon(
-                                              Icons.water_drop,
-                                              color: Colors.black.withValues(
-                                                alpha: 0.3,
-                                              ),
-                                              size: clusterSize * 0.8,
-                                            ),
-                                          ),
-                                        ),
-                                        // The main Water Drop icon
-                                        // Colors completely ONLY if all are done.
-                                        Center(
-                                          child: Icon(
-                                            Icons.water_drop,
-                                            color: allDone
-                                                ? AppColors.primary
-                                                : Colors.grey[400],
-                                            size: clusterSize * 0.8,
-                                          ),
-                                        ),
-                                        // The Notification Globito (the badge)
-                                        Positioned(
-                                          right: 0,
-                                          top: 0,
-                                          child: Container(
-                                            padding: const EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              gradient: anyDone
-                                                  ? const LinearGradient(
-                                                      colors: [
-                                                        AppColors.primary,
-                                                        AppColors.secondary,
-                                                      ],
-                                                    )
-                                                  : null,
-                                              color: anyDone
-                                                  ? null
-                                                  : Colors.grey[500],
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color:
-                                                      (anyDone
-                                                              ? AppColors
-                                                                    .primary
-                                                              : Colors.black)
-                                                          .withValues(
-                                                            alpha: 0.3,
-                                                          ),
-                                                  blurRadius: 6,
-                                                  spreadRadius: 2,
-                                                ),
-                                              ],
-                                            ),
-                                            constraints: const BoxConstraints(
-                                              minWidth: 20,
-                                              minHeight: 20,
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                markers.length.toString(),
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                  },
                                 );
                               },
                             ),

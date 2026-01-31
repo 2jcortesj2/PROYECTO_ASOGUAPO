@@ -1,18 +1,18 @@
-# GuapoLector 💧 v1.0.1
+# GuapoLector 💧 v1.2.0
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.x-blue.svg)](https://dart.dev/)
 [![SQLite](https://img.shields.io/badge/SQLite-3.x-green.svg)](https://sqlite.org/)
 [![Platform](https://img.shields.io/badge/Platform-Android-orange.svg)](https://android.com/)
 
-**AguaLector** es una solución móvil diseñada específicamente para la gestión eficiente del registro de lecturas de contadores de agua potable en comunidades rurales y administraciones locales de acueducto (ASOGUAPO).
+**GuapoLector** is a professional mobile solution designed for efficient water meter reading management in rural communities and local water administrations (ASOGUAPO).
 
-## 🚀 Misión del Proyecto
-Digitalizar y agilizar el proceso de toma de lecturas en campo, eliminando el uso de papel, reduciendo errores humanos y garantizando la trazabilidad mediante pruebas fotográficas y geolocalización.
+## 🚀 Mission
+Digitalize the field reading process, ensuring traceability through photographic evidence, GPS geolocation, and high-performance interactive mapping.
 
 ---
 
-## 🎯 Estado Actual: Piloto Fase 2 - Despliegue Total (v0.9.0)
+## 🎯 Current Status: Production Release (v1.2.0)
 
 Esta versión consolida la madurez de la aplicación tras múltiples ciclos de retroalimentación, habilitando el despliegue para la totalidad de suscriptores y añadiendo flexibilidad para casos excepcionales de lectura.
 

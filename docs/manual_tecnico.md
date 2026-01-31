@@ -58,7 +58,7 @@ app/
 └── pubspec.lock
 ```
 
-> En la versión **v0.5.5**, se ha introducido la lógica de ventana de edición de 15 días y auto-limpieza de fotos. Para la exportación (v0.5.4), se utiliza `compute` (Isolates) para mover la compresión ZIP a un hilo separado, evitando bloqueos en la UI. Todas las exportaciones se consolidan en un único archivo ZIP para mayor compatibilidad con apps de mensajería (WhatsApp).
+> En la versión **v1.2.0**, se implementó una optimización masiva del motor de mapas, introduciendo lógica de clustering $O(1)$ y desacoplamiento de estado mediante `ValueNotifiers`, garantizando fluidez de 60fps constantes. Se mantiene la lógica de ventana de edición de 15 días y auto-limpieza de fotos instaurada anteriormente.
 
 ---
 
@@ -307,13 +307,13 @@ El APK se genera en: `build/app/outputs/flutter-apk/app-release.apk`
 
 ---
 
-## Sistema de Mapa Premium (v1.1.0)
+## Sistema de Mapa de Alto Rendimiento (v1.2.0)
 
-El módulo de mapas ha sido rediseñado para ofrecer una experiencia profesional:
+El módulo de mapas ha sido optimizado para máximo rendimiento:
 
+- **Motor O(1):** Uso de `ContadorMarker` para acceso directo a estados en el builder de clusters.
+- **Desacoplamiento Reactivo:** Implementación de `ValueNotifiers` y `ValueListenableBuilder` para aislar los repintados de la cámara (zoom/rotation) del resto de la aplicación.
 - **Persistencia de Estado:** Singleton en `MapService` que almacena `lastCenter`, `lastZoom` y `lastRotation`.
-- **Verticalidad Total:** Lógica de contra-rotación manual con `Transform.rotate` (`-camera.rotation`).
-- **Clustering:** Radio de `30px`, iconografía de gota corporativa y badges de progreso vinculados al estado de los contadores.
 - **Caché:** Integración de `flutter_map_cache` con `MemCacheStore`.
 
 ### Arquitectura y Flujo de Datos

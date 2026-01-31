@@ -1,6 +1,10 @@
-# Changelog
+## [1.2.0] - 2026-01-30
 
-Todas las versiones importantes y cambios realizados en el proyecto AguaLector.
+### Optimización de Alto Rendimiento
+- **Motor de Marcadores O(1):** Rediseño total de la lógica de clustering para acceso instantáneo a datos, eliminando retrasos en mapas con alta densidad de puntos.
+- **UI Ultra-Fluida:** Integración de `ValueNotifiers` para desacoplar el movimiento del mapa (zoom/rotación) del ciclo de vida del widget principal, logrando 60fps constantes.
+- **Memoización Inteligente:** Los marcadores ahora se generan una única vez y se reutilizan, reduciendo drásticamente la carga sobre el procesador.
+- **Corrección de Visualización:** Se solucionó el error de recorte (clipping) en iconos individuales al usar niveles de zoom extremos.
 
 ## [1.1.0] - 2026-01-30
 
