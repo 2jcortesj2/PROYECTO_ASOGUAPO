@@ -1,3 +1,8 @@
+## [1.2.7] - 2026-01-30
+
+### Mejorado
+- **Splash Nativo**: El splash screen nativo de Android ahora muestra fondo blanco consistente (sin importar el modo oscuro) y el logo coincide con el splash de Flutter para una transición visual perfecta.
+
 ## [1.2.6] - 2026-01-30
 
 ### Corregido
