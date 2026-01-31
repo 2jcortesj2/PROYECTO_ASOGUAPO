@@ -31,6 +31,7 @@ class _MapScreenState extends State<MapScreen> {
   bool _isLoading = true;
   final MapController _mapController = MapController();
   double _currentZoom = 15.0;
+  double _currentRotation = 270.0;
   CacheStore? _cacheStore;
 
   String _searchQuery = '';
@@ -52,6 +53,8 @@ class _MapScreenState extends State<MapScreen> {
     if (widget.initialVereda != null) {
       _veredaSeleccionada = widget.initialVereda!;
     }
+    _currentZoom = _mapService.lastZoom ?? 15.0;
+    _currentRotation = _mapService.lastRotation ?? 270.0;
     _loadContadores();
   }
 
@@ -580,6 +583,7 @@ class _MapScreenState extends State<MapScreen> {
                             setState(() {
                               final camera = _mapController.camera;
                               _currentZoom = camera.zoom;
+                              _currentRotation = camera.rotation;
                               // Persist the state in the service
                               _mapService.lastZoom = camera.zoom;
                               _mapService.lastCenter = camera.center;
@@ -630,10 +634,7 @@ class _MapScreenState extends State<MapScreen> {
                                   child: GestureDetector(
                                     onTap: () => _showContadorDetails(contador),
                                     child: Transform.rotate(
-                                      angle:
-                                          -_mapController.camera.rotation *
-                                          math.pi /
-                                          180,
+                                      angle: -_currentRotation * math.pi / 180,
                                       child: Stack(
                                         children: [
                                           Positioned(
@@ -715,11 +716,8 @@ class _MapScreenState extends State<MapScreen> {
                                 );
                                 const double clusterSize = 50.0;
 
-                                // Counter-rotate to stay upright
-                                final rotation = _mapController.camera.rotation;
-
                                 return Transform.rotate(
-                                  angle: -rotation * math.pi / 180,
+                                  angle: -_currentRotation * math.pi / 180,
                                   child: SizedBox(
                                     width: clusterSize,
                                     height: clusterSize,
