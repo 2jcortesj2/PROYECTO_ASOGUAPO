@@ -294,21 +294,21 @@ class _MapScreenState extends State<MapScreen> {
     final isDone = contador.estado == EstadoContador.registrado;
 
     return Positioned(
-      bottom: 20,
-      left: 20,
-      right: 20,
+      bottom: 0,
+      left: 0,
+      right: 0,
       child: GestureDetector(
         onTap: () => _handleInfoBoxTap(contador),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+                blurRadius: 20,
+                offset: const Offset(0, -2),
               ),
             ],
           ),
@@ -540,18 +540,18 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
-        backgroundColor: _isInteracting ? AppColors.primary : Colors.white,
+        backgroundColor: _isInteracting
+            ? AppColors.primary.withValues(alpha: 0.1)
+            : Colors.white,
         surfaceTintColor: Colors.transparent,
         // Animate color transition
-        iconTheme: IconThemeData(
-          color: _isInteracting ? Colors.white : Colors.black87,
-        ),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
         title: Column(
           children: [
             Text(
               'Lectura en Mapa',
               style: AppTextStyles.titulo.copyWith(
-                color: _isInteracting ? Colors.white : AppColors.textPrimary,
+                color: AppColors.textPrimary,
               ),
             ),
             Text(
@@ -565,7 +565,7 @@ class _MapScreenState extends State<MapScreen> {
             icon: const Icon(Icons.list_alt),
             onPressed: () => Navigator.pop(context, _veredaSeleccionada),
             tooltip: 'Ver Lista',
-            color: _isInteracting ? Colors.white : AppColors.textPrimary,
+            color: AppColors.textPrimary,
           ),
         ],
       ),

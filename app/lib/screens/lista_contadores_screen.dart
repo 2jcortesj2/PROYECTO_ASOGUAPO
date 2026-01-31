@@ -36,28 +36,15 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
   List<Contador> _contadores = [];
   bool _cargando = true;
   bool _ocultarCompletados = false;
-  double _scrollProgress = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_updateScrollProgress);
     // Usar vereda inicial si se proporciona
     if (widget.veredaInicial != null) {
       _veredaSeleccionada = widget.veredaInicial!;
     }
     _cargarContadores();
-  }
-
-  void _updateScrollProgress() {
-    if (!_scrollController.hasClients) return;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.position.pixels;
-    if (maxScroll > 0) {
-      setState(() {
-        _scrollProgress = (currentScroll / maxScroll).clamp(0.0, 1.0);
-      });
-    }
   }
 
   Future<void> _cargarContadores() async {
@@ -72,8 +59,6 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
       setState(() {
         _contadores = contadores;
         _cargando = false;
-        // Reset process after load
-        _scrollProgress = 0.0;
       });
     }
   }
@@ -159,7 +144,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.primary.withValues(alpha: 0.08),
         surfaceTintColor: Colors.transparent,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -287,13 +272,7 @@ class _ListaContadoresScreenState extends State<ListaContadoresScreen> {
                   ? _buildEmptyState()
                   : RawScrollbar(
                       controller: _scrollController,
-                      thumbColor:
-                          Color.lerp(
-                            AppColors.primary,
-                            AppColors.secondary,
-                            _scrollProgress,
-                          ) ??
-                          AppColors.primary,
+                      thumbColor: AppColors.primary.withValues(alpha: 0.6),
                       radius: const Radius.circular(10),
                       thickness: 4,
                       fadeDuration: const Duration(milliseconds: 500),
